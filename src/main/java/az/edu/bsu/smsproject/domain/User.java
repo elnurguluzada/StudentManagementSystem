@@ -1,8 +1,6 @@
 package az.edu.bsu.smsproject.domain;
 
-import java.beans.PersistenceDelegate;
 import java.io.Serializable;
-import java.time.Period;
 import java.util.Objects;
 
 public abstract class User extends BaseDomain implements Serializable, Comparable<User> {
@@ -16,7 +14,8 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     protected String faculty;
     protected char gender;
 
-    public User(long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
+    public User(long id, String name, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
+        super(id, name);
         this.roleId = roleId;
         this.surname = surname;
         this.email = email;
@@ -27,6 +26,57 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     }
 
     public User() {
+    }
+
+    //TODO make sure
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
+
+        User user;
+        if (obj instanceof User) {
+            user = (User) obj;
+            return this.id == user.getId() &&
+                    this.name.equals(user.getName()) &&
+                    this.surname.equals(user.getSurname()) &&
+                    this.email.equals(user.getEmail());
+        } else
+            return false;
+
+    }
+
+    //TODO make sure
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "roleId=" + roleId +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", faculty='" + faculty + '\'' +
+                ", gender=" + gender +
+                '}';
+    }
+
+    @Override
+    public int compareTo(User o) {
+        if (this.id != o.getId())
+            return (int) (this.id - o.getId());
+        else {
+            if (!this.name.equals(o.getName()))
+                return this.name.compareTo(o.getName());
+            else
+                return this.surname.compareTo(o.getSurname());
+        }
     }
 
     public long getRoleId() {
@@ -83,58 +133,6 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
 
     public void setGender(char gender) {
         this.gender = gender;
-    }
-
-    //TODO make sure
-    @Override
-    public boolean equals(Object obj) {
-        if ( this == obj )
-            return true;
-        if ( obj==null || obj.getClass() != this.getClass() )
-            return false;
-
-        User user;
-        if ( obj instanceof User ) {
-            user = (User) obj;
-            return  this.id == user.getId() &&
-                    this.name.equals(user.getName()) &&
-                    this.surname.equals(user.getSurname()) &&
-                    this.email.equals(user.getEmail());
-        }
-        else
-            return false;
-
-    }
-
-    //TODO make sure
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, email);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "roleId=" + roleId +
-                ", surname='" + surname + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", faculty='" + faculty + '\'' +
-                ", gender=" + gender +
-                '}';
-    }
-
-    @Override
-    public int compareTo(User o) {
-        if ( this.id != o.getId() )
-            return (int) (this.id - o.getId());
-        else {
-            if ( !this.name.equals( o.getName() ) )
-                return this.name.compareTo( o.getName() );
-            else
-                return this.surname.compareTo( o.getSurname() );
-        }
     }
 
 }
