@@ -1,17 +1,18 @@
 package az.edu.bsu.smsproject.domain;
 
+import az.edu.bsu.smsproject.domain.Enums.Status;
+
 import java.io.Serializable;
 
 public class Role extends BaseDomain implements Serializable {
     private static final long serialVersionUID = -3201383828144212802L;
 
-    private String status;
+
     private String defaultController;
     private String defaultPage;
 
-    public Role(long id, String name, String status, String defaultController, String defaultPage) {
-        super(id, name);
-        this.status = status;
+    public Role(long id, String name, Status status, String defaultController, String defaultPage) {
+        super(id, name, status);
         this.defaultController = defaultController;
         this.defaultPage = defaultPage;
     }
@@ -55,5 +56,4 @@ public class Role extends BaseDomain implements Serializable {
     public void setDefaultPage(String defaultPage) {
         this.defaultPage = defaultPage;
     }
-
 }
