@@ -23,11 +23,22 @@ public class Role extends BaseDomain implements Serializable {
     @Override
     public String toString() {
         return "Role{" +
+                "status='" + status + '\'' +
                 ", defaultController='" + defaultController + '\'' +
                 ", defaultPage='" + defaultPage + '\'' +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    //TODO make sure there is no need to override equals, hashCode and compareTo methods
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDefaultController() {
