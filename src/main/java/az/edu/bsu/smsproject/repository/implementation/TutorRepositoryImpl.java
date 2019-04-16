@@ -2,16 +2,21 @@ package az.edu.bsu.smsproject.repository.implementation;
 
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.RoleRepository;
+import az.edu.bsu.smsproject.repository.SQLqueries;
 import az.edu.bsu.smsproject.repository.TutorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 
 @Repository
 public class TutorRepositoryImpl implements TutorRepository {
@@ -35,11 +40,82 @@ public class TutorRepositoryImpl implements TutorRepository {
 
     }
 
+    @Override
+    public List<Student> getStudentList() {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
+
+                (((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setId(resultSet.getLong("user_id"));
+                    student.setName(resultSet.getString("name"));
+                    student.setSurname(resultSet.getString("surname"));
+                    return student;
+              }))
+
+              );
+
+        return studentList;
+    }
+
+
+
+    @Override
+    public List<Student> getStudentInfo(long studentId) {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
+                (((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setName( resultSet.getString("name") );
+                    student.setSurname(resultSet.getString("surname"));
+                    student.setFaculty(resultSet.getString("faculty"));
+                    student.setFatherName(resultSet.getString("father_name"));
+                    student.setGender(resultSet.getString("gender").charAt(0));
+                    student.setProfession(resultSet.getString("profession"));
+                    student.setSection(resultSet.getString("section"));
+                    student.setGroup(resultSet.getString("group"));
+                    student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
+                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+                    student.setBirthPlace(resultSet.getString("birth_place"));
+                    student.setEducationType(resultSet.getString("education_type"));
+                    return student;
+
+                }))
+                ,new Object[]{studentId} );
+
+        return studentList;
+    }
+
+
+
+    private class StudentMapper implements RowMapper<Student> {
+
+        @Override
+        public Student mapRow(ResultSet resultSet, int i) throws SQLException {
+            Student student = new Student();
+            student.setName( resultSet.getString("name") );
+            student.setSurname(resultSet.getString("surname"));
+            student.setFaculty(resultSet.getString("faculty"));
+            student.setFatherName(resultSet.getString("father_name"));
+            student.setGender(resultSet.getString("gender").charAt(0));
+            student.setProfession(resultSet.getString("profession"));
+            student.setSection(resultSet.getString("section"));
+            student.setGroup(resultSet.getString("group"));
+            student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
+            student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+            student.setBirthPlace(resultSet.getString("birth_place"));
+            student.setEducationType(resultSet.getString("education_type"));
+            return student;
+        }
+    }
+
+    //???????????????????????????????????????????????????
     private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
 
         String sql = "INSERT INTO bdu_user(user_id, role_id, name, surname, email, password, phone_num, faculty, gender) " +
                 "values(nextval('user_sequence'), "+ roleIdOfStudent +", ?, ?, ?, ?, ?, ?, ?)";
+
 
 
         PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(sql, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR);

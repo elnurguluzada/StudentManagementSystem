@@ -1,5 +1,7 @@
 package az.edu.bsu.smsproject.domain;
 
+import az.edu.bsu.smsproject.domain.Enums.Status;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,8 +16,18 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     protected String faculty;
     protected char gender;
 
-    public User(long id, String name, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
-        super(id, name);
+    public User(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
+        super(id, name, status);
+        this.roleId = roleId;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.faculty = faculty;
+        this.gender = gender;
+    }
+
+    public User(long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
         this.roleId = roleId;
         this.surname = surname;
         this.email = email;

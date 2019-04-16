@@ -33,11 +33,11 @@ public class Role extends BaseDomain implements Serializable {
 
     //TODO make sure there is no need to override equals, hashCode and compareTo methods
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
