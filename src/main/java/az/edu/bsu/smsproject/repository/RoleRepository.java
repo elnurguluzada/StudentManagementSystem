@@ -7,4 +7,5 @@ public interface RoleRepository {
 
     public int getRoleIdByName( String name );
 
+
 }

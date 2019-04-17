@@ -36,7 +36,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     public int getRoleIdByName(String name) {
 
         return jdbcTemplate.query( SQLqueries.GET_ROLE_ID_BY_ROLE_NAME,
-                ((resultSet, i) -> resultSet.getInt("student")),
+                ((resultSet, i) -> resultSet.getInt("id")),
                 name).get(0);
 
     }
