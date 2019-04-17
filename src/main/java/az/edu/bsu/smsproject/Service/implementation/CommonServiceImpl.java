@@ -11,13 +11,11 @@ import java.util.List;
 @Service
 public class CommonServiceImpl implements CommonService {
 
-    private final JdbcTemplate jdbcTemplate;
     private final CommonRepository commonRepository;
 
     @Autowired
-    public CommonServiceImpl(CommonRepository commonRepository, JdbcTemplate jdbcTemplate) {
+    public CommonServiceImpl(CommonRepository commonRepository) {
         this.commonRepository = commonRepository;
-        this.jdbcTemplate = jdbcTemplate;
     }
 
 

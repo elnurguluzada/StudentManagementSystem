@@ -15,5 +15,11 @@ public class SQLqueries {
 
     public static String GET_ROLE_ID_BY_ROLE_NAME = "SELECT id FROM role WHERE name = ?";
 
-    public static String GET_SECTION_LIST_BY_YEAR = "SELECT section FROM groups WHERE year = ?";
+    public static String GET_STUDENT_INFO_BY_ID = " select u.name, u.surname, u.faculty , s.father_name , u.gender , s.profession, s.section , " +
+            " s.group , s.education_year,  s.birth_date , s.birth_place, s.education_type " +
+            " from bdu_user u inner join student s on u.user_id = s.user_id  " +
+            " where u.user_id = ? ";
+
+    public static String GET_STUDENT_LIST = " SELECT user_id , name , surname FROM bdu_user WHERE role_id = 1 ";
+    public static String GET_SECTION_LIST_BY_YEAR = "SELECT DISTINCT section FROM groups WHERE year = ?";
 }
