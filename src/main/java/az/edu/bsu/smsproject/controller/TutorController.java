@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -50,15 +52,6 @@ public class TutorController {
         return "redirect:/addStudent";
     }
 
-    public List<String> getSections(
-            @RequestParam(name = "selectedYear") int year
-    ){
-        List<String> sectionList = commonService.getSectionList( year );
-
-        return sectionList;
-    }
-
-
     @GetMapping("/getStudentInfo")
     public ModelAndView showStudentInfo(@RequestParam(name = "id") long id){
         ModelAndView modelAndView = new ModelAndView("student-info");
@@ -66,14 +59,24 @@ public class TutorController {
         return modelAndView;
     }
 
+    @PostMapping("/getSectionList")
+    public List<String> getSections( @RequestParam(name = "selectedYear") int year ) {
+        List<String> list = commonService.getSectionList(year);
+        System.out.println(list);
+        return list;
+    }
 
     @GetMapping("/getStudents")
-    public ModelAndView showStudents() {
+    public ModelAndView showStudentList() {
         ModelAndView modelAndView = new ModelAndView("studentList");
-        modelAndView.addObject("students", tutorService.getStudentList());
+        List<Student> list = tutorService.getStudentList();
+        modelAndView.addObject("students", list);
         return modelAndView;
     }
 
+    public List<String> getFaculties( @RequestParam(name = "selectedYear") int year ){
+            return commonService.getFacultyList( year );
+    }
 
 
 

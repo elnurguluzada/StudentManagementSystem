@@ -137,13 +137,12 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     private int insertIntoStudentTable( Student student, long userId ){
-        String sql = "insert into student(" +
-                "+user_id, id_card_num, id_card_fin_code, father_name, birth_date, birth_place, living_place, official_home, social_status_id, parent_num, " +
+        String sql = "insert into student( " +
+                "user_id, id_card_num, id_card_fin_code, father_name, birth_date, birth_place, living_place, official_home, social_status_id, parent_num, " +
                 "graduation_region, graduation_school, entry_id_num, entry_score, education_type, profession, section, group, education_year, scholarship_status) " +
                 "values( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  )";
 
-        return jdbcTemplate.update( sql, new Object[]{
-                userId,
+        return jdbcTemplate.update( sql, userId,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
                 student.getFatherName(),
@@ -162,8 +161,7 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getSection(),
                 student.getGroup(),
                 student.getEntryYear(),
-                student.getScholarshipStatus()
-        } );
+                student.getScholarshipStatus());
 
     }
 
