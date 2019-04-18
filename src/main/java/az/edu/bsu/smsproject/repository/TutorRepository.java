@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TutorRepository {
     public boolean addStudent( Student student );
-    public List<Student> getStudentInfo(long studentId);
+    public List<Student> getStudentById(long studentId);
     public List<Student> getStudentList();
 
 }

@@ -40,52 +40,6 @@ public class TutorRepositoryImpl implements TutorRepository {
 
     }
 
-    @Override
-    public List<Student> getStudentList() {
-
-        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
-
-                (((resultSet, i) -> {
-                    Student student = new Student();
-                    student.setId(resultSet.getLong("user_id"));
-                    student.setName(resultSet.getString("name"));
-                    student.setSurname(resultSet.getString("surname"));
-                    return student;
-              }))
-
-              );
-
-        return studentList;
-    }
-
-
-
-    @Override
-    public List<Student> getStudentInfo(long studentId) {
-
-        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
-                (((resultSet, i) -> {
-                    Student student = new Student();
-                    student.setName( resultSet.getString("name") );
-                    student.setSurname(resultSet.getString("surname"));
-                    student.setFaculty(resultSet.getString("faculty"));
-                    student.setFatherName(resultSet.getString("father_name"));
-                    student.setGender(resultSet.getString("gender").charAt(0));
-                    student.setProfession(resultSet.getString("profession"));
-                    student.setSection(resultSet.getString("section"));
-                    student.setGroup(resultSet.getString("group"));
-                    student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
-                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
-                    student.setBirthPlace(resultSet.getString("birth_place"));
-                    student.setEducationType(resultSet.getString("education_type"));
-                    return student;
-
-                }))
-                ,new Object[]{studentId} );
-
-        return studentList;
-    }
-
 
 
     private class StudentMapper implements RowMapper<Student> {
@@ -167,6 +121,56 @@ public class TutorRepositoryImpl implements TutorRepository {
 
     }
 
+    public int getNumberOfStudents(){
+        String sql = "";
 
+        return jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getInt("count(*)") )).get(0);
+    }
+
+
+    @Override
+    public List<Student> getStudentList() {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
+
+                ((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setId(resultSet.getLong("user_id"));
+                    student.setName(resultSet.getString("name"));
+                    student.setSurname(resultSet.getString("surname"));
+                    return student;
+                })
+
+        );
+
+        return studentList;
+    }
+
+    @Override
+    public List<Student> getStudentById(long studentId) {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
+                (((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setName( resultSet.getString("name") );
+                    student.setSurname(resultSet.getString("surname"));
+                    student.setFaculty(resultSet.getString("faculty"));
+                    student.setFatherName(resultSet.getString("father_name"));
+                    student.setGender(resultSet.getString("gender").charAt(0));
+                    student.setProfession(resultSet.getString("profession"));
+                    student.setSection(resultSet.getString("section"));
+                    student.setGroup(resultSet.getString("group"));
+                    student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
+                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+                    student.setBirthPlace(resultSet.getString("birth_place"));
+                    student.setEducationType(resultSet.getString("education_type"));
+                    return student;
+
+                }))
+                ,new Object[]{studentId} );
+
+        return studentList;
+    }
 
 }

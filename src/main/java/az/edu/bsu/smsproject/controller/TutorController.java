@@ -3,7 +3,10 @@ package az.edu.bsu.smsproject.controller;
 import az.edu.bsu.smsproject.Service.CommonService;
 import az.edu.bsu.smsproject.Service.StudentService;
 import az.edu.bsu.smsproject.Service.TutorService;
+import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Student;
+import com.google.gson.Gson;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -11,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -21,7 +23,7 @@ public class TutorController {
     private final CommonService commonService;
     private final StudentService studentService;
     private final TutorService tutorService;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 
     @Autowired
     public TutorController(StudentService studentService, TutorService tutorService, CommonService commonService) {
@@ -58,23 +60,66 @@ public class TutorController {
         return sectionList;
     }
 
+//      Elnur
+//    @GetMapping("/getStudents")
+//    public ModelAndView showStudents() {
+//        ModelAndView modelAndView = new ModelAndView("studentList");
+//        modelAndView.addObject("students", tutorService.getStudentList());
+//        return modelAndView;
+//    }
 
     @GetMapping("/getStudentInfo")
     public ModelAndView showStudentInfo(@RequestParam(name = "id") long id){
         ModelAndView modelAndView = new ModelAndView("student-info");
-        modelAndView.addObject("student" , tutorService.getStudentInfoById(id));
+        modelAndView.addObject("student" , tutorService.getStudentById(id));
         return modelAndView;
+    }
+
+    @GetMapping("/getStudentsForm")
+    public String getStudentsForm(){
+        return "studentList";
     }
 
 
     @GetMapping("/getStudents")
-    public ModelAndView showStudents() {
-        ModelAndView modelAndView = new ModelAndView("studentList");
-        modelAndView.addObject("students", tutorService.getStudentList());
+    public ModelAndView showStudents(
+            @RequestParam(name = "draw") int draw,
+            @RequestParam(name = "start") int start,
+            @RequestParam(name = "length") int length,
+            @RequestParam(name = "search[value]") String searchValue
+    ) {
+        System.out.println(draw);
+        System.out.println(start);
+        System.out.println(length);
+        System.out.println(searchValue);
+        DataTable dataTable = new DataTable();
+
+        dataTable.setDraw(draw);
+
+        List<Student> allStudents = tutorService.getStudentList();
+        dataTable.setRecordsTotal( allStudents.size() );
+
+        dataTable.setRecordsFiltered( allStudents.size() );
+
+        String[][] data = new String[length][3];
+        for (int i=0; i<length; i++){
+            data[i][0] = String.valueOf(allStudents.get(i).getId());
+            data[i][1] = allStudents.get(i).getName();
+            data[i][2] = allStudents.get(i).getSurname();
+        }
+
+        dataTable.setData( data );
+
+
+        Gson gson = new Gson();
+        String dataTableJson =gson.toJson(dataTable);
+
+        System.out.println(dataTableJson);
+
+        ModelAndView modelAndView = new ModelAndView("ajaxReceiver");
+        modelAndView.addObject("dataTable", dataTableJson);
         return modelAndView;
     }
-
-
 
 
 }

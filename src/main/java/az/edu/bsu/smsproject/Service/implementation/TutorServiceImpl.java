@@ -25,8 +25,8 @@ public class TutorServiceImpl implements TutorService {
     }
 
     @Override
-    public List<Student> getStudentInfoById(long id) {
-        return tutorRepository.getStudentInfo(id);
+    public List<Student> getStudentById(long id) {
+        return tutorRepository.getStudentById(id);
     }
 
     @Override
