@@ -8,6 +8,16 @@ public class DataTable {
     private int recordsFiltered;
     private String[][] data;
 
+    public DataTable(int draw, int recordsTotal, int recordsFiltered, String[][] data) {
+        this.draw = draw;
+        this.recordsTotal = recordsTotal;
+        this.recordsFiltered = recordsFiltered;
+        this.data = data;
+    }
+
+    public DataTable() {
+    }
+
     @Override
     public String toString() {
         return "DataTable{" +

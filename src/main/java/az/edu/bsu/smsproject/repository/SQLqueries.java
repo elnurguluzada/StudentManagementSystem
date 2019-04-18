@@ -20,6 +20,9 @@ public class SQLqueries {
             " from bdu_user u inner join student s on u.user_id = s.user_id  " +
             " where u.user_id = ? ";
 
-    public static String GET_STUDENT_LIST = " SELECT user_id , name , surname FROM bdu_user WHERE role_id = 1 ";
+    public static String GET_STUDENT_LIST = "SELECT * FROM bdu_user bu JOIN student s ON bu.user_id = s.user_id";
+
     public static String GET_SECTION_LIST_BY_YEAR = "SELECT DISTINCT section FROM groups WHERE year = ?";
+
+    public static String GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID = "SELECT ss.id FROM student s JOIN social_status ss ON s.social_status_id = ss.id where s.user_id = ?";
 }

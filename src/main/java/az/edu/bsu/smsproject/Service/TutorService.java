@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TutorService {
     public boolean addStudent( Student student );
-    List<Student> getStudentById(long id);
-    List<Student> getStudentList();
+    public Student getStudentById(long studentId);
+    public List<Student> getStudentList();
 
 }

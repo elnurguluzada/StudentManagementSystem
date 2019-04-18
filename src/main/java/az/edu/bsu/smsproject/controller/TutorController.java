@@ -60,12 +60,8 @@ public class TutorController {
         return modelAndView;
     }
 
-    @PostMapping("/getSectionList")
-    public List<String> getSections( @RequestParam(name = "selectedYear") int year ){
-        List<String> list = commonService.getSectionList( year );
-        System.out.println(list);
-        return list;
-    @GetMapping("/getStudentsForm")
+
+    @GetMapping("/getStudentsList")
     public String getStudentsForm(){
         return "studentList";
     }
@@ -85,17 +81,45 @@ public class TutorController {
         DataTable dataTable = new DataTable();
 
         dataTable.setDraw(draw);
-
+        System.out.println("Before");
         List<Student> allStudents = tutorService.getStudentList();
+        System.out.println("After");
         dataTable.setRecordsTotal( allStudents.size() );
 
         dataTable.setRecordsFiltered( allStudents.size() );
-
-        String[][] data = new String[length][3];
+        String[][] data = new String[length][25];
         for (int i=0; i<length; i++){
             data[i][0] = String.valueOf(allStudents.get(i).getId());
             data[i][1] = allStudents.get(i).getName();
             data[i][2] = allStudents.get(i).getSurname();
+            data[i][3] = allStudents.get(i).getFatherName();
+            data[i][4] = allStudents.get(i).getBirthDate().toString();
+            data[i][5] = allStudents.get(i).getBirthPlace();
+            data[i][6] = allStudents.get(i).getLivingPlace();
+            data[i][7] = allStudents.get(i).getOfficialHome();
+            data[i][8] = allStudents.get(i).getEmail();
+            data[i][9] = allStudents.get(i).getPhoneNumber();
+            data[i][10] = allStudents.get(i).getParentPhoneNumber();
+            data[i][11] = String.valueOf(allStudents.get(i).getEntryYear());
+            data[i][12] = allStudents.get(i).getGraduatedRegion();
+            data[i][13] = allStudents.get(i).getGraduatedRegion();
+            data[i][14] = String.valueOf(allStudents.get(i).getEntryIdNumber());
+            data[i][15] = String.valueOf(allStudents.get(i).getEntryScore());
+            data[i][16] = allStudents.get(i).getSection();
+            data[i][17] = allStudents.get(i).getFaculty();
+            data[i][18] = allStudents.get(i).getProfession();
+            data[i][19] = allStudents.get(i).getGroup();
+            data[i][20] = allStudents.get(i).getEducationType();
+//            data[i][10] = allStudents.get(i).getEducationYear;
+            data[i][21] = allStudents.get(i).getIdCardNumber();
+            data[i][22] = allStudents.get(i).getIdCardFinCode();
+            data[i][23] = String.valueOf(allStudents.get(i).getGender());
+            data[i][24] = allStudents.get(i).getSocialStatusSet().toString();
+
+
+            /*
+            <%--todo scholarship status--%>
+             */
         }
 
         dataTable.setData( data );
