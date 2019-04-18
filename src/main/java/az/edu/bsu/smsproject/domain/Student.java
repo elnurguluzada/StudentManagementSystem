@@ -65,7 +65,7 @@ public class Student extends User implements Serializable {
     private String educationType;
     private boolean presidentialScholarship;            // true -> prezident teqaudcusu
     private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
-    private int entryYear;
+    private LocalDate entryYear;
     private String profession;
     private String section;
     private String group;
@@ -273,11 +273,11 @@ public class Student extends User implements Serializable {
         this.dovletSifarisli = dovletSifarisli;
     }
 
-    public int getEntryYear() {
+    public LocalDate getEntryYear() {
         return entryYear;
     }
 
-    public void setEntryYear(int entryYear) {
+    public void setEntryYear(LocalDate entryYear) {
         this.entryYear = entryYear;
     }
 

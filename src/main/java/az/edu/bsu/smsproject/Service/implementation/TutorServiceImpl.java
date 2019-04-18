@@ -6,6 +6,8 @@ import az.edu.bsu.smsproject.repository.TutorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TutorServiceImpl implements TutorService {
 
@@ -21,4 +23,16 @@ public class TutorServiceImpl implements TutorService {
     public boolean addStudent(Student student) {
         return tutorRepository.addStudent( student );
     }
+
+    @Override
+    public List<Student> getStudentInfoById(long id) {
+        return tutorRepository.getStudentInfo(id);
+    }
+
+    @Override
+    public List<Student> getStudentList() {
+        return  tutorRepository.getStudentList();
+    }
+
+
 }
