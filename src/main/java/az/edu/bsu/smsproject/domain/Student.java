@@ -6,38 +6,62 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Student extends User implements Serializable {
     private static final long serialVersionUID = 3743824363989869865L;
 
+    //    fatherName
     private String fatherName;
-    @Past
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    @NotNull(message = "birth date is required")
+
+    //    birthDate
+    @Past(message = "That student hasn't been born yet") @DateTimeFormat(pattern = "dd/MM/yyyy") @NotNull(message = "birth date is required")
     private LocalDate birthDate;
+
+    //    birthPlace
     @NotBlank(message = "Birth place is required")
     private String birthPlace;
+
+    //  livingPlace
     @NotBlank(message = "Living place is required")
     private String livingPlace;
+
+    //    officialHome
     @NotBlank(message = "Official home address is required")
     private String officialHome;
 
+    //    idCardNumber
     @Digits(integer = 8, fraction = 0, message = "Invalid Id card number")
     private String idCardNumber;
-//  @Pattern(regexp = "")         //todo learn regular expression
+
+    //    idCardFinCode     todo learn regular expression
     private String idCardFinCode;
 
-    private String socialStatusId;
+    //    parentPhoneNumber
     @Digits(integer = 10, fraction = 0, message = "Invalid telephone number")
     private String parentPhoneNumber;
+
+    //    graduatedRegion
     @NotBlank(message = "Graduated region id required")
     private String graduatedRegion;
+
+    //    graduatedSchool
     @NotBlank(message = "Graduated school id required")
     private String graduatedSchool;
 
-    //todo compete missing @Patterns
+    //    entryIdNumber todo compete missing @Patterns
     private int entryIdNumber;
+
+    //    entryScore
     private int entryScore;
+
+    //    socialStatusSet
+    Set<Integer> socialStatusSet;
+
+    //    educationType
     private String educationType;
     private boolean presidentialScholarship;            // true -> prezident teqaudcusu
     private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
@@ -48,7 +72,7 @@ public class Student extends User implements Serializable {
     private int scholarshipStatus;
 
 
-    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, String socialStatusId, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, LocalDate entryYear, String profession, String section, String group, int scholarshipStatus) {
+    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, String group, int scholarshipStatus) {
         super(id, name, status, roleId, surname, email, password, phoneNumber, faculty, gender);
         this.fatherName = fatherName;
         this.birthDate = birthDate;
@@ -57,61 +81,12 @@ public class Student extends User implements Serializable {
         this.officialHome = officialHome;
         this.idCardNumber = idCardNumber;
         this.idCardFinCode = idCardFinCode;
-        this.socialStatusId = socialStatusId;
         this.parentPhoneNumber = parentPhoneNumber;
         this.graduatedRegion = graduatedRegion;
         this.graduatedSchool = graduatedSchool;
         this.entryIdNumber = entryIdNumber;
         this.entryScore = entryScore;
-        this.educationType = educationType;
-        this.presidentialScholarship = presidentialScholarship;
-        this.dovletSifarisli = dovletSifarisli;
-        this.entryYear = entryYear;
-        this.profession = profession;
-        this.section = section;
-        this.group = group;
-        this.scholarshipStatus = scholarshipStatus;
-    }
-
-    public Student(long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, String socialStatusId, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, LocalDate entryYear, String profession, String section, String group, int scholarshipStatus) {
-        super(roleId, surname, email, password, phoneNumber, faculty, gender);
-        this.fatherName = fatherName;
-        this.birthDate = birthDate;
-        this.birthPlace = birthPlace;
-        this.livingPlace = livingPlace;
-        this.officialHome = officialHome;
-        this.idCardNumber = idCardNumber;
-        this.idCardFinCode = idCardFinCode;
-        this.socialStatusId = socialStatusId;
-        this.parentPhoneNumber = parentPhoneNumber;
-        this.graduatedRegion = graduatedRegion;
-        this.graduatedSchool = graduatedSchool;
-        this.entryIdNumber = entryIdNumber;
-        this.entryScore = entryScore;
-        this.educationType = educationType;
-        this.presidentialScholarship = presidentialScholarship;
-        this.dovletSifarisli = dovletSifarisli;
-        this.entryYear = entryYear;
-        this.profession = profession;
-        this.section = section;
-        this.group = group;
-        this.scholarshipStatus = scholarshipStatus;
-    }
-
-    public Student(String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, String socialStatusId, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, LocalDate entryYear, String profession, String section, String group, int scholarshipStatus) {
-        this.fatherName = fatherName;
-        this.birthDate = birthDate;
-        this.birthPlace = birthPlace;
-        this.livingPlace = livingPlace;
-        this.officialHome = officialHome;
-        this.idCardNumber = idCardNumber;
-        this.idCardFinCode = idCardFinCode;
-        this.socialStatusId = socialStatusId;
-        this.parentPhoneNumber = parentPhoneNumber;
-        this.graduatedRegion = graduatedRegion;
-        this.graduatedSchool = graduatedSchool;
-        this.entryIdNumber = entryIdNumber;
-        this.entryScore = entryScore;
+        this.socialStatusSet = socialStatusSet;
         this.educationType = educationType;
         this.presidentialScholarship = presidentialScholarship;
         this.dovletSifarisli = dovletSifarisli;
@@ -123,11 +98,37 @@ public class Student extends User implements Serializable {
     }
 
     public Student() {
+        this.fatherName = "";
+        this.birthPlace = "";
+        this.livingPlace = "";
+        this.officialHome = "";
+        this.idCardNumber = "";
+        this.idCardFinCode = "";
+        this.parentPhoneNumber = "";
+        this.graduatedRegion = "";
+        this.graduatedSchool = "";
+        this.socialStatusSet = new HashSet<>();
+        this.educationType = "";
+        this.presidentialScholarship = false;
+        this.dovletSifarisli = false;
+        this.profession = "";
+        this.section = "";
+        this.group = "";
     }
 
     @Override
     public String toString() {
         return "Student{" +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", roleId=" + roleId +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", faculty='" + faculty + '\'' +
+                ", gender=" + gender +
                 "fatherName='" + fatherName + '\'' +
                 ", birthDate=" + birthDate +
                 ", birthPlace='" + birthPlace + '\'' +
@@ -135,12 +136,12 @@ public class Student extends User implements Serializable {
                 ", officialHome='" + officialHome + '\'' +
                 ", idCardNumber='" + idCardNumber + '\'' +
                 ", idCardFinCode='" + idCardFinCode + '\'' +
-                ", socialStatusId='" + socialStatusId + '\'' +
                 ", parentPhoneNumber='" + parentPhoneNumber + '\'' +
                 ", graduatedRegion='" + graduatedRegion + '\'' +
                 ", graduatedSchool='" + graduatedSchool + '\'' +
                 ", entryIdNumber=" + entryIdNumber +
                 ", entryScore=" + entryScore +
+                ", socialStatusSet=" + socialStatusSet +
                 ", educationType='" + educationType + '\'' +
                 ", presidentialScholarship=" + presidentialScholarship +
                 ", dovletSifarisli=" + dovletSifarisli +
@@ -206,14 +207,6 @@ public class Student extends User implements Serializable {
 
     public void setIdCardFinCode(String idCardFinCode) {
         this.idCardFinCode = idCardFinCode;
-    }
-
-    public String getSocialStatusId() {
-        return socialStatusId;
-    }
-
-    public void setSocialStatusId(String socialStatusId) {
-        this.socialStatusId = socialStatusId;
     }
 
     public String getParentPhoneNumber() {
@@ -318,5 +311,13 @@ public class Student extends User implements Serializable {
 
     public void setScholarshipStatus(int scholarshipStatus) {
         this.scholarshipStatus = scholarshipStatus;
+    }
+
+    public Set<Integer> getSocialStatusSet() {
+        return socialStatusSet;
+    }
+
+    public void setSocialStatusSet(Set<Integer> socialStatusSet) {
+        this.socialStatusSet = socialStatusSet;
     }
 }
