@@ -36,8 +36,54 @@ public class TutorRepositoryImpl implements TutorRepository {
         long userId = insertIntoUserTable( student );
         student.setId( userId );
 
-        return insertIntoStudentTable(student, userId) == 1;
+        return insertIntoStudentTable(student, userId) == 1 &&
+                insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size();
+    }
 
+    @Override
+    public List<Student> getStudentList() {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
+
+                (((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setId(resultSet.getLong("user_id"));
+                    student.setName(resultSet.getString("name"));
+                    student.setSurname(resultSet.getString("surname"));
+                    return student;
+              }))
+
+              );
+
+        return studentList;
+    }
+
+
+
+    @Override
+    public List<Student> getStudentInfo(long studentId) {
+
+        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
+                (((resultSet, i) -> {
+                    Student student = new Student();
+                    student.setName( resultSet.getString("name") );
+                    student.setSurname(resultSet.getString("surname"));
+                    student.setFaculty(resultSet.getString("faculty"));
+                    student.setFatherName(resultSet.getString("father_name"));
+                    student.setGender(resultSet.getString("gender").charAt(0));
+                    student.setProfession(resultSet.getString("profession"));
+                    student.setSection(resultSet.getString("section"));
+                    student.setGroup(resultSet.getString("group"));
+                    student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
+                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+                    student.setBirthPlace(resultSet.getString("birth_place"));
+                    student.setEducationType(resultSet.getString("education_type"));
+                    return student;
+
+                }))
+                ,new Object[]{studentId} );
+
+        return studentList;
     }
 
 
@@ -66,13 +112,12 @@ public class TutorRepositoryImpl implements TutorRepository {
     //???????????????????????????????????????????????????
     private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
-
         String sql = "INSERT INTO bdu_user(user_id, role_id, name, surname, email, password, phone_num, faculty, gender) " +
                 "values(nextval('user_sequence'), "+ roleIdOfStudent +", ?, ?, ?, ?, ?, ?, ?)";
 
 
-
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(sql, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(sql, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        factory.setReturnGeneratedKeys(true);
         PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
                 student.getName(),
                 student.getSurname(),
@@ -86,17 +131,16 @@ public class TutorRepositoryImpl implements TutorRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update( creator, keyHolder );
-        long userId = keyHolder.getKey().longValue();
+        long userId = (long) keyHolder.getKeyList().get(0).get("user_id");
         return userId;
     }
 
     private int insertIntoStudentTable( Student student, long userId ){
-        String sql = "insert into student(" +
-                "+user_id, id_card_num, id_card_fin_code, father_name, birth_date, birth_place, living_place, official_home, social_status_id, parent_num, " +
-                "graduation_region, graduation_school, entry_id_num, entry_score, education_type, profession, section, group, education_year, scholarship_status) " +
-                "values( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  )";
+        String sql = "insert into student(user_id, id_card_num, id_card_fin_code, father_name, birth_date, birth_place, living_place, official_home, parent_num, " +
+                "graduation_region, graduation_school, entry_id_num, entry_score, education_type, profession, section, bsu_group, education_year, scholarship_status) " +
+                "values( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-        return jdbcTemplate.update( sql, new Object[]{
+        return jdbcTemplate.update( sql,
                 userId,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -105,7 +149,6 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getBirthPlace(),
                 student.getLivingPlace(),
                 student.getOfficialHome(),
-                student.getSocialStatusId(),
                 student.getParentPhoneNumber(),
                 student.getGraduatedRegion(),
                 student.getGraduatedSchool(),
@@ -116,11 +159,16 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getSection(),
                 student.getGroup(),
                 student.getEntryYear(),
-                student.getScholarshipStatus()
-        } );
+                student.getScholarshipStatus());
 
     }
 
+    private int insertIntoStudentSocialStatusTable( Student student ){
+        String sql = "insert into student_social_status(id, user_id, social_status_id) values(nextval('student_social_status_sequence'), ?, ?)";
+        int numOfInserts = 0;
+        for (int socialStatusId: student.getSocialStatusSet()){
+            numOfInserts += jdbcTemplate.update( sql, student.getId(), socialStatusId );
+        }
     public int getNumberOfStudents(){
         String sql = "";
 
@@ -144,6 +192,8 @@ public class TutorRepositoryImpl implements TutorRepository {
 
         );
 
+        return numOfInserts;
+    }
         return studentList;
     }
 

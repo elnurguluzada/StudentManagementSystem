@@ -12,8 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -26,55 +30,41 @@ public class TutorController {
 
 
     @Autowired
-    public TutorController(StudentService studentService, TutorService tutorService, CommonService commonService) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
     }
 
-    @GetMapping("/addStudent")
+    @GetMapping("/addStudentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("/Tutor/addStudent");
         modelAndView.addObject("student", new Student());
         return modelAndView;
     }
 
-
     @PostMapping("/addStudent")
-    public String addStudent(@Valid @ModelAttribute("student") Student student, Errors errors){
-        if ( errors.hasErrors() ){
-            System.out.println("There are errors");
-            return "Tutor/addStudent";
+    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
+
+        ModelAndView modelAndView = new ModelAndView("Tutor/addStudent");
+
+        System.out.println( student );
+
+        if ( !errors.hasErrors() ){
+
+            if ( tutorService.addStudent( student ) )
+                modelAndView.addObject("success", true);
+            else
+                modelAndView.addObject("success", false);
         }
-        System.out.println("No errors");
-        System.out.println(student);
-
-        return "redirect:/addStudent";
-    }
-
-    public List<String> getSections(
-            @RequestParam(name = "selectedYear") int year
-    ){
-        List<String> sectionList = commonService.getSectionList( year );
-
-        return sectionList;
-    }
-
-//      Elnur
-//    @GetMapping("/getStudents")
-//    public ModelAndView showStudents() {
-//        ModelAndView modelAndView = new ModelAndView("studentList");
-//        modelAndView.addObject("students", tutorService.getStudentList());
-//        return modelAndView;
-//    }
-
-    @GetMapping("/getStudentInfo")
-    public ModelAndView showStudentInfo(@RequestParam(name = "id") long id){
-        ModelAndView modelAndView = new ModelAndView("student-info");
-        modelAndView.addObject("student" , tutorService.getStudentById(id));
         return modelAndView;
     }
 
+    @PostMapping("/getSectionList")
+    public List<String> getSections( @RequestParam(name = "selectedYear") int year ){
+        List<String> list = commonService.getSectionList( year );
+        System.out.println(list);
+        return list;
     @GetMapping("/getStudentsForm")
     public String getStudentsForm(){
         return "studentList";

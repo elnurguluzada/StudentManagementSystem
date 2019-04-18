@@ -2,6 +2,7 @@ package az.edu.bsu.smsproject.domain;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 //todo is @Data or @Entity annotation needed for domain classes
@@ -9,7 +10,10 @@ public class BaseDomain implements Serializable {
     private static final long serialVersionUID = 4521808119054728114L;
 
     protected long id;
+
+    @NotBlank(message = "Name is required")
     protected String name;
+
     protected Status status;
 
     public BaseDomain(long id, String name, Status status) {
