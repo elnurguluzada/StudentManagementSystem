@@ -8,43 +8,42 @@
 <body>
 
         <%--These columns are hidden when the table is initialisez first time: 5 6 7 10 11 12 13 14 20 21 22 23 24--%>
-        Id: <input type="checkbox" id="id" onclick="toggleColumn(this, 0)" checked/> <br/>
-        Name: <input type="checkbox" id="name" onclick="toggleColumn(this, 1)" checked/> <br/>
-        Surname: <input type="checkbox" id="surname" onclick="toggleColumn(this, 2)" checked/> <br/>
-        Father name: <input type="checkbox"  onclick="toggleColumn(this, 3)" checked/> <br/>
-        Birth Date: <input type="checkbox"  onclick="toggleColumn(this, 4)" checked/> <br/>
+        <%--id of checkboxes refer to column numbers--%>
+        Id: <input type="checkbox" id="0" onclick="toggleColumn(this)" checked/> <br/>
+        Name: <input type="checkbox" id="1" onclick="toggleColumn(this)" checked/> <br/>
+        Surname: <input type="checkbox" id="2" onclick="toggleColumn(this)" checked/> <br/>
+        Father name: <input type="checkbox" id="3" onclick="toggleColumn(this)" checked/> <br/>
+        Birth Date: <input type="checkbox" id="4" onclick="toggleColumn(this)" checked/> <br/>
 
-        Birth place: <input type="checkbox"  onclick="toggleColumn(this, 5)" /> <br/>
-        Living place: <input type="checkbox"  onclick="toggleColumn(this, 6)" /> <br/>
-        Official address: <input type="checkbox"  onclick="toggleColumn(this, 7)" /> <br/>
-        Email: <input type="checkbox"  onclick="toggleColumn(this, 8)" checked/> <br/>
-        Phone number: <input type="checkbox"  onclick="toggleColumn(this, 9)" checked/> <br/>
+        Birth place: <input type="checkbox" id="5" onclick="toggleColumn(this)" /> <br/>
+        Living place: <input type="checkbox" id="6" onclick="toggleColumn(this)" /> <br/>
+        Official address: <input type="checkbox" id="7" onclick="toggleColumn(this)" /> <br/>
+        Email: <input type="checkbox" id="8" onclick="toggleColumn(this)" checked/> <br/>
+        Phone number: <input type="checkbox" id="9" onclick="toggleColumn(this)" checked/> <br/>
 
-        Parents phone number: <input type="checkbox"  onclick="toggleColumn(this, 10)" /> <br/>
-        Entry year: <input type="checkbox"  onclick="toggleColumn(this, 11)" /> <br/>
-        Graduation region: <input type="checkbox"  onclick="toggleColumn(this, 12)" /> <br/>
-        Graduation school: <input type="checkbox"  onclick="toggleColumn(this, 13)" /> <br/>
-        Entry ID number: <input type="checkbox"  onclick="toggleColumn(this, 14)" /> <br/>
+        Parents phone number: <input type="checkbox" id="10" onclick="toggleColumn(this)" /> <br/>
+        Entry year: <input type="checkbox" id="11" onclick="toggleColumn(this)" /> <br/>
+        Graduation region: <input type="checkbox" id="12" onclick="toggleColumn(this)" /> <br/>
+        Graduation school: <input type="checkbox" id="13" onclick="toggleColumn(this)" /> <br/>
+        Entry ID number: <input type="checkbox" id="14" onclick="toggleColumn(this)" /> <br/>
 
-        Entry score: <input type="checkbox"  onclick="toggleColumn(this, 15)" checked/> <br/>
-        Section: <input type="checkbox"  onclick="toggleColumn(this, 16)" checked/> <br/>
-        Faculty: <input type="checkbox"  onclick="toggleColumn(this, 17)" checked/> <br/>
-        Profession: <input type="checkbox"  onclick="toggleColumn(this, 18)" checked/> <br/>
-        Group: <input type="checkbox"  onclick="toggleColumn(this, 19)" checked/> <br/>
+        Entry score: <input type="checkbox" id="15" onclick="toggleColumn(this)" checked/> <br/>
+        Section: <input type="checkbox" id="16" onclick="toggleColumn(this)" checked/> <br/>
+        Faculty: <input type="checkbox" id="17" onclick="toggleColumn(this)" checked/> <br/>
+        Profession: <input type="checkbox" id="18" onclick="toggleColumn(this)" checked/> <br/>
+        Group: <input type="checkbox" id="19" onclick="toggleColumn(this)" checked/> <br/>
 
-        Education type: <input type="checkbox"  onclick="toggleColumn(this, 20)" /> <br/>
-        Id card number: <input type="checkbox"  onclick="toggleColumn(this, 21)" /> <br/>
-        Id card Fin code: <input type="checkbox"  onclick="toggleColumn(this, 22)" /> <br/>
-        Gender: <input type="checkbox"  onclick="toggleColumn(this, 23)" /> <br/>
-        Social Status: <input type="checkbox"  onclick="toggleColumn(this, 24)" /> <br/>
+        Education type: <input type="checkbox" id="20" onclick="toggleColumn(this)" /> <br/>
+        Id card number: <input type="checkbox" id="21" onclick="toggleColumn(this)" /> <br/>
+        Id card Fin code: <input type="checkbox" id="22" onclick="toggleColumn(this)" /> <br/>
+        Gender: <input type="checkbox" id="23" onclick="toggleColumn(this)" /> <br/>
+        Social Status: <input type="checkbox" id="24" onclick="toggleColumn(this)" /> <br/>
 
+        <br/>
+        <br/>
+        <br/>
 
-    <form>
-
-
-    </form>
-
-    <table id="student-list-table" class="display" style="width: 100%" > <!--display is a class in the imported dataTables.min.css-->
+        <table id="student-list-table" class="display" style="width: 100%" > <!--display is a class in the imported dataTables.min.css-->
         <thead>
         <tr>
             <th>Id</th> <!--0-->
@@ -209,8 +208,8 @@
 
         }
 
-        function toggleColumn( element, columnNum ) {
-            myTable.column(columnNum).visible( element.checked );
+        function toggleColumn( element ) {
+            myTable.column(element.getAttribute("id")).visible( element.checked );
         }
 
     </script>

@@ -34,5 +34,15 @@ public class TutorServiceImpl implements TutorService {
         return  tutorRepository.getStudentList();
     }
 
+    @Override
+    public List<Student> getFilteredStudentList(String searchValue) {
+        return tutorRepository.getFilteredStudentList(searchValue);
+    }
+
+    @Override
+    public int getNumberOfAllStudents() {
+        return tutorRepository.getNumberOfAllStudents();
+    }
+
 
 }

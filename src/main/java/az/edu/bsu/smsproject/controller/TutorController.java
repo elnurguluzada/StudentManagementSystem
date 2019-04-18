@@ -13,11 +13,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import javax.validation.Valid;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -81,49 +77,52 @@ public class TutorController {
         DataTable dataTable = new DataTable();
 
         dataTable.setDraw(draw);
-        System.out.println("Before");
-        List<Student> allStudents = tutorService.getStudentList();
-        System.out.println("After");
-        dataTable.setRecordsTotal( allStudents.size() );
 
-        dataTable.setRecordsFiltered( allStudents.size() );
+//        List<Student> allStudents = tutorService.getStudentList();
+        int numberOfAllStudents = tutorService.getNumberOfAllStudents();
+        dataTable.setRecordsTotal( numberOfAllStudents );
+
+        List<Student > filteredStudentList = tutorService.getFilteredStudentList( searchValue );
+        int numberOfFilteredStudents = filteredStudentList.size();
+        dataTable.setRecordsFiltered( numberOfFilteredStudents );
+
+        if ( draw * length > numberOfFilteredStudents )
+            length = numberOfFilteredStudents % length;
+
         String[][] data = new String[length][25];
         for (int i=0; i<length; i++){
-            data[i][0] = String.valueOf(allStudents.get(i).getId());
-            data[i][1] = allStudents.get(i).getName();
-            data[i][2] = allStudents.get(i).getSurname();
-            data[i][3] = allStudents.get(i).getFatherName();
-            data[i][4] = allStudents.get(i).getBirthDate().toString();
-            data[i][5] = allStudents.get(i).getBirthPlace();
-            data[i][6] = allStudents.get(i).getLivingPlace();
-            data[i][7] = allStudents.get(i).getOfficialHome();
-            data[i][8] = allStudents.get(i).getEmail();
-            data[i][9] = allStudents.get(i).getPhoneNumber();
-            data[i][10] = allStudents.get(i).getParentPhoneNumber();
-            data[i][11] = String.valueOf(allStudents.get(i).getEntryYear());
-            data[i][12] = allStudents.get(i).getGraduatedRegion();
-            data[i][13] = allStudents.get(i).getGraduatedRegion();
-            data[i][14] = String.valueOf(allStudents.get(i).getEntryIdNumber());
-            data[i][15] = String.valueOf(allStudents.get(i).getEntryScore());
-            data[i][16] = allStudents.get(i).getSection();
-            data[i][17] = allStudents.get(i).getFaculty();
-            data[i][18] = allStudents.get(i).getProfession();
-            data[i][19] = allStudents.get(i).getGroup();
-            data[i][20] = allStudents.get(i).getEducationType();
-//            data[i][10] = allStudents.get(i).getEducationYear;
-            data[i][21] = allStudents.get(i).getIdCardNumber();
-            data[i][22] = allStudents.get(i).getIdCardFinCode();
-            data[i][23] = String.valueOf(allStudents.get(i).getGender());
-            data[i][24] = allStudents.get(i).getSocialStatusSet().toString();
-
+            data[i][0] = String.valueOf(filteredStudentList.get(i).getId());
+            data[i][1] = filteredStudentList.get(i).getName();
+            data[i][2] = filteredStudentList.get(i).getSurname();
+            data[i][3] = filteredStudentList.get(i).getFatherName();
+            data[i][4] = filteredStudentList.get(i).getBirthDate().toString();
+            data[i][5] = filteredStudentList.get(i).getBirthPlace();
+            data[i][6] = filteredStudentList.get(i).getLivingPlace();
+            data[i][7] = filteredStudentList.get(i).getOfficialHome();
+            data[i][8] = filteredStudentList.get(i).getEmail();
+            data[i][9] = filteredStudentList.get(i).getPhoneNumber();
+            data[i][10] = filteredStudentList.get(i).getParentPhoneNumber();
+            data[i][11] = String.valueOf(filteredStudentList.get(i).getEntryYear());
+            data[i][12] = filteredStudentList.get(i).getGraduatedRegion();
+            data[i][13] = filteredStudentList.get(i).getGraduatedRegion();
+            data[i][14] = String.valueOf(filteredStudentList.get(i).getEntryIdNumber());
+            data[i][15] = String.valueOf(filteredStudentList.get(i).getEntryScore());
+            data[i][16] = filteredStudentList.get(i).getSection();
+            data[i][17] = filteredStudentList.get(i).getFaculty();
+            data[i][18] = filteredStudentList.get(i).getProfession();
+            data[i][19] = filteredStudentList.get(i).getGroup();
+            data[i][20] = filteredStudentList.get(i).getEducationType();
+//            data[i][10] = filteredStudentList.get(i).getEducationYear;
+            data[i][21] = filteredStudentList.get(i).getIdCardNumber();
+            data[i][22] = filteredStudentList.get(i).getIdCardFinCode();
+            data[i][23] = String.valueOf(filteredStudentList.get(i).getGender());
+            data[i][24] = filteredStudentList.get(i).getSocialStatusSet().toString();
 
             /*
             <%--todo scholarship status--%>
              */
         }
-
         dataTable.setData( data );
-
 
         Gson gson = new Gson();
         String dataTableJson =gson.toJson(dataTable);

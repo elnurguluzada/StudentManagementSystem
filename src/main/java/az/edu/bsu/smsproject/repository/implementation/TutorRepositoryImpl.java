@@ -112,6 +112,24 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     @Override
+    public List<Student> getFilteredStudentList(String searchValue) {
+        String sql = "SELECT * FROM bdu_user bu JOIN student s ON bu.user_id = s.user_id WHERE LOWER(bu.name) like LOWER (?) ";
+        return jdbcTemplate.query(sql,
+                new StudentMapper(),
+                "%"+searchValue+"%");
+    }
+
+    @Override
+    public int getNumberOfAllStudents() {
+        String sql = "select count(*) from student";
+
+        return jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getInt(1))
+        ).get(0);
+
+    }
+
+    @Override
     public Student getStudentById(long studentId) {
 
         Student studentUltimate = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,

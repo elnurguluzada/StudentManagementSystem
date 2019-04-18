@@ -9,5 +9,7 @@ public interface TutorService {
     public boolean addStudent( Student student );
     public Student getStudentById(long studentId);
     public List<Student> getStudentList();
+    public List<Student> getFilteredStudentList(String searchValue);
+    public int getNumberOfAllStudents();
 
 }
