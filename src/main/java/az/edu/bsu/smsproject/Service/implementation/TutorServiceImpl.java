@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TutorServiceImpl implements TutorService {
@@ -42,6 +43,26 @@ public class TutorServiceImpl implements TutorService {
     @Override
     public int getNumberOfAllStudents() {
         return tutorRepository.getNumberOfAllStudents();
+    }
+
+    @Override
+    public int updateStudent(Student student) {
+        return tutorRepository.updateStudent( student );
+    }
+
+    @Override
+    public Set<String> getFacultySet(int year) {
+        return tutorRepository.getFacultySet(year);
+    }
+
+    @Override
+    public Set<String> getProfessionSet(int year, String faculty) {
+        return tutorRepository.getProfessionSet(year, faculty);
+    }
+
+    @Override
+    public Set<String> getSectionSet(int year, String faculty, String profession) {
+        return tutorRepository.getSectionSet(year, faculty, profession);
     }
 
 
