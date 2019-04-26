@@ -5,10 +5,7 @@ import az.edu.bsu.smsproject.repository.RoleRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
 import az.edu.bsu.smsproject.repository.TutorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -16,7 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class TutorRepositoryImpl implements TutorRepository {
@@ -30,7 +29,6 @@ public class TutorRepositoryImpl implements TutorRepository {
         this.roleRepository = roleRepository;
     }
 
-
     @Override
     public boolean addStudent(Student student) {
         long userId = insertIntoUserTable( student );
@@ -40,85 +38,13 @@ public class TutorRepositoryImpl implements TutorRepository {
                 insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size();
     }
 
-    @Override
-    public List<Student> getStudentList() {
-
-        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
-
-                (((resultSet, i) -> {
-                    Student student = new Student();
-                    student.setId(resultSet.getLong("user_id"));
-                    student.setName(resultSet.getString("name"));
-                    student.setSurname(resultSet.getString("surname"));
-                    return student;
-              }))
-
-              );
-
-        return studentList;
-    }
-
-
-
-    @Override
-    public List<Student> getStudentInfo(long studentId) {
-
-        List<Student> studentList = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
-                (((resultSet, i) -> {
-                    Student student = new Student();
-                    student.setName( resultSet.getString("name") );
-                    student.setSurname(resultSet.getString("surname"));
-                    student.setFaculty(resultSet.getString("faculty"));
-                    student.setFatherName(resultSet.getString("father_name"));
-                    student.setGender(resultSet.getString("gender").charAt(0));
-                    student.setProfession(resultSet.getString("profession"));
-                    student.setSection(resultSet.getString("section"));
-                    student.setGroup(resultSet.getString("group"));
-                    student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
-                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
-                    student.setBirthPlace(resultSet.getString("birth_place"));
-                    student.setEducationType(resultSet.getString("education_type"));
-                    return student;
-
-                }))
-                ,new Object[]{studentId} );
-
-        return studentList;
-    }
-
-
-
-    private class StudentMapper implements RowMapper<Student> {
-
-        @Override
-        public Student mapRow(ResultSet resultSet, int i) throws SQLException {
-            Student student = new Student();
-            student.setName( resultSet.getString("name") );
-            student.setSurname(resultSet.getString("surname"));
-            student.setFaculty(resultSet.getString("faculty"));
-            student.setFatherName(resultSet.getString("father_name"));
-            student.setGender(resultSet.getString("gender").charAt(0));
-            student.setProfession(resultSet.getString("profession"));
-            student.setSection(resultSet.getString("section"));
-            student.setGroup(resultSet.getString("group"));
-            student.setEntryYear(resultSet.getDate("education_year").toLocalDate());
-            student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
-            student.setBirthPlace(resultSet.getString("birth_place"));
-            student.setEducationType(resultSet.getString("education_type"));
-            return student;
-        }
-    }
-
-    //???????????????????????????????????????????????????
     private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
-        String sql = "INSERT INTO bdu_user(user_id, role_id, name, surname, email, password, phone_num, faculty, gender) " +
-                "values(nextval('user_sequence'), "+ roleIdOfStudent +", ?, ?, ?, ?, ?, ?, ?)";
 
-
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(sql, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE ,Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
         factory.setReturnGeneratedKeys(true);
         PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
+                roleIdOfStudent,
                 student.getName(),
                 student.getSurname(),
                 student.getEmail(),
@@ -136,11 +62,8 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     private int insertIntoStudentTable( Student student, long userId ){
-        String sql = "insert into student(user_id, id_card_num, id_card_fin_code, father_name, birth_date, birth_place, living_place, official_home, parent_num, " +
-                "graduation_region, graduation_school, entry_id_num, entry_score, education_type, profession, section, bsu_group, education_year, scholarship_status) " +
-                "values( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-        return jdbcTemplate.update( sql,
+        return jdbcTemplate.update( SQLqueries.INSERT_STUDENT_INTO_STUDENT_TABLE,
                 userId,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -163,14 +86,209 @@ public class TutorRepositoryImpl implements TutorRepository {
 
     }
 
-    private int insertIntoStudentSocialStatusTable( Student student ){
-        String sql = "insert into student_social_status(id, user_id, social_status_id) values(nextval('student_social_status_sequence'), ?, ?)";
-        int numOfInserts = 0;
-        for (int socialStatusId: student.getSocialStatusSet()){
-            numOfInserts += jdbcTemplate.update( sql, student.getId(), socialStatusId );
-        }
+    private int insertIntoStudentSocialStatusTable( Student student ) {
 
+        int numOfInserts = 0;
+        for (int socialStatusId : student.getSocialStatusSet()) {
+            numOfInserts += jdbcTemplate.update(SQLqueries.INSERT_INTO_STUDENT_SOCIAL_STATUS_TABLE, student.getId(), socialStatusId);
+        }
         return numOfInserts;
     }
+
+
+    @Override
+    public List<Student> getStudentList() {
+
+        return jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
+                new StudentMapper()
+        );
+    }
+
+    @Override
+    public int getNumberOfAllStudents() {
+
+        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_ALL_STUDENTS,
+                ((resultSet, i) -> resultSet.getInt(1))
+        ).get(0);
+
+    }
+
+    @Override
+    public List<Student> getFilteredStudentList(String searchValue) {
+        return jdbcTemplate.query(SQLqueries.GET_FILTERED_STUDENT_LIST,
+                new StudentMapper(),
+                "%"+searchValue+"%");
+    }
+
+    @Override
+    public Student getStudentById(long studentId) {
+
+        Student studentUltimate = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
+//                ((resultSet, i) -> {
+//                    Student student = new Student();
+//                    student.setName( resultSet.getString("name") );
+//                    student.setSurname(resultSet.getString("surname"));
+//                    student.setFaculty(resultSet.getString("faculty"));
+//                    student.setFatherName(resultSet.getString("father_name"));
+//                    student.setGender(resultSet.getString("gender").charAt(0));
+//                    student.setProfession(resultSet.getString("profession"));
+//                    student.setSection(resultSet.getString("section"));
+//                    student.setGroup(resultSet.getString("group"));
+//                    student.setEntryYear(resultSet.getInt("education_year"));
+//                    student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+//                    student.setBirthPlace(resultSet.getString("birth_place"));
+//                    student.setEducationType(resultSet.getString("education_type"));
+//                    return student;
+//
+//                })
+                new StudentMapper()
+                ,new Object[]{studentId} ).get(0);
+
+        return studentUltimate;
+    }
+
+
+    @Override
+    public int updateStudent(Student student) {
+
+        if ( updateStudentInBduUser( student ) == 1 && updateStudentInStudent( student ) == 1 )
+            return 1;
+        else
+            return 0;
+    }
+
+    @Override
+    public Set<String> getFacultiesOfYear(int year) {
+        String sql = "SELECT distinct(faculty) FROM groups WHERE year=?";
+
+        List<String> facultiesList =
+                jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getString("distinct(faculty)")),
+                year);
+
+        Set<String> facultiesSet = new HashSet<>(facultiesList);
+
+        return facultiesSet;
+    }
+
+    private int updateStudentInBduUser( Student student ){
+
+        return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_BDU_USER_TABLE,
+                student.getName(),
+                student.getSurname(),
+                student.getEmail(),
+                student.getPhoneNumber(),
+                student.getFaculty(),
+                student.getGender(),
+                student.getId());
+    }
+
+    private int updateStudentInStudent( Student student ){
+
+        return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_STUDENT_TABLE,
+                student.getIdCardNumber(),
+                student.getIdCardFinCode(),
+                student.getFatherName(),
+                student.getBirthDate(),
+                student.getBirthPlace(),
+                student.getLivingPlace(),
+                student.getOfficialHome(),
+                student.getParentPhoneNumber(),
+                student.getGraduatedRegion(),
+                student.getGraduatedSchool(),
+                student.getEntryIdNumber(),
+                student.getEntryScore(),
+                student.getEducationType(),
+                student.getProfession(),
+                student.getSection(),
+                student.getGroup(),
+                student.getScholarshipStatus(),
+                student.getEntryYear()); //todo social_status_id
+    }
+
+
+    public Set<String> getFacultySet(int year){
+        String sql = "SELECT distinct(faculty) FROM groups WHERE year = ?";
+
+        List<String> facultyList = jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getString(1)),
+                year);
+
+        System.out.println(facultyList);
+
+        return new HashSet<>(facultyList);
+    }
+
+    public Set<String> getProfessionSet(int year, String faculty){
+        String sql = "SELECT distinct(profession) FROM groups WHERE year = ? and faculty=?";
+
+        List<String> professionList = jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getString(1)),
+                year, faculty);
+
+        System.out.println(professionList);
+
+        return new HashSet<>(professionList);
+    }
+
+    public Set<String> getSectionSet(int year, String faculty, String profession){
+        String sql = "SELECT distinct(section) FROM groups WHERE year = ? and faculty=? and profession=?";
+
+        List<String> sectionList = jdbcTemplate.query(sql,
+                ((resultSet, i) -> resultSet.getString(1)),
+                year, faculty, profession);
+
+        System.out.println( sectionList );
+
+        return new HashSet<>(sectionList);
+    }
+
+
+
+    private class StudentMapper implements RowMapper<Student> {
+        @Override
+        public Student mapRow(ResultSet resultSet, int i) throws SQLException {
+            Student student = new Student();
+            student.setId( resultSet.getLong("user_id") );
+            student.setSurname(resultSet.getString("surname"));
+            student.setName( resultSet.getString("name") );
+            student.setEmail(resultSet.getString("email"));
+            student.setRoleId( resultSet.getInt("role_id") );
+            student.setPassword(resultSet.getString("password"));
+            student.setPhoneNumber(resultSet.getString("phone_num"));
+            student.setFaculty(resultSet.getString("faculty"));
+            student.setGender(resultSet.getString("gender").charAt(0));
+            student.setIdCardNumber(resultSet.getString("id_card_num"));
+            student.setIdCardFinCode(resultSet.getString("id_card_fin_code"));
+            student.setFatherName(resultSet.getString("father_name")); //
+            student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+            student.setBirthPlace(resultSet.getString("birth_place"));
+            student.setLivingPlace(resultSet.getString("living_place"));
+            student.setOfficialHome(resultSet.getString("official_home"));
+            student.setSocialStatusSet( getSocialStatusSetById( resultSet.getLong("user_id")));
+            student.setParentPhoneNumber(resultSet.getString("parent_num"));
+            student.setGraduatedRegion(resultSet.getString("graduation_school"));
+            student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
+            student.setEntryScore(resultSet.getInt("entry_score"));
+            student.setEducationType(resultSet.getString("education_type"));
+            student.setProfession(resultSet.getString("profession"));
+            student.setSection(resultSet.getString("section"));
+            student.setGroup(resultSet.getString("bsu_group"));
+            student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
+            student.setEntryYear(resultSet.getInt("entry_year"));
+            return student;
+        }
+    }
+
+    private Set<Integer> getSocialStatusSetById( long userId ){
+
+        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+                ((resultSet, i) -> resultSet.getInt("id")),
+                userId);
+
+        return new HashSet<>(socialStatusList);
+    }
+
+
 
 }

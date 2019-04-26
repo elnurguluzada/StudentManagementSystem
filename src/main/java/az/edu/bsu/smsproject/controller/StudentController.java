@@ -12,12 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/student")
 public class StudentController {
 
-    @GetMapping( value = {"/", "/home", "/index"})
-    public ModelAndView showIndexPage(HttpServletRequest request){
-        request.getSession().getAttribute("it");
-        ModelAndView mav = new ModelAndView("demo");
-        mav.addObject("sth", 5);
-        return mav;
-    }
+
 
 }
