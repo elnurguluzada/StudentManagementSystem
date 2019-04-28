@@ -84,12 +84,11 @@ public class TutorController {
         dataTable.setRecordsFiltered( numberOfFilteredStudents );
 
         if ( start + length > numberOfFilteredStudents )
-
             length = numberOfFilteredStudents % length;
 
         String[][] data = new String[length][25];
         for (int i=0; i<length; i++){
-            Student student = filteredStudentList.get(i);
+            Student student = filteredStudentList.get(start+i);
             data[i][0] = String.valueOf(student.getId());
             data[i][1] = student.getName();
             data[i][2] = student.getSurname();
