@@ -1,8 +1,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-${requestScope.get("message")}
-<form:form action="/tutor/updateStudent" method="post" modelAttribute="student">
+<form:form>
 
     <form:label path="name">Name</form:label>
     <form:input path="name"/> <br/>
@@ -122,9 +121,6 @@ ${requestScope.get("message")}
         <form:option value="Physics teacher"/>
     </form:select>
     <br/><br/>
-
-    <form:button>Update</form:button>
-
 
 </form:form>
 
