@@ -51,7 +51,8 @@
     <br/><br/>
     <form:label path="gender">Gender</form:label> <br/>
     Male: <form:radiobutton path="gender" value="M"/>
-    Female: <form:radiobutton path="gender" value="F"/>
+    Female: <form:radiobutton path="gender" value="F"/> <br/>
+    <small><form:errors path="gender" cssClass="error"/> </small>
     <br/><br/>
     <form:label path="fatherName">Father Name</form:label>
     <form:input path="fatherName" /> <br/>
@@ -107,8 +108,6 @@
     <form:label path="dovletSifarisli">Dovlet Sifarisli</form:label>
     <form:checkbox path="dovletSifarisli"/>
     <br/><br/>
-    ----------------------------------------------------
-    <%-- It would be better if curre --%>
     <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:select path="entryYear" id="entry-year" >
@@ -119,53 +118,33 @@
         <form:option value="${currentYear-4}" id="year5" onclick="fillFaculty(this)"/>
     </form:select>
     <br/><br/>
-    <%--todo take from DB--%>
+    <%--value attribute should be empty not 'Select one', otherwise spring validation will accept
+    'Select one' as faculty name--%>
     <form:label path="faculty" >Faculty</form:label>
     <form:select path="faculty" id="faculty-select-id">
-        <form:option value="Select one" />
-    </form:select>
+        <form:option value="" label="Select one"/>
+    </form:select> <br/>
     <small><form:errors path="faculty" cssClass="error"/></small>
     <br/><br/>
     <form:label path="profession" >Profession</form:label>
     <form:select path="profession" id="profession-select-id" >
-        <form:option value="Select one"/>
-    </form:select>
+        <form:option value="" label="Select one"/>
+    </form:select> <br/>
+    <small><form:errors path="profession" cssClass="error"/></small>
     <br/><br/>
     <form:label path="section">Section</form:label>
     <form:select path="section" id="section-select-id">
-        <form:option value="Select one"/>
-    </form:select>
+        <form:option value="" label="Select one"/>
+    </form:select> <br/>
+    <small><form:errors path="section" cssClass="error"/> </small>
     <br/><br/>
-    <%--todo What if there isn't qiyabi type in that faculty--%>
-    <form:label path="educationType">Education Type</form:label>
-    <form:select path="educationType" id="education-type-select-id">
-        <form:option value="Select one" />
-    </form:select>
+    <form:label path="educationType">Education Type</form:label> <br/>
+        <form:label path="educationType" >Eyani</form:label>
+        <form:radiobutton path="educationType" value="Eyani"/> <br/>
+        <form:label path="educationType" >Qiyabi</form:label>
+        <form:radiobutton path="educationType" value="Qiyabi"/>
     <br/><br/>
-    <%--
-        private String fatherName;
-        private LocalDate birthDate;
-        private String birthPlace;
-        private String livingPlace;
-        private String officialHome;
-        private String idCardNumber;
-        private String idCardFinCode;
-        private String socialStatusId;
-        private String parentPhoneNumber;
-        private String graduatedRegion;
-        private String graduatedSchool;
-        private int entryIdNumber;
-        private int entryScore;
-        private String educationType;
-        private boolean presidentialScholarship;            // true -> prezident teqaudcusu
-        private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
-        private int educationYear;
-        private String profession;
-        private String section;
-        private String group;
-        private int scholarshipStatus;
-    --%>
-
+    <small><form:errors path="educationType" cssClass="error"/> </small> <br/>
     <form:button>Submit</form:button>
 </form:form>
 
@@ -235,8 +214,6 @@
                 $("#faculty-select-id").html(data);
         }
         );
-
-
         <%--var facultySelect = document.getElementById("facultyId");--%>
 
         <%--for(var i=0; i<facultyArray.length; i++){--%>
@@ -267,21 +244,6 @@
             $("#profession-select-id").html(data);
         });
 
-        // var professionArray = ['Physics', 'Physics teacher'];
-        //
-        // var professionSelect = document.getElementById("professionId");
-        //
-        // for(var i=0; i<professionArray.length; i++){
-        //     var option = document.createElement("option");
-        //     var valueAttr = document.createAttribute("value");
-        //     var onclickAttr = document.createAttribute("onclick");
-        //     valueAttr.value=professionArray[i];
-        //     onclickAttr.value='fillSection(this)';
-        //     option.setAttributeNode(valueAttr);
-        //     option.setAttributeNode(onclickAttr);
-        //     option.innerText = professionArray[i];
-        //     professionSelect.add(option);
-        // }
     }
     
     function fillSection(element) {
@@ -298,61 +260,8 @@
             alert("came back");
                 $("#section-select-id").html(data);
             })
-
-        // var sectionArray = ['Az', 'Rus'];
-        //
-        // var sectionSelect = document.getElementById("sectionId");
-        //
-        // for(var i=0; i<sectionArray.length; i++){
-        //     var option = document.createElement("option");
-        //     var valueAttr = document.createAttribute("value");
-        //     var onclickAttr = document.createAttribute("onclick");
-        //     valueAttr.value=sectionArray[i];
-        //     onclickAttr.value='fillEducationType(this)';
-        //     option.setAttributeNode(valueAttr);
-        //     option.setAttributeNode(onclickAttr);
-        //     option.innerText = sectionArray[i];
-        //     sectionSelect.add(option);
-        // }
-    }
-
-    function fillEducationType(element) {
-        section = element.getAttribute("value");
-        // alert(section);
-
-        var educationTypeArray = ['Eyani', 'Qiyabi'];
-
-        var educationTypeSelect = document.getElementById("educationTypeId");
-
-        for(var i=0; i<educationTypeArray.length; i++){
-            var option = document.createElement("option");
-            var valueAttr = document.createAttribute("value");
-            valueAttr.value=educationTypeArray[i];
-            option.setAttributeNode(valueAttr);
-            option.innerText = educationTypeArray[i];
-            educationTypeSelect.add(option);
-        }
     }
 
 </script>
-
-<%--Getting sections accordinging to selected year WIP --%>
-<%--<script>--%>
-    <%--$(document).ready(function () {--%>
-        <%--var currentYear = new Date().getFullYear();--%>
-
-        <%--$("#entry-year").change(function(){--%>
-
-            <%--var year = $(this).find("option:selected").attr("year");--%>
-
-            <%--$.post("/tutor/getSectionList",--%>
-                <%--{selectedYear: year},--%>
-                <%--function () {--%>
-                    <%--alert("Good Job")--%>
-                <%--}--%>
-            <%--)--%>
-        <%--});--%>
-    <%--})--%>
-<%--</script>--%>
 
 </body>

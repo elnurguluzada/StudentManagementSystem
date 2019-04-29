@@ -5,11 +5,13 @@ import az.edu.bsu.smsproject.Service.StudentService;
 import az.edu.bsu.smsproject.Service.TutorService;
 import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Student;
+import az.edu.bsu.smsproject.domain.StudentValidation;
 import com.google.gson.Gson;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -24,13 +26,25 @@ public class TutorController {
     private final CommonService commonService;
     private final StudentService studentService;
     private final TutorService tutorService;
-
+    private final StudentValidation studentValidation;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, StudentValidation studentValidation) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
+        this.studentValidation = studentValidation;
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder webDataBinder){
+        Object target = webDataBinder.getTarget();
+
+        if (target == null)
+            return;
+        if ( target.getClass() == Student.class )
+            webDataBinder.setValidator(studentValidation);
+
     }
 
     @GetMapping("/addStudentForm")

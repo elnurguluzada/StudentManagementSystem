@@ -11,14 +11,9 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     private static final long serialVersionUID = -1691632973585761641L;
 
     protected long roleId;
-    @NotBlank(message = "Surname is required")
     protected String surname;
-    @NotBlank(message = "Email is required")
     protected String email;
-    @NotBlank(message = "Password is required" )
-    @Length(min = 5, message = "Password must contain at least 5 characters")
     protected String password;
-//    todo regular expression
     protected String phoneNumber;
     protected String faculty;
     protected char gender;
@@ -35,6 +30,11 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     }
 
     public User() {
+        surname = "";
+        email = "";
+        password = "";
+        phoneNumber = "";
+        faculty = "";
     }
 
 
