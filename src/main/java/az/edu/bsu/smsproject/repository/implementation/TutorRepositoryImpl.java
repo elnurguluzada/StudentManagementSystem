@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class TutorRepositoryImpl implements TutorRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.roleRepository = roleRepository;
     }
-
+//------------------------------------------------------------------------------------------------------
     @Override
     public boolean addStudent(Student student) {
         long userId = insertIntoUserTable( student );
@@ -94,30 +95,13 @@ public class TutorRepositoryImpl implements TutorRepository {
         }
         return numOfInserts;
     }
-
-
+//------------------------------------------------------------------------------------------------------
     @Override
     public List<Student> getStudentList() {
 
         return jdbcTemplate.query(SQLqueries.GET_STUDENT_LIST,
                 new StudentMapper()
         );
-    }
-
-    @Override
-    public int getNumberOfAllStudents() {
-
-        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_ALL_STUDENTS,
-                ((resultSet, i) -> resultSet.getInt(1))
-        ).get(0);
-
-    }
-
-    @Override
-    public List<Student> getFilteredStudentList(String searchValue) {
-        return jdbcTemplate.query(SQLqueries.GET_FILTERED_STUDENT_LIST,
-                new StudentMapper(),
-                "%"+searchValue+"%");
     }
 
     @Override
@@ -147,32 +131,34 @@ public class TutorRepositoryImpl implements TutorRepository {
         return studentUltimate;
     }
 
+    @Override
+    public int getNumberOfAllStudents() {
 
+        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_ALL_STUDENTS,
+                ((resultSet, i) -> resultSet.getInt(1))
+        ).get(0);
+
+    }
+
+    @Override
+    public List<Student> getFilteredStudentList(String searchValue) {
+        return jdbcTemplate.query(SQLqueries.GET_FILTERED_STUDENT_LIST,
+                new StudentMapper(),
+                "%"+searchValue+"%");
+    }
+//------------------------------------------------------------------------------------------------------
     @Override
     public int updateStudent(Student student) {
 
-        if ( updateStudentInBduUser( student ) == 1 && updateStudentInStudent( student ) == 1 )
+        if ( updateStudentInBduUser( student ) == 1 && updateStudentInStudent( student ) == 1 &&
+                updateStudentInStudentSocialStatus( student ) == 1 )
             return 1;
         else
             return 0;
     }
 
-    @Override
-    public Set<String> getFacultiesOfYear(int year) {
-        String sql = "SELECT distinct(faculty) FROM groups WHERE year=?";
-
-        List<String> facultiesList =
-                jdbcTemplate.query(sql,
-                ((resultSet, i) -> resultSet.getString("distinct(faculty)")),
-                year);
-
-        Set<String> facultiesSet = new HashSet<>(facultiesList);
-
-        return facultiesSet;
-    }
-
     private int updateStudentInBduUser( Student student ){
-
+//        "update bdu_user set name = ?, surname = ?,email = ?,phone_num = ?,faculty = ?,gender = ? where user_id = ?"
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_BDU_USER_TABLE,
                 student.getName(),
                 student.getSurname(),
@@ -184,7 +170,12 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     private int updateStudentInStudent( Student student ){
-
+/*
+"UPDATE student SET id_card_num  = ?, id_card_fin_code  = ?, father_name  = ?, birth_date  = ?, " +
+            "birth_place  = ?, living_place  = ?, official_home  = ?, parent_num  = ?, graduation_region  = ?, graduation_school  = ?, " +
+            "entry_id_num  = ?, entry_score  = ?, education_type  = ?, profession  = ?, section  = ?, bsu_group  = ?, " +
+            "scholarship_status  = ?, entry_year  = ? WHERE user_id = ?"
+ */
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_STUDENT_TABLE,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -203,10 +194,56 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getSection(),
                 student.getGroup(),
                 student.getScholarshipStatus(),
-                student.getEntryYear()); //todo social_status_id
+                student.getEntryYear(),
+                student.getId()); //todo social_status_id
     }
 
+    private int updateStudentInStudentSocialStatus( Student student ){
+        Set<Integer> updatedStatus = student.getSocialStatusSet();
+        Set<Integer> currentStatusInDB = getSocialStatusSetById(student.getId());
+        Set<Integer> statusToAdd = new HashSet<>();
+        Set<Integer> statusToRemove = new HashSet<>();
+//which statuses will be added
+        for (Integer i: updatedStatus){
+            boolean flag=false;
+            for (Integer j: currentStatusInDB) {
+                if (i.equals(j)) flag = true;
+            }
+            if (!flag)
+                statusToAdd.add(i);
+        }
 
+//which statuses will be removed
+        for (Integer i: currentStatusInDB){
+            boolean flag=false;
+            for (Integer j: updatedStatus) {
+                if (i.equals(j)) flag = true;
+            }
+            if (!flag)
+                statusToRemove.add(i);
+        }
+
+//add new statuses
+        String sql = "INSERT INTO student_social_status VALUES (nextval('student_social_status_sequence'), ?, ?)";
+        for (Integer status : statusToAdd) {
+            jdbcTemplate.update(sql,
+                    student.getId(),
+                    status
+            );
+        }
+
+//remove old statuses
+        sql = "DELETE FROM student_social_status WHERE user_id=? AND social_status_id=? ";
+        for (Integer status : statusToRemove) {
+            jdbcTemplate.update(sql,
+                    student.getId(),
+                    status
+            );
+        }
+
+        return 1;
+    }
+//------------------------------------------------------------------------------------------------------
     public Set<String> getFacultySet(int year){
         String sql = "SELECT distinct(faculty) FROM groups WHERE year = ?";
 

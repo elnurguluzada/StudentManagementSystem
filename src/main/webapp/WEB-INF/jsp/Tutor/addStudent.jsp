@@ -29,7 +29,7 @@
     <form:input path="surname" /> <br/>
     <small><form:errors path="surname" cssClass="error"/></small>
     <br/><br/>
-    <form:label path="birthDate">Birth Date <small>(dd/MM/yyyy)</small></form:label> <!--todo jQuery-->
+    <form:label path="birthDate">Birth Date</form:label>
     <form:input path="birthDate" id="birth-date-id"/> <br/>
     <small><form:errors path="birthDate" cssClass="error"/></small>
     <br/><br/>
@@ -119,7 +119,6 @@
         <form:option value="${currentYear-4}" id="year5" onclick="fillFaculty(this)"/>
     </form:select>
     <br/><br/>
-    <%--todo take from DB--%>
     <form:label path="faculty" >Faculty</form:label>
     <form:select path="faculty" id="faculty-select-id">
         <form:option value="Select one" />
@@ -142,30 +141,6 @@
         <form:option value="Select one" />
     </form:select>
     <br/><br/>
-    <%--
-        private String fatherName;
-        private LocalDate birthDate;
-        private String birthPlace;
-        private String livingPlace;
-        private String officialHome;
-        private String idCardNumber;
-        private String idCardFinCode;
-        private String socialStatusId;
-        private String parentPhoneNumber;
-        private String graduatedRegion;
-        private String graduatedSchool;
-        private int entryIdNumber;
-        private int entryScore;
-        private String educationType;
-        private boolean presidentialScholarship;            // true -> prezident teqaudcusu
-        private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
-        private int educationYear;
-        private String profession;
-        private String section;
-        private String group;
-        private int scholarshipStatus;
-    --%>
-
     <form:button>Submit</form:button>
 </form:form>
 
@@ -176,10 +151,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script
 <%--popup--%>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-<%--Flat date--%>
-
-<%-- Pop-up after submitting --%>
 <script>
 
     $(document).ready(function () {
@@ -190,9 +163,11 @@
     function dateInput() {
         flatpickr("#birth-date-id",
             {
-                "dateFormat":"d/m/Y",
+                // "altInput": true,
+                "dateFormat":"Y/m/d",
+                // "altDate": "dd-mm-yyyy",
                 "allowInput":true,
-                "minDate": "01/01/1950",
+                "minDate": "1950/01/01",
                 "maxDate": "today",
                 "onOpen": function(selectedDates, dateStr, instance) {
                     instance.setDate(instance.input.value, false);
@@ -204,14 +179,13 @@
     function popup() {
         $( "#dialog-success" ).dialog({ autoOpen: false });
         $( "#dialog-fail" ).dialog({ autoOpen: false });
-
-        console.log( ${requestScope.success} );
-        console.log( ${requestScope.success== true} );
-
-        if (${requestScope.success== true}){
+        // alert("here1");
+        if (${requestScope.get("success") == true}){
+            // alert("here2")
             $( "#dialog-success" ).dialog( "open" );
         }
         else if ( ${requestScope.get("success") == false} ) {
+            // alert("here3");
             $( "#dialog-fail" ).dialog( "open" );
         }
 

@@ -54,11 +54,9 @@
         <th>Gender</th>
         <th>Social Status</th>
         <th>Action1</th>
-        <th>Action2</th>
 
         <%--todo social status id--%>
         <%--todo scholarship status--%>
-        <%--<th>Action</th>--%>
     </tr>
     </thead>
     <tfoot>
@@ -90,15 +88,16 @@
         <th>Gender</th>
         <th>Social Status</th>
         <th>Action1</th>
-        <th>Action2</th>
         <%--todo social status id--%>
         <%--todo scholarship status--%>
-        <%--<th>Action</th>--%>
+
     </tr>
     </tfoot>
 </table>
 
 <div id="detailedStudentInformation" title="Student Information"></div>
+<div id="update-success" title="Student update">Student was updated successfully</div>
+<div id="update-fail" title="Student update">An error occurred while updating</div>
 
 <%--include jQuery-----------------------------------------------------------------------%>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -113,7 +112,10 @@
 
     $(document).ready(
         $("#detailedStudentInformation").dialog({autoOpen: false}),
-        drawTable()
+        $("#update-success").dialog({autoOpen: false}),
+        $("#update-fail").dialog({autoOpen: false}),
+        drawTable(),
+        func()
     );
 
     var myTable;
@@ -127,28 +129,30 @@
             "dom": 'Bfrtip',
             "initComplete": function () { // initializing the table is completed
 
-                // $('#student-list-table tbody').on('click', 'button', function () { //is activated when button is clicked
-                //
-                //         $("#detailedStudentInformation").dialog({
-                //             autoOpen: false
-                //         });
-                //
-                //         var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
-                //
-                //         $("#detailedStudentInformation").load(
-                //             "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
-                //             function () {                                   // function is executed when response comes from url
-                //                 $("#detailedStudentInformation").dialog('open');
-                //         });
-                //     });
+                $('#student-list-table tbody').on('click', 'button', function () { //is activated when button is clicked
 
-                $(".updateInfo").on('click', function () {
-                    var userId = myTable.row($(this).parents('tr')).data()[0];
-                    $.post("/tutor/updateStudent",
-                        {
-                            "userId": userId
+                        $("#detailedStudentInformation").dialog({
+                            autoOpen: false
                         });
-                })
+
+                        var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+
+                        $("#detailedStudentInformation").load(
+                            "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
+                            function () {                                   // function is executed when response comes from url
+                                $("#detailedStudentInformation").dialog('open');
+                        });
+                    });
+
+                // $(".detailedInfo").on('click', function () {
+                //     var userId = myTable.row( $(this).parents('tr') ).data()[0];
+                //     alert(userId);
+                //     $("#detailedStudentInformation").load("/tutor/getStudentInfoPopup?userId=" + userId,
+                //     function () {
+                //         $("#detailedStudentInformation").dialog('open');
+                //     })
+                // });
+
             },
             "buttons": [
                 'colvis'
@@ -220,16 +224,10 @@
                     "searchable": false
                 },
                 {
-                    "targets": [-2],
-                    "visible": true,
-                    "defaultContent": "<button class='detailedInfo'>Detailed!</button>"
-                },
-                {
                     "targets": [-1],
                     "visible": true,
-                    "defaultContent": "<button class='updateInfo'>Update!</button>"
+                    "defaultContent": "<button class='detailedInfo'>Detailed!</button>"
                 }
-
             ]
         });
 
@@ -245,12 +243,16 @@
         )
     }
 
+    function func() {
+
+        <c:if test="${success == true}" >
+            $("#update-success").dialog('open');
+        </c:if>
+        <c:if test="${success == false}">
+            $("#update-fail").dialog('open');
+        </c:if>
+    }
 </script>
 
 </body>
 </html>
-
-
-<%--
-<a href="/tutor/studentInfo?id=${student.id}">Info</a>
---%>

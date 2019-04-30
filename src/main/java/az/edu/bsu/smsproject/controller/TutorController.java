@@ -8,11 +8,14 @@ import az.edu.bsu.smsproject.domain.Student;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +34,11 @@ public class TutorController {
         this.tutorService = tutorService;
     }
 
+    @GetMapping(value = {"/index", "/"})
+    public String index(){
+        return "Tutor/index";
+    }
+//--------------------------------------------------------------------------------------
     @GetMapping("/addStudentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("/Tutor/addStudent");
@@ -45,20 +53,56 @@ public class TutorController {
         ModelAndView modelAndView = new ModelAndView("Tutor/addStudent");
 
         if ( !errors.hasErrors() ){
-
-            if ( tutorService.addStudent( student ) )
+            if ( tutorService.addStudent( student ) ){
                 modelAndView.addObject("success", true);
-            else
+            }
+            else{
                 modelAndView.addObject("success", false);
+            }
+        }
+        else{
+            modelAndView.addObject("success", false);
         }
         return modelAndView;
     }
 
+    @PostMapping("/getFaculties")
+    public ModelAndView getFaculties(
+            @RequestParam(name="year") int year
+    ){
+        Set<String> facultySet = tutorService.getFacultySet(year);
+        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
+        modelAndView.addObject("optionsSet", facultySet).addObject("functionToCall", "fillProfession(this)");
+        return modelAndView;
+    }
+
+    @PostMapping("/getProfessions")
+    public ModelAndView getProfessions(
+            @RequestParam(name="year") int year,
+            @RequestParam(name="faculty") String faculty
+    ){
+        Set<String> professionSet = tutorService.getProfessionSet(year, faculty);
+        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
+        modelAndView.addObject("optionsSet", professionSet).addObject("functionToCall", "fillSection(this)");
+        return modelAndView;
+    }
+
+    @PostMapping("/getSections")
+    public ModelAndView getSections(
+            @RequestParam(name="year") int year,
+            @RequestParam(name="faculty") String faculty,
+            @RequestParam(name="profession") String profession
+    ){
+        Set<String> sectionSet = tutorService.getSectionSet(year, faculty, profession);
+        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
+        modelAndView.addObject("optionsSet", sectionSet);
+        return modelAndView;
+    }
+ //--------------------------------------------------------------------------------------
     @GetMapping("/getStudentsList")
     public ModelAndView getStudentsForm(){
         return new ModelAndView("Tutor/studentList");
     }
-
 //    @GetMapping("/getStudents")
 //    public ModelAndView showStudents(
 //            @RequestParam(name = "draw") int draw,
@@ -117,7 +161,6 @@ public class TutorController {
 //
 //        Gson gson = new Gson();
 //        String dataTableJson =gson.toJson(dataTable);
-//        System.out.println(dataTableJson);
 //
 //        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiver");
 //        modelAndView.addObject("dataTable", dataTableJson);
@@ -183,82 +226,30 @@ public class TutorController {
         return dataTable;
     }
 
-
     @GetMapping("/getStudentInfoPopup")
-    public ModelAndView getPersonalStudentInfo(
-            @RequestParam(name="userId") long userId
+    public String getPersonalStudentInfo(
+            @RequestParam(name="userId") long userId,
+            Model model
     ) {
-        ModelAndView modelAndView = new ModelAndView("Tutor/studentPersonalInfo");
-        modelAndView.addObject("student", tutorService.getStudentById(userId));
-
-        return modelAndView;
-    }
-
-    @GetMapping("/updateStudent")
-    public ModelAndView updateStudent(
-            @RequestParam(name = "userId") long userId
-    ){
-        System.out.println(userId);
-        ModelAndView modelAndView = new ModelAndView("Tutor/updateStudentInfo");
-        modelAndView.addObject("userId", userId);
-        return modelAndView;
+        model.addAttribute("student", tutorService.getStudentById(userId));
+        return "Tutor/studentPersonalInfo";
     }
 
     @PostMapping("/updateStudent")
     public ModelAndView updateStudent(
             @Valid @ModelAttribute(name = "student") Student student,
-            Errors errors
+            BindingResult bindingResult
     ){
-        String message;
-        ModelAndView modelAndView = new ModelAndView("Tutor/studentPersonalInfo");
-
-        if ( !errors.hasErrors() ){
-            tutorService.updateStudent(student);
-            message = "Good";
-        }
-        else {
-            message = "Bad";
+        boolean success = false;
+        ModelAndView modelAndView = new ModelAndView("Tutor/studentList");
+        if ( !bindingResult.hasErrors() ){
+            success = tutorService.updateStudent(student) == 1;
         }
 
-        modelAndView.addObject("message", message);
+        modelAndView.addObject("success", success);
         return modelAndView;
     }
 
 
-
-    @PostMapping("/getFaculties")
-    public ModelAndView getFaculties(
-            @RequestParam(name="year") int year
-    ){
-        Set<String> facultySet = tutorService.getFacultySet(year);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", facultySet).addObject("functionToCall", "fillProfession(this)");
-        return modelAndView;
-    }
-
-    @PostMapping("/getProfessions")
-    public ModelAndView getProfessions(
-            @RequestParam(name="year") int year,
-            @RequestParam(name="faculty") String faculty
-    ){
-        System.out.println("In getProfessions");
-        Set<String> professionSet = tutorService.getProfessionSet(year, faculty);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", professionSet).addObject("functionToCall", "fillSection(this)");
-        return modelAndView;
-    }
-
-    @PostMapping("/getSections")
-    public ModelAndView getSections(
-            @RequestParam(name="year") int year,
-            @RequestParam(name="faculty") String faculty,
-            @RequestParam(name="profession") String profession
-    ){
-        System.out.println("In getSections");
-        Set<String> sectionSet = tutorService.getSectionSet(year, faculty, profession);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", sectionSet);
-        return modelAndView;
-    }
 
 }

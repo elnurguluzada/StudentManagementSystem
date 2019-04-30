@@ -32,7 +32,7 @@ public class SQLqueries {
     public static String UPDATE_STUDENT_IN_STUDENT_TABLE = "UPDATE student SET id_card_num  = ?, id_card_fin_code  = ?, father_name  = ?, birth_date  = ?, " +
             "birth_place  = ?, living_place  = ?, official_home  = ?, parent_num  = ?, graduation_region  = ?, graduation_school  = ?, " +
             "entry_id_num  = ?, entry_score  = ?, education_type  = ?, profession  = ?, section  = ?, bsu_group  = ?, " +
-            "scholarship_status  = ?, entry_year  = ?, social_status_id = WHERE user_id = ?";
+            "scholarship_status  = ?, entry_year  = ? WHERE user_id = ?";
 
     public static String INSERT_STUDENT_INTO_BDU_USER_TABLE = "INSERT INTO bdu_user(user_id, role_id, name, surname, email, password, phone_num, faculty, gender) " +
             "values(nextval('user_sequence'), ?, ?, ?, ?, ?, ?, ?, ?)";
