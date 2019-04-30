@@ -203,6 +203,9 @@ public class TutorRepositoryImpl implements TutorRepository {
         Set<Integer> currentStatusInDB = getSocialStatusSetById(student.getId());
         Set<Integer> statusToAdd = new HashSet<>();
         Set<Integer> statusToRemove = new HashSet<>();
+        System.out.println("1"+updatedStatus);
+        System.out.println("2"+currentStatusInDB);
+
 //which statuses will be added
         for (Integer i: updatedStatus){
             boolean flag=false;
@@ -212,7 +215,7 @@ public class TutorRepositoryImpl implements TutorRepository {
             if (!flag)
                 statusToAdd.add(i);
         }
-
+        System.out.println("3"+statusToAdd);
 //which statuses will be removed
         for (Integer i: currentStatusInDB){
             boolean flag=false;
@@ -222,7 +225,7 @@ public class TutorRepositoryImpl implements TutorRepository {
             if (!flag)
                 statusToRemove.add(i);
         }
-
+        System.out.println("4"+statusToRemove);
 //add new statuses
         String sql = "INSERT INTO student_social_status VALUES (nextval('student_social_status_sequence'), ?, ?)";
         for (Integer status : statusToAdd) {
@@ -318,11 +321,11 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     private Set<Integer> getSocialStatusSetById( long userId ){
-
+//"SELECT sss.id FROM student s JOIN student_social_status sss ON s.user_id = sss.user_id where s.user_id = ?";
         List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
-                ((resultSet, i) -> resultSet.getInt("id")),
+                ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
-
+        System.out.println(userId+" list = " +socialStatusList);
         return new HashSet<>(socialStatusList);
     }
 

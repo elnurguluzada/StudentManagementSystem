@@ -25,7 +25,7 @@ public class SQLqueries {
 
     public static String GET_SECTION_LIST_BY_YEAR = "SELECT DISTINCT section FROM groups WHERE year = ?";
 
-    public static String GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID = "SELECT ss.id FROM student s JOIN social_status ss ON s.social_status_id = ss.id where s.user_id = ?";
+    public static String GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID = "SELECT sss.social_status_id FROM student s JOIN student_social_status sss ON s.user_id = sss.user_id where s.user_id = ?";
 
     public static String GET_THE_NUMBER_OF_ALL_STUDENTS = "SELECT count(*) FROM student";
 
