@@ -156,12 +156,11 @@
 <%--popup--%>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-<%--Flat date--%>
-
-<%-- Pop-up after submitting --%>
 <script>
 
     $(document).ready(function () {
+        $("#dialog-success").hide();
+        $("#dialog-fail").hide();
         dateInput();
         popup();
     });
@@ -181,6 +180,7 @@
 }
 
     function popup() {
+
         $( "#dialog-success" ).dialog({ autoOpen: false });
         $( "#dialog-fail" ).dialog({ autoOpen: false });
 
@@ -188,9 +188,11 @@
         console.log( ${requestScope.success== true} );
 
         if (${requestScope.success== true}){
+            $("#dialog-success").show();
             $( "#dialog-success" ).dialog( "open" );
         }
         else if ( ${requestScope.get("success") == false} ) {
+            $("#dialog-fail").show();
             $( "#dialog-fail" ).dialog( "open" );
         }
 
@@ -263,5 +265,4 @@
     }
 
 </script>
-
 </body>

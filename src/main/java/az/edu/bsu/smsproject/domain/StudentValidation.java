@@ -1,11 +1,11 @@
 package az.edu.bsu.smsproject.domain;
 
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.apache.commons.validator.routines.EmailValidator;
 
 import java.time.LocalDate;
 
@@ -91,6 +91,8 @@ public class StudentValidation implements Validator {
 //Birth date
            if ( student.getBirthDate().isAfter(LocalDate.now()) )
                 errors.rejectValue("birthDate","addStudent.birthDate.future");
+//            todo if (student.getBirthDate())
+//                errors.rejectValue("birthDate", "addStudent.birthDate.invalid");
 //Parent's phone number
             if ( isPhoneNumberValid( student.getParentPhoneNumber() ) )
                 errors.rejectValue("parentPhoneNumber","addStudent.parentPhoneNumber.invalid");
