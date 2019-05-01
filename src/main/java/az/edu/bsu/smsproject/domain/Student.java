@@ -14,54 +14,20 @@ import java.util.Set;
 public class Student extends User implements Serializable {
     private static final long serialVersionUID = 3743824363989869865L;
 
-    //    fatherName
     private String fatherName;
-
-    //    birthDate
-    @Past(message = "That student hasn't been born yet") @DateTimeFormat(pattern = "dd/MM/yyyy") @NotNull(message = "birth date is required")
+    @DateTimeFormat(pattern="yyyy/MM/dd")
     private LocalDate birthDate;
-
-    //    birthPlace
-    @NotBlank(message = "Birth place is required")
     private String birthPlace;
-
-    //  livingPlace
-    @NotBlank(message = "Living place is required")
     private String livingPlace;
-
-    //    officialHome
-    @NotBlank(message = "Official home address is required")
     private String officialHome;
-
-    //    idCardNumber
-    @Digits(integer = 8, fraction = 0, message = "Invalid Id card number")
     private String idCardNumber;
-
-    //    idCardFinCode     todo learn regular expression
     private String idCardFinCode;
-
-    //    parentPhoneNumber
-    @Digits(integer = 10, fraction = 0, message = "Invalid telephone number")
     private String parentPhoneNumber;
-
-    //    graduatedRegion
-    @NotBlank(message = "Graduated region id required")
     private String graduatedRegion;
-
-    //    graduatedSchool
-    @NotBlank(message = "Graduated school id required")
     private String graduatedSchool;
-
-    //    entryIdNumber todo compete missing @Patterns
     private int entryIdNumber;
-
-    //    entryScore
     private int entryScore;
-
-    //    socialStatusSet
     Set<Integer> socialStatusSet;
-
-    //    educationType
     private String educationType;
     private boolean presidentialScholarship;            // true -> prezident teqaudcusu
     private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli

@@ -29,7 +29,7 @@
     <form:input path="surname" /> <br/>
     <small><form:errors path="surname" cssClass="error"/></small>
     <br/><br/>
-    <form:label path="birthDate">Birth Date <small>(dd/MM/yyyy)</small></form:label> <!--todo jQuery-->
+    <form:label path="birthDate">Birth Date</form:label>
     <form:input path="birthDate" id="birth-date-id"/> <br/>
     <small><form:errors path="birthDate" cssClass="error"/></small>
     <br/><br/>
@@ -112,14 +112,13 @@
     <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:select path="entryYear" id="entry-year" >
-        <form:option value="${currentYear}"  id="year1" onclick="fillFaculty(this)" />
-        <form:option value="${currentYear-1}" id="year2" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-2}" id="year3" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-3}" id="year4" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-4}" id="year5" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear}"  onclick="fillFaculty(this)" />
+        <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-2}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-3}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-4}" onclick="fillFaculty(this)"/>
     </form:select>
     <br/><br/>
-    <%--todo take from DB--%>
     <form:label path="faculty" >Faculty</form:label>
     <form:select path="faculty" id="faculty-select-id">
         <form:option value="Select one" />
@@ -139,33 +138,11 @@
     <%--todo What if there isn't qiyabi type in that faculty--%>
     <form:label path="educationType">Education Type</form:label>
     <form:select path="educationType" id="education-type-select-id">
-        <form:option value="Select one" />
+        <form:option value="" label="Select one" />
+        <form:option value="Eyani" />
+        <form:option value="Qiyabi" />
     </form:select>
     <br/><br/>
-    <%--
-        private String fatherName;
-        private LocalDate birthDate;
-        private String birthPlace;
-        private String livingPlace;
-        private String officialHome;
-        private String idCardNumber;
-        private String idCardFinCode;
-        private String socialStatusId;
-        private String parentPhoneNumber;
-        private String graduatedRegion;
-        private String graduatedSchool;
-        private int entryIdNumber;
-        private int entryScore;
-        private String educationType;
-        private boolean presidentialScholarship;            // true -> prezident teqaudcusu
-        private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
-        private int educationYear;
-        private String profession;
-        private String section;
-        private String group;
-        private int scholarshipStatus;
-    --%>
-
     <form:button>Submit</form:button>
 </form:form>
 
@@ -176,10 +153,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script
 <%--popup--%>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-<%--Flat date--%>
-
-<%-- Pop-up after submitting --%>
 <script>
 
     $(document).ready(function () {
@@ -190,9 +165,11 @@
     function dateInput() {
         flatpickr("#birth-date-id",
             {
-                "dateFormat":"d/m/Y",
+                // "altInput": true,
+                "dateFormat":"Y/m/d",
+                // "altDate": "dd-mm-yyyy",
                 "allowInput":true,
-                "minDate": "01/01/1950",
+                "minDate": "1950/01/01",
                 "maxDate": "today",
                 "onOpen": function(selectedDates, dateStr, instance) {
                     instance.setDate(instance.input.value, false);
@@ -204,11 +181,7 @@
     function popup() {
         $( "#dialog-success" ).dialog({ autoOpen: false });
         $( "#dialog-fail" ).dialog({ autoOpen: false });
-
-        console.log( ${requestScope.success} );
-        console.log( ${requestScope.success== true} );
-
-        if (${requestScope.success== true}){
+        if (${requestScope.get("success") == true}){
             $( "#dialog-success" ).dialog( "open" );
         }
         else if ( ${requestScope.get("success") == false} ) {
@@ -224,14 +197,12 @@
 
     function fillFaculty(element) {
         year = element.getAttribute("value");
-        alert(year);
 
         $.post("/tutor/getFaculties",
             {
                 "year": year
             },
             function (data) {
-                alert("came back!");
                 $("#faculty-select-id").html(data);
         }
         );
@@ -255,7 +226,6 @@
 
     function fillProfession(element){
         faculty = element.getAttribute("value");
-        alert(faculty);
 
         $.post("/tutor/getProfessions",
             {
@@ -263,7 +233,6 @@
                 "faculty": faculty
             },
         function (data) {
-            alert("came back");
             $("#profession-select-id").html(data);
         });
 
@@ -286,8 +255,6 @@
     
     function fillSection(element) {
         profession = element.getAttribute("value");
-        alert(profession);
-
         $.post("/tutor/getSections",
             {
                 "year": year,
@@ -295,64 +262,28 @@
                 "profession":profession
             },
             function (data) {
-            alert("came back");
                 $("#section-select-id").html(data);
             })
 
-        // var sectionArray = ['Az', 'Rus'];
-        //
-        // var sectionSelect = document.getElementById("sectionId");
-        //
-        // for(var i=0; i<sectionArray.length; i++){
-        //     var option = document.createElement("option");
-        //     var valueAttr = document.createAttribute("value");
-        //     var onclickAttr = document.createAttribute("onclick");
-        //     valueAttr.value=sectionArray[i];
-        //     onclickAttr.value='fillEducationType(this)';
-        //     option.setAttributeNode(valueAttr);
-        //     option.setAttributeNode(onclickAttr);
-        //     option.innerText = sectionArray[i];
-        //     sectionSelect.add(option);
-        // }
     }
 
-    function fillEducationType(element) {
-        section = element.getAttribute("value");
-        // alert(section);
-
-        var educationTypeArray = ['Eyani', 'Qiyabi'];
-
-        var educationTypeSelect = document.getElementById("educationTypeId");
-
-        for(var i=0; i<educationTypeArray.length; i++){
-            var option = document.createElement("option");
-            var valueAttr = document.createAttribute("value");
-            valueAttr.value=educationTypeArray[i];
-            option.setAttributeNode(valueAttr);
-            option.innerText = educationTypeArray[i];
-            educationTypeSelect.add(option);
-        }
-    }
+    // function fillEducationType(element) {
+    //     section = element.getAttribute("value");
+    //
+    //     var educationTypeArray = ['Eyani', 'Qiyabi'];
+    //
+    //     var educationTypeSelect = document.getElementById("educationTypeId");
+    //
+    //     for(var i=0; i<educationTypeArray.length; i++){
+    //         var option = document.createElement("option");
+    //         var valueAttr = document.createAttribute("value");
+    //         valueAttr.value=educationTypeArray[i];
+    //         option.setAttributeNode(valueAttr);
+    //         option.innerText = educationTypeArray[i];
+    //         educationTypeSelect.add(option);
+    //     }
+    // }
 
 </script>
-
-<%--Getting sections accordinging to selected year WIP --%>
-<%--<script>--%>
-    <%--$(document).ready(function () {--%>
-        <%--var currentYear = new Date().getFullYear();--%>
-
-        <%--$("#entry-year").change(function(){--%>
-
-            <%--var year = $(this).find("option:selected").attr("year");--%>
-
-            <%--$.post("/tutor/getSectionList",--%>
-                <%--{selectedYear: year},--%>
-                <%--function () {--%>
-                    <%--alert("Good Job")--%>
-                <%--}--%>
-            <%--)--%>
-        <%--});--%>
-    <%--})--%>
-<%--</script>--%>
 
 </body>
