@@ -112,11 +112,11 @@
     <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:select path="entryYear" id="entry-year" >
-        <form:option value="${currentYear}"  id="year1" onclick="fillFaculty(this)" />
-        <form:option value="${currentYear-1}" id="year2" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-2}" id="year3" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-3}" id="year4" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-4}" id="year5" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear}"  onclick="fillFaculty(this)" />
+        <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-2}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-3}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-4}" onclick="fillFaculty(this)"/>
     </form:select>
     <br/><br/>
     <form:label path="faculty" >Faculty</form:label>
@@ -138,7 +138,9 @@
     <%--todo What if there isn't qiyabi type in that faculty--%>
     <form:label path="educationType">Education Type</form:label>
     <form:select path="educationType" id="education-type-select-id">
-        <form:option value="Select one" />
+        <form:option value="" label="Select one" />
+        <form:option value="Eyani" />
+        <form:option value="Qiyabi" />
     </form:select>
     <br/><br/>
     <form:button>Submit</form:button>
@@ -179,13 +181,10 @@
     function popup() {
         $( "#dialog-success" ).dialog({ autoOpen: false });
         $( "#dialog-fail" ).dialog({ autoOpen: false });
-        // alert("here1");
         if (${requestScope.get("success") == true}){
-            // alert("here2")
             $( "#dialog-success" ).dialog( "open" );
         }
         else if ( ${requestScope.get("success") == false} ) {
-            // alert("here3");
             $( "#dialog-fail" ).dialog( "open" );
         }
 
@@ -198,14 +197,12 @@
 
     function fillFaculty(element) {
         year = element.getAttribute("value");
-        alert(year);
 
         $.post("/tutor/getFaculties",
             {
                 "year": year
             },
             function (data) {
-                alert("came back!");
                 $("#faculty-select-id").html(data);
         }
         );
@@ -229,7 +226,6 @@
 
     function fillProfession(element){
         faculty = element.getAttribute("value");
-        alert(faculty);
 
         $.post("/tutor/getProfessions",
             {
@@ -237,7 +233,6 @@
                 "faculty": faculty
             },
         function (data) {
-            alert("came back");
             $("#profession-select-id").html(data);
         });
 
@@ -260,8 +255,6 @@
     
     function fillSection(element) {
         profession = element.getAttribute("value");
-        alert(profession);
-
         $.post("/tutor/getSections",
             {
                 "year": year,
@@ -269,64 +262,28 @@
                 "profession":profession
             },
             function (data) {
-            alert("came back");
                 $("#section-select-id").html(data);
             })
 
-        // var sectionArray = ['Az', 'Rus'];
-        //
-        // var sectionSelect = document.getElementById("sectionId");
-        //
-        // for(var i=0; i<sectionArray.length; i++){
-        //     var option = document.createElement("option");
-        //     var valueAttr = document.createAttribute("value");
-        //     var onclickAttr = document.createAttribute("onclick");
-        //     valueAttr.value=sectionArray[i];
-        //     onclickAttr.value='fillEducationType(this)';
-        //     option.setAttributeNode(valueAttr);
-        //     option.setAttributeNode(onclickAttr);
-        //     option.innerText = sectionArray[i];
-        //     sectionSelect.add(option);
-        // }
     }
 
-    function fillEducationType(element) {
-        section = element.getAttribute("value");
-        // alert(section);
-
-        var educationTypeArray = ['Eyani', 'Qiyabi'];
-
-        var educationTypeSelect = document.getElementById("educationTypeId");
-
-        for(var i=0; i<educationTypeArray.length; i++){
-            var option = document.createElement("option");
-            var valueAttr = document.createAttribute("value");
-            valueAttr.value=educationTypeArray[i];
-            option.setAttributeNode(valueAttr);
-            option.innerText = educationTypeArray[i];
-            educationTypeSelect.add(option);
-        }
-    }
+    // function fillEducationType(element) {
+    //     section = element.getAttribute("value");
+    //
+    //     var educationTypeArray = ['Eyani', 'Qiyabi'];
+    //
+    //     var educationTypeSelect = document.getElementById("educationTypeId");
+    //
+    //     for(var i=0; i<educationTypeArray.length; i++){
+    //         var option = document.createElement("option");
+    //         var valueAttr = document.createAttribute("value");
+    //         valueAttr.value=educationTypeArray[i];
+    //         option.setAttributeNode(valueAttr);
+    //         option.innerText = educationTypeArray[i];
+    //         educationTypeSelect.add(option);
+    //     }
+    // }
 
 </script>
-
-<%--Getting sections accordinging to selected year WIP --%>
-<%--<script>--%>
-    <%--$(document).ready(function () {--%>
-        <%--var currentYear = new Date().getFullYear();--%>
-
-        <%--$("#entry-year").change(function(){--%>
-
-            <%--var year = $(this).find("option:selected").attr("year");--%>
-
-            <%--$.post("/tutor/getSectionList",--%>
-                <%--{selectedYear: year},--%>
-                <%--function () {--%>
-                    <%--alert("Good Job")--%>
-                <%--}--%>
-            <%--)--%>
-        <%--});--%>
-    <%--})--%>
-<%--</script>--%>
 
 </body>

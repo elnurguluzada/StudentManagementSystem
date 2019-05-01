@@ -123,9 +123,126 @@
     <%--todo What if there isn't qiyabi type in that faculty--%>
     <form:label path="educationType">Education Type</form:label>
     <form:select path="educationType" id="education-type-select-id">
-        <form:option value="Select one" />
+        <form:option value="" label="Select one" />
+        <form:option value="Eyani" />
+        <form:option value="Qiyabi" />
     </form:select>
     <br/><br/>
     <form:button>Update</form:button>
 
 </form:form>
+
+<script>
+
+    $(document).ready(function () {
+        dateInput();
+        popup();
+    });
+
+    function dateInput() {
+        flatpickr("#birth-date-id",
+            {
+                // "altInput": true,
+                "dateFormat":"Y/m/d",
+                // "altDate": "dd-mm-yyyy",
+                "allowInput":true,
+                "minDate": "1950/01/01",
+                "maxDate": "today",
+                "onOpen": function(selectedDates, dateStr, instance) {
+                    instance.setDate(instance.input.value, false);
+                }
+            }
+        );
+    }
+
+    function popup() {
+        $( "#dialog-success" ).dialog({ autoOpen: false });
+        $( "#dialog-fail" ).dialog({ autoOpen: false });
+        if (${requestScope.get("success") == true}){
+            $( "#dialog-success" ).dialog( "open" );
+        }
+        else if ( ${requestScope.get("success") == false} ) {
+            $( "#dialog-fail" ).dialog( "open" );
+        }
+
+    }
+
+    var year;
+    var faculty;
+    var profession;
+    var section;
+
+    function fillFaculty(element) {
+        year = element.getAttribute("value");
+
+        $.post("/tutor/getFaculties",
+            {
+                "year": year
+            },
+            function (data) {
+                $("#faculty-select-id").html(data);
+            }
+        );
+
+
+        <%--var facultySelect = document.getElementById("facultyId");--%>
+
+        <%--for(var i=0; i<facultyArray.length; i++){--%>
+        <%--var option = document.createElement("option");--%>
+        <%--var valueAttr = document.createAttribute("value");--%>
+        <%--var onclickAttr = document.createAttribute("onclick");--%>
+        <%--valueAttr.value=facultyArray[i];--%>
+        <%--onclickAttr.value='fillProfession(this)';--%>
+        <%--option.setAttributeNode(valueAttr);--%>
+        <%--option.setAttributeNode(onclickAttr);--%>
+        <%--option.innerText = facultyArray[i];--%>
+        <%--facultySelect.add(option);--%>
+        <%--}--%>
+
+    }
+
+    function fillProfession(element){
+        faculty = element.getAttribute("value");
+
+        $.post("/tutor/getProfessions",
+            {
+                "year": year,
+                "faculty": faculty
+            },
+            function (data) {
+                $("#profession-select-id").html(data);
+            });
+    }
+
+    function fillSection(element) {
+        profession = element.getAttribute("value");
+        $.post("/tutor/getSections",
+            {
+                "year": year,
+                "faculty":faculty,
+                "profession":profession
+            },
+            function (data) {
+                $("#section-select-id").html(data);
+            })
+
+    }
+
+    // function fillEducationType(element) {
+    //     section = element.getAttribute("value");
+    // alert(section);
+    //     var educationTypeArray = ['Eyani', 'Qiyabi'];
+    //
+    //     var educationTypeSelect = document.getElementById("education-type-select-id");
+    //
+    //     for(var i=0; i<educationTypeArray.length; i++){
+    //         var option = document.createElement("option");
+    //         var valueAttr = document.createAttribute("value");
+    //         valueAttr.value=educationTypeArray[i];
+    //         option.setAttributeNode(valueAttr);
+    //         option.innerText = educationTypeArray[i];
+    //         educationTypeSelect.add(option);
+    //     }
+    // }
+
+</script>

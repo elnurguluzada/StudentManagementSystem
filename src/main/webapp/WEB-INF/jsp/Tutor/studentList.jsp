@@ -115,7 +115,7 @@
         $("#update-success").dialog({autoOpen: false}),
         $("#update-fail").dialog({autoOpen: false}),
         drawTable(),
-        func()
+        popup()
     );
 
     var myTable;
@@ -243,7 +243,7 @@
         )
     }
 
-    function func() {
+    function popup() {
 
         <c:if test="${success == true}" >
             $("#update-success").dialog('open');

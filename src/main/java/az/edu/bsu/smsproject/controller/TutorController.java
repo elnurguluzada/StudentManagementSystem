@@ -5,7 +5,6 @@ import az.edu.bsu.smsproject.Service.StudentService;
 import az.edu.bsu.smsproject.Service.TutorService;
 import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Student;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -180,16 +178,17 @@ public class TutorController {
         int numberOfAllStudents = tutorService.getNumberOfAllStudents();
         dataTable.setRecordsTotal( numberOfAllStudents );
 
-        List<Student > filteredStudentList = tutorService.getFilteredStudentList( searchValue );
-        int numberOfFilteredStudents = filteredStudentList.size();
+        int numberOfFilteredStudents = tutorService.getNumberOfFilteredStudents(searchValue);
         dataTable.setRecordsFiltered( numberOfFilteredStudents );
+
+        List<Student > filteredStudentList = tutorService.getFilteredStudentList( searchValue, start, start+length );
 
         if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents % length;
 
         String[][] data = new String[length][25];
         for (int i=0; i<length; i++){
-            Student student = filteredStudentList.get(start+i);
+            Student student = filteredStudentList.get(i);
             data[i][0] = String.valueOf(student.getId());
             data[i][1] = student.getName();
             data[i][2] = student.getSurname();
