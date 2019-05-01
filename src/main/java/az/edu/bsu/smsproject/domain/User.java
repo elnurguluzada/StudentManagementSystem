@@ -30,6 +30,11 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     }
 
     public User() {
+        surname = "";
+        email = "";
+        password = "";
+        phoneNumber = "";
+        faculty = "";
     }
 
 

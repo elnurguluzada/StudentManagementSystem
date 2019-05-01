@@ -15,7 +15,6 @@ public class Student extends User implements Serializable {
     private static final long serialVersionUID = 3743824363989869865L;
 
     private String fatherName;
-    @DateTimeFormat(pattern="yyyy/MM/dd")
     private LocalDate birthDate;
     private String birthPlace;
     private String livingPlace;
@@ -80,6 +79,8 @@ public class Student extends User implements Serializable {
         this.profession = "";
         this.section = "";
         this.group = "";
+        this.gender = ' '; //otherwise spring initializes gender and when gender isn't selected in addStudent form,
+        //it is validated as correct
     }
 
     @Override
