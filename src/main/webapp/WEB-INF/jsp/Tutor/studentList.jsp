@@ -53,11 +53,10 @@
         <th>Id card fin code</th>
         <th>Gender</th>
         <th>Social Status</th>
-        <th>Action</th>
+        <th>Action1</th>
 
         <%--todo social status id--%>
         <%--todo scholarship status--%>
-        <%--<th>Action</th>--%>
     </tr>
     </thead>
     <tfoot>
@@ -88,15 +87,17 @@
         <th>Id card fin code</th>
         <th>Gender</th>
         <th>Social Status</th>
-        <th>Action</th>
+        <th>Action1</th>
         <%--todo social status id--%>
         <%--todo scholarship status--%>
-        <%--<th>Action</th>--%>
+
     </tr>
     </tfoot>
 </table>
 
 <div id="detailedStudentInformation" title="Student Information"></div>
+<div id="update-success" title="Student update">Student was updated successfully</div>
+<div id="update-fail" title="Student update">An error occurred while updating</div>
 
 <%--include jQuery-----------------------------------------------------------------------%>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -111,11 +112,13 @@
 
     $(document).ready(
         $("#detailedStudentInformation").dialog({autoOpen: false}),
-        drawTable()
+        $("#update-success").dialog({autoOpen: false}),
+        $("#update-fail").dialog({autoOpen: false}),
+        drawTable(),
+        popup()
     );
 
     var myTable;
-
     function drawTable() {
 
         myTable = $("#student-list-table").DataTable({
@@ -141,82 +144,90 @@
                         });
                     });
 
+                // $(".detailedInfo").on('click', function () {
+                //     var userId = myTable.row( $(this).parents('tr') ).data()[0];
+                //     alert(userId);
+                //     $("#detailedStudentInformation").load("/tutor/getStudentInfoPopup?userId=" + userId,
+                //     function () {
+                //         $("#detailedStudentInformation").dialog('open');
+                //     })
+                // });
+
             },
             "buttons": [
                 'colvis'
             ],
             "columnDefs": [
                 {
-                    "targets": [5], //todo complete it
+                    "targets": [5],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [6], //todo complete it
+                    "targets": [6],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [7], //todo complete it
+                    "targets": [7],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [10], //todo complete it
+                    "targets": [10],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [11], //todo complete it
+                    "targets": [11],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [12], //todo complete it
+                    "targets": [12],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [13], //todo complete it
+                    "targets": [13],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [14], //todo complete it
+                    "targets": [14],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [20], //todo complete it
+                    "targets": [20],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [21], //todo complete it
+                    "targets": [21],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [22], //todo complete it
+                    "targets": [22],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [23], //todo complete it
+                    "targets": [23],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [24], //todo complete it
+                    "targets": [24],
                     "visible": false,
                     "searchable": false
                 },
                 {
-                    "targets": [-1], //todo complete it
+                    "targets": [-1],
                     "visible": true,
-                    "defaultContent": "<button>Detailed!</button>"
+                    "defaultContent": "<button class='detailedInfo'>Detailed!</button>"
                 }
-
             ]
         });
 
@@ -232,26 +243,16 @@
         )
     }
 
-    function popupAgain(element) {
-        $("#detailedStudentInformation").dialog({
-            autoOpen: false
-        });
+    function popup() {
 
-        var userId = element.getAttribute("");
-
-        $("#detailedStudentInformation").load(
-            "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
-            function () {                                   // function is executed when response comes from url
-                $("#detailedStudentInformation").dialog('open');
-            });
+        <c:if test="${success == true}" >
+            $("#update-success").dialog('open');
+        </c:if>
+        <c:if test="${success == false}">
+            $("#update-fail").dialog('open');
+        </c:if>
     }
-
 </script>
 
 </body>
 </html>
-
-
-<%--
-<a href="/tutor/studentInfo?id=${student.id}">Info</a>
---%>

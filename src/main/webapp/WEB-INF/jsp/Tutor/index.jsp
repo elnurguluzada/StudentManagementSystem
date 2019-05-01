@@ -5,6 +5,7 @@
 </head>
 <body>
     <a href="/tutor/addStudentForm">Add Student</a>
-    <a href="/tutor/createGroup">Create Group</a>
+    <br/> <br/>
+    <a href="/tutor/getStudentsList">Students List</a>
 </body>
 </html>
