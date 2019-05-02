@@ -4,6 +4,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <head>
+    <%--For jquery-ui (pop-up)--%>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+        <!--For Flatpickr-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         .error{ color: red; }
     </style>
@@ -142,8 +147,8 @@
     <form:button>Update</form:button>
 </form:form>
 
-<%--<div id="update-success" title="Student update">Student was updated successfully</div>--%>
-<%--<div id="update-fail" title="Student update">An error occurred while updating</div>--%>
+<div id="update-success" title="Student update">Student was updated successfully</div>
+<div id="update-fail" title="Student update">An error occurred while updating</div>
 
 <%--include jQuery-----------------------------------------------------------------------%>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -153,13 +158,11 @@
 <script>
 
     $(document).ready(function () {
-        // $("#update-success").hide();
-        // $("#update-fail").hide();
-
+        $("#update-success").hide();
+        $("#update-fail").hide();
         setEntryYear();
-        popup();
         dateInput();
-        alert('ready5');
+        popup();
     });
 
     function setEntryYear() {
@@ -189,19 +192,17 @@
     }
 
     function popup() {
-        // $("#dialog-success" ).dialog({ autoOpen: false });
-        // $("#dialog-fail" ).dialog({ autoOpen: false });
+        $("#update-success" ).dialog({ autoOpen: false });
+        $("#update-fail" ).dialog({ autoOpen: false });
 
-        <c:if test="${success == true}" >
-            // $("#update-success").show();
-            alert("Student was updated successfully");
-            // $("#dialog-success").dialog("open");
-        </c:if>
-        <c:if test="${success == false}" >
-            // $("#update-fail").show();
-            alert("An error occurred while updating");
-            // $("#dialog-fail").dialog("open");
-        </c:if>
+        if(${requestScope.success == true}) {
+            $("#update-success").show();
+            $("#update-success").dialog("open");
+        }
+        else if(${requestScope.success == false}) {
+            $("#update-fail").show();
+            $("#update-fail").dialog("open");
+        }
 
     }
 
