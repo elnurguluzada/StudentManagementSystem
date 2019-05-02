@@ -6,8 +6,6 @@ import az.edu.bsu.smsproject.Service.TutorService;
 import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.domain.StudentValidation;
-import com.google.gson.Gson;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,7 +52,7 @@ public class TutorController {
         return "Tutor/index";
     }
 //--------------------------------------------------------------------------------------
-    @GetMapping("/addStudentForm")
+    @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("/Tutor/addStudent");
         modelAndView.addObject("student", new Student());
@@ -114,10 +112,11 @@ public class TutorController {
         return modelAndView;
     }
  //--------------------------------------------------------------------------------------
-    @GetMapping("/getStudentsList")
+    @GetMapping("/studentsList")
     public ModelAndView getStudentsForm(){
         return new ModelAndView("Tutor/studentList");
     }
+
 //    @GetMapping("/getStudents")
 //    public ModelAndView showStudents(
 //            @RequestParam(name = "draw") int draw,
@@ -225,7 +224,7 @@ public class TutorController {
             data[i][16] = student.getSection();
             data[i][17] = student.getFaculty();
             data[i][18] = student.getProfession();
-            data[i][19] = student.getGroup();
+            data[i][19] = String.valueOf(student.getGroupId());
             data[i][20] = student.getEducationType();
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
@@ -256,12 +255,13 @@ public class TutorController {
             @Valid @ModelAttribute(name = "student") Student student,
             BindingResult bindingResult
     ){
+        System.out.println( student );
+        bindingResult.getAllErrors().forEach(System.out::println);
         boolean success = false;
-        ModelAndView modelAndView = new ModelAndView("Tutor/studentList");
+        ModelAndView modelAndView = new ModelAndView("Tutor/studentPersonalInfo");
         if ( !bindingResult.hasErrors() ){
             success = tutorService.updateStudent(student) == 1;
         }
-
         modelAndView.addObject("success", success);
         return modelAndView;
     }

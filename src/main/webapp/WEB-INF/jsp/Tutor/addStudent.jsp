@@ -149,7 +149,7 @@
 </form:form>
 
 <div id="dialog-success" title="Student Registration">Student was registered successfully</div>
-<div id="dialog-fail" title="Student Registration">Err</div>
+<div id="dialog-fail" title="Student Registration">Error occurred while adding new student</div>
 
 <%--Inclode jQuery--%>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script
@@ -175,6 +175,7 @@
                 "allowInput":true,
                 "minDate": "1950/01/01",
                 "maxDate": "today",
+                // "defaultDate": "2000/01/01",
                 "onOpen": function(selectedDates, dateStr, instance) {
                     instance.setDate(instance.input.value, false);
                 }

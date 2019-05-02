@@ -1,16 +1,21 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<head>
+    <style>
+        .error{ color: red; }
+    </style>
+</head>
 
 <% request.setAttribute("currentYear", LocalDate.now().getYear()); %>
 
 <form:form action="/tutor/updateStudent" method="post" modelAttribute="student" >
-
-    <form:label path="id">Id</form:label>
-    <form:input path="id"  readonly="true"/>
+    <form:hidden path="id" />
     <br/><br/>
     <form:label path="name">Name</form:label>
-    <form:input path="name"/> <br/>
+    <form:input path="name" /> <br/>
     <small><form:errors path="name" cssClass="error"/></small>
     <br/><br/>
     <form:label path="surname">Surname</form:label>
@@ -29,9 +34,7 @@
     <form:input path="email" /> <br/>
     <small><form:errors path="email" cssClass="error"/></small>
     <br/><br/>
-    <form:label path="password">Password</form:label>
-    <form:password path="password" readonly="true"/> <br/>
-    <small><form:errors path="password" cssClass="error"/></small>
+    <form:hidden path="password" />
     <br/><br/>
     <form:label path="phoneNumber">Phone Number</form:label>
     <form:input path="phoneNumber" /> <br/>
@@ -39,7 +42,8 @@
     <br/><br/>
     <form:label path="gender">Gender</form:label> <br/>
     Male: <form:radiobutton path="gender" value="M"/>
-    Female: <form:radiobutton path="gender" value="F"/>
+    Female: <form:radiobutton path="gender" value="F"/> <br/>
+    <small><form:errors path="gender" cssClass="error"/> </small>
     <br/><br/>
     <form:label path="fatherName">Father Name</form:label>
     <form:input path="fatherName" /> <br/>
@@ -95,49 +99,78 @@
     <form:label path="dovletSifarisli">Dovlet Sifarisli</form:label>
     <form:checkbox path="dovletSifarisli"/>
     <br/><br/>
+    <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:select path="entryYear" id="entry-year" >
-        <form:option value="${currentYear}"  id="year1" onclick="fillFaculty(this)" />
-        <form:option value="${currentYear-1}" id="year2" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-2}" id="year3" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-3}" id="year4" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-4}" id="year5" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear}"  onclick="fillFaculty(this)" />
+        <form:option value="${currentYear-1}" onclick="fillFaculty(this)" />
+        <form:option value="${currentYear-2}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-3}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-4}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-5}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-6}" onclick="fillFaculty(this)"/>
+        <form:option value="${currentYear-7}" onclick="fillFaculty(this)"/>
     </form:select>
     <br/><br/>
+    <%--value attribute should be empty not 'Select one', otherwise spring validation will accept
+    'Select one' as faculty name--%>
     <form:label path="faculty" >Faculty</form:label>
     <form:select path="faculty" id="faculty-select-id">
-        <form:option value="Select one" />
-    </form:select>
+        <form:option value="${student.faculty}"/>
+    </form:select> <br/>
     <small><form:errors path="faculty" cssClass="error"/></small>
     <br/><br/>
     <form:label path="profession" >Profession</form:label>
     <form:select path="profession" id="profession-select-id" >
-        <form:option value="Select one"/>
-    </form:select>
+        <form:option value="${student.profession}" />
+    </form:select> <br/>
+    <small><form:errors path="profession" cssClass="error"/></small>
     <br/><br/>
     <form:label path="section">Section</form:label>
     <form:select path="section" id="section-select-id">
-        <form:option value="Select one"/>
-    </form:select>
+        <form:option value="${student.section}" />
+    </form:select> <br/>
+    <small><form:errors path="section" cssClass="error"/> </small>
     <br/><br/>
-    <%--todo What if there isn't qiyabi type in that faculty--%>
-    <form:label path="educationType">Education Type</form:label>
-    <form:select path="educationType" id="education-type-select-id">
-        <form:option value="" label="Select one" />
-        <form:option value="Eyani" />
-        <form:option value="Qiyabi" />
-    </form:select>
+        <form:label path="educationType">Education Type</form:label> <br/>
+        <form:label path="educationType" >Eyani</form:label>
+        <form:radiobutton path="educationType" value="Eyani"/> <br/>
+        <form:label path="educationType" >Qiyabi</form:label>
+        <form:radiobutton path="educationType" value="Qiyabi"/>
     <br/><br/>
+    <small><form:errors path="educationType" cssClass="error"/> </small> <br/>
     <form:button>Update</form:button>
-
 </form:form>
 
+<%--<div id="update-success" title="Student update">Student was updated successfully</div>--%>
+<%--<div id="update-fail" title="Student update">An error occurred while updating</div>--%>
+
+<%--include jQuery-----------------------------------------------------------------------%>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<%--popup--%>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 
     $(document).ready(function () {
-        dateInput();
+        // $("#update-success").hide();
+        // $("#update-fail").hide();
+
+        setEntryYear();
         popup();
+        dateInput();
+        alert('ready5');
     });
+
+    function setEntryYear() {
+        var select = document.getElementById("entry-year");
+        for (var i = 0; i < select; i++){
+            var option = select.options[i];
+            if ( parseInt(option.value) === parseInt(${student.entryYear})) {
+                option.selected = true;
+            }
+        }
+    }
 
     function dateInput() {
         flatpickr("#birth-date-id",
@@ -156,14 +189,19 @@
     }
 
     function popup() {
-        $( "#dialog-success" ).dialog({ autoOpen: false });
-        $( "#dialog-fail" ).dialog({ autoOpen: false });
-        if (${requestScope.get("success") == true}){
-            $( "#dialog-success" ).dialog( "open" );
-        }
-        else if ( ${requestScope.get("success") == false} ) {
-            $( "#dialog-fail" ).dialog( "open" );
-        }
+        // $("#dialog-success" ).dialog({ autoOpen: false });
+        // $("#dialog-fail" ).dialog({ autoOpen: false });
+
+        <c:if test="${success == true}" >
+            // $("#update-success").show();
+            alert("Student was updated successfully");
+            // $("#dialog-success").dialog("open");
+        </c:if>
+        <c:if test="${success == false}" >
+            // $("#update-fail").show();
+            alert("An error occurred while updating");
+            // $("#dialog-fail").dialog("open");
+        </c:if>
 
     }
 
@@ -227,22 +265,5 @@
             })
 
     }
-
-    // function fillEducationType(element) {
-    //     section = element.getAttribute("value");
-    // alert(section);
-    //     var educationTypeArray = ['Eyani', 'Qiyabi'];
-    //
-    //     var educationTypeSelect = document.getElementById("education-type-select-id");
-    //
-    //     for(var i=0; i<educationTypeArray.length; i++){
-    //         var option = document.createElement("option");
-    //         var valueAttr = document.createAttribute("value");
-    //         valueAttr.value=educationTypeArray[i];
-    //         option.setAttributeNode(valueAttr);
-    //         option.innerText = educationTypeArray[i];
-    //         educationTypeSelect.add(option);
-    //     }
-    // }
 
 </script>

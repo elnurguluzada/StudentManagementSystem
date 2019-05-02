@@ -4,8 +4,8 @@
     <title>Title</title>
 </head>
 <body>
-    <a href="/tutor/addStudentForm">Add Student</a>
+    <a href="/tutor/studentForm">Add Student</a>
     <br/> <br/>
-    <a href="/tutor/getStudentsList">Students List</a>
+    <a href="/tutor/studentsList">Students List</a>
 </body>
 </html>

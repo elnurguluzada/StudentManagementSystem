@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 <head>
@@ -48,7 +48,6 @@
         <th>Profession</th>
         <th>Group</th>
         <th>Education type</th><!--20th column-->
-        <%--<th>Education year</th>--%>
         <th>Id card number</th>
         <th>Id card fin code</th>
         <th>Gender</th>
@@ -82,7 +81,6 @@
         <th>Profession</th>
         <th>Group</th>
         <th>Education type</th> <!--20-->
-        <%--<th>Education year</th>--%>
         <th>Id card number</th>
         <th>Id card fin code</th>
         <th>Gender</th>
@@ -96,8 +94,7 @@
 </table>
 
 <div id="detailedStudentInformation" title="Student Information"></div>
-<div id="update-success" title="Student update">Student was updated successfully</div>
-<div id="update-fail" title="Student update">An error occurred while updating</div>
+
 
 <%--include jQuery-----------------------------------------------------------------------%>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -110,14 +107,13 @@
 
 <script>
 
-    $(document).ready(
-        $("#detailedStudentInformation").dialog({autoOpen: false}),
-        $("#update-success").dialog({autoOpen: false}),
-        $("#update-fail").dialog({autoOpen: false}),
-        drawTable(),
-        popup()
-    );
-
+    $(document).ready( function(){
+        $("#detailedStudentInformation").dialog({autoOpen: false});
+        $("#update-success").dialog({autoOpen: false});
+        $("#update-fail").dialog({autoOpen: false});
+        drawTable();
+        popup();
+    });
     var myTable;
     function drawTable() {
 
@@ -243,15 +239,7 @@
         )
     }
 
-    function popup() {
 
-        <c:if test="${success == true}" >
-            $("#update-success").dialog('open');
-        </c:if>
-        <c:if test="${success == false}">
-            $("#update-fail").dialog('open');
-        </c:if>
-    }
 </script>
 
 </body>

@@ -83,7 +83,7 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getEducationType(),
                 student.getProfession(),
                 student.getSection(),
-                student.getGroup(),
+                student.getGroupId(),
                 student.getEntryYear(),
                 student.getScholarshipStatus());
 
@@ -177,7 +177,7 @@ public class TutorRepositoryImpl implements TutorRepository {
                 ).get(0);
     }
 
-    //------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
     @Override
     public int updateStudent(Student student) {
 
@@ -201,12 +201,7 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     private int updateStudentInStudent( Student student ){
-/*
-"UPDATE student SET id_card_num  = ?, id_card_fin_code  = ?, father_name  = ?, birth_date  = ?, " +
-            "birth_place  = ?, living_place  = ?, official_home  = ?, parent_num  = ?, graduation_region  = ?, graduation_school  = ?, " +
-            "entry_id_num  = ?, entry_score  = ?, education_type  = ?, profession  = ?, section  = ?, bsu_group  = ?, " +
-            "scholarship_status  = ?, entry_year  = ? WHERE user_id = ?"
- */
+
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_STUDENT_TABLE,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -223,7 +218,7 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getEducationType(),
                 student.getProfession(),
                 student.getSection(),
-                student.getGroup(),
+                student.getGroupId(),
                 student.getScholarshipStatus(),
                 student.getEntryYear(),
                 student.getId()); //todo social_status_id
@@ -275,38 +270,32 @@ public class TutorRepositoryImpl implements TutorRepository {
         return 1;
     }
 //------------------------------------------------------------------------------------------------------
-    public Set<String> getFacultySet(int year){
-        String sql = "SELECT distinct(faculty) FROM groups WHERE year = ?";
+    public Set<String> getFacultySet(int creationYear){
+        String sql = "SELECT distinct(faculty) FROM groups WHERE creation_year = ?";
 
         List<String> facultyList = jdbcTemplate.query(sql,
                 ((resultSet, i) -> resultSet.getString(1)),
-                year);
-
-        System.out.println(facultyList);
+                creationYear);
 
         return new HashSet<>(facultyList);
     }
 
-    public Set<String> getProfessionSet(int year, String faculty){
-        String sql = "SELECT distinct(profession) FROM groups WHERE year = ? and faculty=?";
+    public Set<String> getProfessionSet(int creationYear, String faculty){
+        String sql = "SELECT distinct(profession) FROM groups WHERE creation_year = ? and faculty=?";
 
         List<String> professionList = jdbcTemplate.query(sql,
                 ((resultSet, i) -> resultSet.getString(1)),
-                year, faculty);
-
-        System.out.println(professionList);
+                creationYear, faculty);
 
         return new HashSet<>(professionList);
     }
 
-    public Set<String> getSectionSet(int year, String faculty, String profession){
-        String sql = "SELECT distinct(section) FROM groups WHERE year = ? and faculty=? and profession=?";
+    public Set<String> getSectionSet(int creationYear, String faculty, String profession){
+        String sql = "SELECT distinct(section) FROM groups WHERE creation_year = ? and faculty=? and profession=?";
 
         List<String> sectionList = jdbcTemplate.query(sql,
                 ((resultSet, i) -> resultSet.getString(1)),
-                year, faculty, profession);
-
-        System.out.println( sectionList );
+                creationYear, faculty, profession);
 
         return new HashSet<>(sectionList);
     }
@@ -341,7 +330,7 @@ public class TutorRepositoryImpl implements TutorRepository {
             student.setEducationType(resultSet.getString("education_type"));
             student.setProfession(resultSet.getString("profession"));
             student.setSection(resultSet.getString("section"));
-            student.setGroup(resultSet.getString("bsu_group"));
+            student.setGroupId(resultSet.getInt("group_id"));
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
             return student;
@@ -352,7 +341,6 @@ public class TutorRepositoryImpl implements TutorRepository {
         List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
                 ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
-        System.out.println(userId+" list = " +socialStatusList);
         return new HashSet<>(socialStatusList);
     }
 
