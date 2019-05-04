@@ -114,6 +114,7 @@
         drawTable();
         popup();
     });
+
     var myTable;
     function drawTable() {
 
@@ -123,33 +124,7 @@
             "ordering": true,
             "ajax": "/tutor/getStudents",
             "dom": 'Bfrtip',
-            "initComplete": function () { // initializing the table is completed
-
-                $('#student-list-table tbody').on('click', 'button', function () { //is activated when button is clicked
-
-                        $("#detailedStudentInformation").dialog({
-                            autoOpen: false
-                        });
-
-                        var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
-
-                        $("#detailedStudentInformation").load(
-                            "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
-                            function () {                                   // function is executed when response comes from url
-                                $("#detailedStudentInformation").dialog('open');
-                        });
-                    });
-
-                // $(".detailedInfo").on('click', function () {
-                //     var userId = myTable.row( $(this).parents('tr') ).data()[0];
-                //     alert(userId);
-                //     $("#detailedStudentInformation").load("/tutor/getStudentInfoPopup?userId=" + userId,
-                //     function () {
-                //         $("#detailedStudentInformation").dialog('open');
-                //     })
-                // });
-
-            },
+            // "initComplete": , it works when the table is initialized for the 1st time, but not when you move to next page
             "buttons": [
                 'colvis'
             ],
@@ -222,10 +197,40 @@
                 {
                     "targets": [-1],
                     "visible": true,
-                    "defaultContent": "<button class='detailedInfo'>Detailed!</button>"
+                    "defaultContent": "<button class='detailedInfo'>Detailed!</button> &nbsp " +
+                        "<a><button class='updateInfo'>Update!</button></a>"
                 }
             ]
         });
+
+        //The draw event is fired whenever the table is redrawn on the page, at the same point as drawCallback.
+        myTable.on( 'draw', function () {
+
+                $(".detailedInfo").click(function () {
+                    $(".detailedStudentInformation").dialog({
+                        autoOpen: false
+                    });
+
+                    var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                    $("#detailedStudentInformation").load(
+                        "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
+                        function () {                                   // function is executed when response comes from url
+                            $("#detailedStudentInformation").dialog('open');
+                        });
+
+                });
+
+                $(".updateInfo").click(function () {
+
+                    var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                    window.location.href = "/tutor/updateStudent?userId="+userId;
+
+                    // var xhr = new XMLHttpRequest();
+                    // xhr.open('GET',"/tutor/updateStudent?userId="+userId,false);
+                    // xhr.send();
+
+                });
+        } );
 
     }
 
@@ -244,3 +249,5 @@
 
 </body>
 </html>
+
+<%--href='/tutor/updateStudent?userId='"+myTable.row(this.parents('tr')).data()[0]+--%>

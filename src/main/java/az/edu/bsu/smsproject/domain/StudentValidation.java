@@ -111,8 +111,7 @@ public class StudentValidation implements Validator {
         return true;
     }
 
-    private boolean isPhoneNumberValid(String number){ // 0703251694
-        System.out.println(number);
+    private boolean isPhoneNumberValid(String number){
         if ( number.charAt(0) == '0' && number.length()!=10 )
             return false;
         else if ( number.charAt(0) !='0' && number.length()!=9 )

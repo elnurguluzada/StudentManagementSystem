@@ -54,7 +54,7 @@ public class TutorController {
 //--------------------------------------------------------------------------------------
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
-        ModelAndView modelAndView = new ModelAndView("/Tutor/addStudent");
+        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
         modelAndView.addObject("student", new Student());
         return modelAndView;
     }
@@ -63,7 +63,7 @@ public class TutorController {
     public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student,
                                     Errors errors ){
 
-        ModelAndView modelAndView = new ModelAndView("Tutor/addStudent");
+        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
             if ( tutorService.addStudent( student ) ){
@@ -79,42 +79,33 @@ public class TutorController {
         return modelAndView;
     }
 
-    @PostMapping("/getFaculties")
-    public ModelAndView getFaculties(
+    @ResponseBody @GetMapping("/getFaculties")
+    public Set<String> getFaculties(
             @RequestParam(name="year") int year
     ){
-        Set<String> facultySet = tutorService.getFacultySet(year);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", facultySet).addObject("functionToCall", "fillProfession(this)");
-        return modelAndView;
+        return tutorService.getFacultySet(year);
     }
 
-    @PostMapping("/getProfessions")
-    public ModelAndView getProfessions(
+    @ResponseBody @GetMapping("/getProfessions")
+    public Set<String> getProfessions(
             @RequestParam(name="year") int year,
             @RequestParam(name="faculty") String faculty
     ){
-        Set<String> professionSet = tutorService.getProfessionSet(year, faculty);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", professionSet).addObject("functionToCall", "fillSection(this)");
-        return modelAndView;
+        return tutorService.getProfessionSet(year, faculty);
     }
 
-    @PostMapping("/getSections")
-    public ModelAndView getSections(
+    @ResponseBody @GetMapping("/getSections")
+    public Set<String> getSections(
             @RequestParam(name="year") int year,
             @RequestParam(name="faculty") String faculty,
             @RequestParam(name="profession") String profession
     ){
-        Set<String> sectionSet = tutorService.getSectionSet(year, faculty, profession);
-        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiverForAddStudent");
-        modelAndView.addObject("optionsSet", sectionSet);
-        return modelAndView;
+        return tutorService.getSectionSet(year, faculty, profession);
     }
  //--------------------------------------------------------------------------------------
     @GetMapping("/studentsList")
     public ModelAndView getStudentsForm(){
-        return new ModelAndView("Tutor/studentList");
+        return new ModelAndView("Tutor/StudentList/studentList");
     }
 
 //    @GetMapping("/getStudents")
@@ -247,7 +238,14 @@ public class TutorController {
             Model model
     ) {
         model.addAttribute("student", tutorService.getStudentById(userId));
-        return "Tutor/studentPersonalInfo";
+        return "Tutor/StudentList/studentPersonalInfo";
+    }
+
+    @GetMapping("/updateStudent")
+    public String showUpdateStudent( @RequestParam(value = "userId") int userId, Model model){
+        System.out.println( "user id = "+userId);
+        model.addAttribute("student", tutorService.getStudentById(userId));
+        return "Tutor/StudentList/updateStudentForm";
     }
 
     @PostMapping("/updateStudent")
@@ -257,12 +255,12 @@ public class TutorController {
     ){
         System.out.println( student );
         bindingResult.getAllErrors().forEach(System.out::println);
-        boolean success = false;
-        ModelAndView modelAndView = new ModelAndView("Tutor/studentPersonalInfo");
+
+        ModelAndView modelAndView = new ModelAndView("Tutor/StudentList/updateStudentForm");
         if ( !bindingResult.hasErrors() ){
-            success = tutorService.updateStudent(student) == 1;
+            boolean success = tutorService.updateStudent(student) == 1;
+            modelAndView.addObject("success", success);
         }
-        modelAndView.addObject("success", success);
         return modelAndView;
     }
 

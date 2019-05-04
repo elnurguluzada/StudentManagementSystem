@@ -19,6 +19,7 @@
 <h3>Add New Student Data</h3>
 <% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
 
+
 <form:form action="/tutor/addStudent" method="post" modelAttribute="student" >
 
     <form:label path="name">Name</form:label>
@@ -207,17 +208,37 @@
     var profession;
     var section;
 
+
     function fillFaculty(element) {
         year = element.getAttribute("value");
 
-        $.post("/tutor/getFaculties",
+        $.get("/tutor/getFaculties",
             {
                 "year": year
             },
             function (data) {
-                $("#faculty-select-id").html(data);
-        }
+                alert(data);
+
+                $('#faculty-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for(var i=0; i<Object.keys(data).length; i++){
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value=data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value='fillProfession(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("faculty-select-id").add(option);
+                }
+            }
         );
+
+
         <%--var facultySelect = document.getElementById("facultyId");--%>
 
         <%--for(var i=0; i<facultyArray.length; i++){--%>
@@ -234,31 +255,65 @@
 
     }
 
-    function fillProfession(element){
+    function fillProfession(element) {
         faculty = element.getAttribute("value");
 
-        $.post("/tutor/getProfessions",
+        $.get("/tutor/getProfessions",
             {
                 "year": year,
                 "faculty": faculty
             },
-        function (data) {
-            $("#profession-select-id").html(data);
-        });
+            function (data) {
+                alert(data);
 
+                $('#profession-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for(var i=0; i<Object.keys(data).length; i++){
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value=data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value='fillSection(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("profession-select-id").add(option);
+                }
+            });
     }
-    
+
     function fillSection(element) {
         profession = element.getAttribute("value");
-        $.post("/tutor/getSections",
+        $.get("/tutor/getSections",
             {
                 "year": year,
-                "faculty":faculty,
-                "profession":profession
+                "faculty": faculty,
+                "profession": profession
             },
             function (data) {
-                $("#section-select-id").html(data);
+                alert(data);
+
+                $('#section-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for(var i=0; i<Object.keys(data).length; i++){
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value=data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value='fillSection(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("section-select-id").add(option);
+                }
             })
+
     }
 
 </script>
