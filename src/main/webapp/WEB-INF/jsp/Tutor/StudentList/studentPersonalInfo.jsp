@@ -1,7 +1,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <form:form  modelAttribute="student" >
-    <form:input path="id" disabled="true"/>
+
+        <div style="display: inline-block;">
+<%--    <form:input path="id" disabled="true"/>--%>
     <br/><br/>
     <form:label path="name">Name</form:label>
     <form:input path="name" disabled="true" /> <br/>
@@ -50,6 +52,8 @@
     <label>Asagi teminatli: </label>
     <form:checkbox path="socialStatusSet" value="3" disabled="true"/>
     <br/><br/>
+        </div>
+        <div style="display: inline-block;">
     <form:label path="parentPhoneNumber">Parent Phone Number</form:label>
     <form:input path="parentPhoneNumber" disabled="true"/> <br/>
     <br/><br/>
@@ -71,7 +75,6 @@
     <form:label path="dovletSifarisli">Dovlet Sifarisli</form:label>
     <form:checkbox path="dovletSifarisli"/>
     <br/><br/>
-    <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:input path="entryYear" disabled="true"/>
     <br/><br/>
@@ -89,5 +92,5 @@
         <form:radiobutton path="educationType" value="Eyani"/> <br/>
         <form:label path="educationType" >Qiyabi</form:label>
         <form:radiobutton path="educationType" value="Qiyabi"/>
-    <br/><br/>
+        </div>
 </form:form>

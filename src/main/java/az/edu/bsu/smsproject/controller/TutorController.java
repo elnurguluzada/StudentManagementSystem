@@ -51,7 +51,7 @@ public class TutorController {
     public String index(){
         return "Tutor/index";
     }
-//--------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
@@ -60,8 +60,7 @@ public class TutorController {
     }
 
     @PostMapping("/addStudent")
-    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student,
-                                    Errors errors ){
+    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
 
         ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
 
@@ -80,115 +79,59 @@ public class TutorController {
     }
 
     @ResponseBody @GetMapping("/getFaculties")
-    public Set<String> getFaculties(
-            @RequestParam(name="year") int year
-    ){
+    public Set<String> getFaculties( @RequestParam(name="year") int year ){
         return tutorService.getFacultySet(year);
     }
 
     @ResponseBody @GetMapping("/getProfessions")
-    public Set<String> getProfessions(
-            @RequestParam(name="year") int year,
-            @RequestParam(name="faculty") String faculty
-    ){
+    public Set<String> getProfessions(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty){
         return tutorService.getProfessionSet(year, faculty);
     }
 
     @ResponseBody @GetMapping("/getSections")
-    public Set<String> getSections(
-            @RequestParam(name="year") int year,
-            @RequestParam(name="faculty") String faculty,
-            @RequestParam(name="profession") String profession
+    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession
     ){
         return tutorService.getSectionSet(year, faculty, profession);
     }
- //--------------------------------------------------------------------------------------
+ //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentsList")
-    public ModelAndView getStudentsForm(){
-        return new ModelAndView("Tutor/StudentList/studentList");
+    public String getStudentsForm(){
+        return "Tutor/StudentList/studentList";
     }
-
-//    @GetMapping("/getStudents")
-//    public ModelAndView showStudents(
-//            @RequestParam(name = "draw") int draw,
-//            @RequestParam(name = "start") int start,
-//            @RequestParam(name = "length") int length,
-//            @RequestParam(name = "search[value]") String searchValue
-//    ) {
-//        DataTable dataTable = new DataTable();
-//        dataTable.setDraw(draw);
-//
-//        int numberOfAllStudents = tutorService.getNumberOfAllStudents();
-//        dataTable.setRecordsTotal( numberOfAllStudents );
-//
-//        List<Student > filteredStudentList = tutorService.getFilteredStudentList( searchValue );
-//        int numberOfFilteredStudents = filteredStudentList.size();
-//        dataTable.setRecordsFiltered( numberOfFilteredStudents );
-//
-//        if ( start + length > numberOfFilteredStudents )
-//            length = numberOfFilteredStudents % length;
-//
-//        String[][] data = new String[length][25];
-//        for (int i=0; i<length; i++){
-//            Student student = filteredStudentList.get(start+i);
-//            data[i][0] = String.valueOf(student.getId());
-//            data[i][1] = student.getName();
-//            data[i][2] = student.getSurname();
-//            data[i][3] = student.getFatherName();
-//            data[i][4] = student.getBirthDate().toString();
-//            data[i][5] = student.getBirthPlace();
-//            data[i][6] = student.getLivingPlace();
-//            data[i][7] = student.getOfficialHome();
-//            data[i][8] = student.getEmail();
-//            data[i][9] = student.getPhoneNumber();
-//            data[i][10] = student.getParentPhoneNumber();
-//            data[i][11] = String.valueOf(student.getEntryYear());
-//            data[i][12] = student.getGraduatedRegion();
-//            data[i][13] = student.getGraduatedRegion();
-//            data[i][14] = String.valueOf(student.getEntryIdNumber());
-//            data[i][15] = String.valueOf(student.getEntryScore());
-//            data[i][16] = student.getSection();
-//            data[i][17] = student.getFaculty();
-//            data[i][18] = student.getProfession();
-//            data[i][19] = student.getGroup();
-//            data[i][20] = student.getEducationType();
-//            data[i][21] = student.getIdCardNumber();
-//            data[i][22] = student.getIdCardFinCode();
-//            data[i][23] = String.valueOf(student.getGender());
-//            data[i][24] = student.getSocialStatusSet().toString();
-////            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
-//
-//            /*
-//            <%--todo scholarship status--%>
-//             */
-//        }
-//        dataTable.setData( data );
-//
-//        Gson gson = new Gson();
-//        String dataTableJson =gson.toJson(dataTable);
-//
-//        ModelAndView modelAndView = new ModelAndView("Tutor/ajaxReceiver");
-//        modelAndView.addObject("dataTable", dataTableJson);
-//        return modelAndView;
-//    }
 
     @ResponseBody @GetMapping("/getStudents")
     public DataTable showStudents(
             @RequestParam(name = "draw") int draw,
             @RequestParam(name = "start") int start,
             @RequestParam(name = "length") int length,
-            @RequestParam(name = "search[value]") String searchValue
+            @RequestParam(name = "search[value]") String searchValue,
+            @RequestParam(name = "columns[1][search][value]") String searchValueForName,
+            @RequestParam(name = "columns[2][search][value]") String searchValueForSurname,
+            @RequestParam(name = "columns[3][search][value]") String searchValueForFatherName,
+            @RequestParam(name = "columns[4][search][value]") String searchValueForBirthDate,
+            @RequestParam(name = "columns[5][search][value]") String searchValueForBirthPlace,
+            @RequestParam(name = "columns[6][search][value]") String searchValueForLivingPlace,
+            @RequestParam(name = "columns[11][search][value]") String searchValueForEntryYear,
+            @RequestParam(name = "columns[12][search][value]") String searchValueForGraduationRegion,
+            @RequestParam(name = "columns[15][search][value]") String searchValueForEntryScore,
+            @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
+            @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
+            @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
+            @RequestParam(name = "columns[16][search][value]") String searchValueForSection
     ) {
-        DataTable dataTable = new DataTable();
-        dataTable.setDraw(draw);
 
         int numberOfAllStudents = tutorService.getNumberOfAllStudents();
-        dataTable.setRecordsTotal( numberOfAllStudents );
 
-        int numberOfFilteredStudents = tutorService.getNumberOfFilteredStudents(searchValue);
-        dataTable.setRecordsFiltered( numberOfFilteredStudents );
+        List<Student > filteredStudentList = tutorService.getFilteredStudentList( start, start+length,
+                searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
+                searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
+                searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection);
 
-        List<Student > filteredStudentList = tutorService.getFilteredStudentList( searchValue, start, start+length );
+        int numberOfFilteredStudents = tutorService.getNumberOfFilteredStudents(
+                searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
+                searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
+                searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
+        );
 
         if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents % length;
@@ -227,33 +170,24 @@ public class TutorController {
             <%--todo scholarship status--%>
              */
         }
-        dataTable.setData( data );
 
-        return dataTable;
+        return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
     }
 
-    @GetMapping("/getStudentInfoPopup")
-    public String getPersonalStudentInfo(
-            @RequestParam(name="userId") long userId,
-            Model model
-    ) {
+    @GetMapping("/getStudentInfoPopup/{userId}")
+    public String getPersonalStudentInfo( @PathVariable("userId") long userId, Model model) {
         model.addAttribute("student", tutorService.getStudentById(userId));
         return "Tutor/StudentList/studentPersonalInfo";
     }
 
-    @GetMapping("/updateStudent")
-    public String showUpdateStudent( @RequestParam(value = "userId") int userId, Model model){
-        System.out.println( "user id = "+userId);
+    @GetMapping("/updateStudent/{userId}")
+    public String showUpdateStudent( @PathVariable("userId") int userId, Model model){
         model.addAttribute("student", tutorService.getStudentById(userId));
         return "Tutor/StudentList/updateStudentForm";
     }
 
     @PostMapping("/updateStudent")
-    public ModelAndView updateStudent(
-            @Valid @ModelAttribute(name = "student") Student student,
-            BindingResult bindingResult
-    ){
-        System.out.println( student );
+    public ModelAndView updateStudent( @Valid @ModelAttribute(name = "student") Student student, BindingResult bindingResult ){
         bindingResult.getAllErrors().forEach(System.out::println);
 
         ModelAndView modelAndView = new ModelAndView("Tutor/StudentList/updateStudentForm");

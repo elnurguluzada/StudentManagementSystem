@@ -31,7 +31,8 @@ public class TutorRepositoryImpl implements TutorRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.roleRepository = roleRepository;
     }
-//------------------------------------------------------------------------------------------------------
+
+    //------------------------------------------------------------------------------------------------------
     @Override
     public boolean addStudent(Student student) {
         long userId = insertIntoUserTable( student );
@@ -143,13 +144,6 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     @Override
-    public List<Student> getFilteredStudentList(String searchValue) {
-        return jdbcTemplate.query(SQLqueries.GET_FILTERED_STUDENT_LIST,
-                new StudentMapper(),
-                "%"+searchValue+"%");
-    }
-
-    @Override
     public List<Student> getFilteredStudentList(String searchValue, int beginRow, int endRow) {
         String sql = "select * from( " +
                         "select row_number() over(order by s.user_id) as rownum, * " +
@@ -166,15 +160,91 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
     @Override
-    public int getNumberOfFilteredStudents(String searchValue) {
-        String sql = "select count(*) " +
-                "from bdu_user bu join student s on bu.user_id = s.user_id " +
-                "where lower(bu.name) like lower(?)";
+    public List<Student> getFilteredStudentList(
+            int beginRow, int endRow,
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    ) {
+        String sql =
+                "select * from( " +
+                    "select row_number() over(order by s.user_id) as rownum, * " +
+                    "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                    "where lower(bu.name) like lower(?) and " +
+                        "lower(bu.surname) like lower(?) and " +
+                        "lower(s.father_name) like lower(?) and " +
+                        "to_char(s.birth_date, 'yyyy-mm-dd') like ? and  " +
+                        "lower(s.birth_place) like lower(?) and " +
+                        "lower(s.living_place) like lower(?) and " +
+                        "to_char(s.entry_year, '9999') like ? and " +
+                        "lower(s.graduation_region) like lower(?) and " +
+                        "to_char(s.entry_score, '999') like ? and " +
+                        "lower(bu.faculty) like lower(?) and " +
+                        "lower(s.profession) like lower(?) and " +
+                        "/*lower(s.group_id) like lower(?) and*/ " +
+                        "lower(s.section) like lower(?)" +
+                ") as sub " +
+                "where sub.rownum between ? and ?";
 
-         return jdbcTemplate.query(sql,
-                (resultSet, i) -> resultSet.getInt(1),
-                "%"+searchValue+"%"
-                ).get(0);
+        return jdbcTemplate.query(sql,
+                new StudentMapper(),
+                "%"+searchValueForName+"%",
+                "%"+searchValueForSurname+"%",
+                "%"+searchValueForFatherName+"%",
+                "%"+searchValueForBirthDate+"%",
+                "%"+searchValueForBirthPlace+"%",
+                "%"+searchValueForLivingPlace+"%",
+                "%"+searchValueForEntryYear+"%",
+                "%"+searchValueForGraduationRegion+"%",
+                "%"+searchValueForEntryScore+"%",
+                "%"+searchValueForFaculty+"%",
+                "%"+searchValueForProfession+"%",
+//                "%"+searchValueForGroup+"%",
+                "%"+searchValueForSection+"%",
+                beginRow,
+                endRow);
+    }
+
+
+    public int getNumberOfFilteredStudents(
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    ) {
+        String sql =
+                "select count(*) " +
+                        "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                        "where lower(bu.name) like lower(?) and " +
+                        "lower(bu.surname) like lower(?) and " +
+                        "lower(s.father_name) like lower(?) and " +
+                        "to_char(s.birth_date, 'yyyy-mm-dd') like ? and " +
+                        "lower(s.birth_place) like lower(?) and " +
+                        "lower(s.living_place) like lower(?) and " +
+                        "to_char(s.entry_year, '9999') like ? and " +
+                        "lower(s.graduation_region) like lower(?) and " +
+                        "to_char(s.entry_score, '999') like ? and " +
+                        "lower(bu.faculty) like lower(?) and " +
+                        "lower(s.profession) like lower(?) and " +
+                        "/*lower(s.group_id) like lower(?) and*/ " +
+                        "lower(s.section) like lower(?)";
+
+        return jdbcTemplate.query(sql,
+                ((resultSet, i)-> resultSet.getInt(1)),
+                "%"+searchValueForName+"%",
+                "%"+searchValueForSurname+"%",
+                "%"+searchValueForFatherName+"%",
+                "%"+searchValueForBirthDate+"%",
+                "%"+searchValueForBirthPlace+"%",
+                "%"+searchValueForLivingPlace+"%",
+                "%"+searchValueForEntryYear+"%",
+                "%"+searchValueForGraduationRegion+"%",
+                "%"+searchValueForEntryScore+"%",
+                "%"+searchValueForFaculty+"%",
+                "%"+searchValueForProfession+"%",
+//                "%"+searchValueForGroup+"%",
+                "%"+searchValueForSection+"%").get(0);
     }
 
 //------------------------------------------------------------------------------------------------------
@@ -299,7 +369,6 @@ public class TutorRepositoryImpl implements TutorRepository {
 
         return new HashSet<>(sectionList);
     }
-
 
 
     private class StudentMapper implements RowMapper<Student> {

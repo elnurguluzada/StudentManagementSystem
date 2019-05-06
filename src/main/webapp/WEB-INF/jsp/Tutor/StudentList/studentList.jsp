@@ -1,27 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 <head>
     <title>Students</title>
-    <%--For datatable--%>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
-    <%--For jquery-ui (pop-up)--%>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"><%--For datatable--%>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css"><%--For datatable buttons--%>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
 </head>
 <body>
-
-
-<label for="section">Section</label>
-<select id="section" onchange="filterRows(this)">
-    <option value="az" onclick="filerRows(this)">az</option>
-    <option value="rus" onclick="flterRows(this)">rus</option>
-</select>
-
-<br/>
-<br/>
-<br/>
 
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->
@@ -52,7 +37,7 @@
         <th>Id card fin code</th>
         <th>Gender</th>
         <th>Social Status</th>
-        <th>Action1</th>
+        <th>Action</th>
 
         <%--todo social status id--%>
         <%--todo scholarship status--%>
@@ -85,7 +70,7 @@
         <th>Id card fin code</th>
         <th>Gender</th>
         <th>Social Status</th>
-        <th>Action1</th>
+        <th>Action</th>
         <%--todo social status id--%>
         <%--todo scholarship status--%>
 
@@ -96,29 +81,39 @@
 <div id="detailedStudentInformation" title="Student Information"></div>
 
 
-<%--include jQuery-----------------------------------------------------------------------%>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<%--Include dataTables libraries--%>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js "></script>
-<%--popup--%>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script><%--dataTables libraries--%>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script><%--buttons for dataTables--%>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js "></script><%--buttons for dataTables--%>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script>
 
-    $(document).ready( function(){
-        $("#detailedStudentInformation").dialog({autoOpen: false});
-        $("#update-success").dialog({autoOpen: false});
-        $("#update-fail").dialog({autoOpen: false});
+    $(document).ready(function () {
+        $("#detailedStudentInformation").dialog({
+            autoOpen: false
+        });
         drawTable();
-        popup();
     });
 
-    var myTable;
     function drawTable() {
 
-        myTable = $("#student-list-table").DataTable({
+        // Setup - add a text input to each footer cell
+        $('#student-list-table tfoot th').each( function () {
+
+            var title = $(this).text();
+            if (title === 'Name' || title === 'Surname' || title === 'Father name' || title === 'Birth date' || title === 'Birth place' ||
+                title === 'Living place' || title === 'Entry year' || title === 'Graduation region' || title === 'Entry score' ||
+                title === 'Faculty' || title === 'Profession' || title === 'Group' || title === 'Section'){
+
+                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            }
+            else{
+                $(this).html( '<input type="text" hidden placeholder="Search '+title+'" />' );
+            }
+        } );
+
+        var myTable = $("#student-list-table").DataTable({
             "processing": true,
             "serverSide": true,
             "ordering": true,
@@ -204,50 +199,139 @@
         });
 
         //The draw event is fired whenever the table is redrawn on the page, at the same point as drawCallback.
-        myTable.on( 'draw', function () {
+        myTable.on('draw', function () {
 
-                $(".detailedInfo").click(function () {
-                    $(".detailedStudentInformation").dialog({
-                        autoOpen: false
+            $(".detailedInfo").click(function () {
+
+                var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                $("#detailedStudentInformation").load(
+                    "/tutor/getStudentInfoPopup/" + userId,  // url from which data will be loaded
+                    function () {                                   // function is executed when response comes from url
+                        $("#detailedStudentInformation").dialog('open');
                     });
 
-                    var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
-                    $("#detailedStudentInformation").load(
-                        "/tutor/getStudentInfoPopup?userId=" + userId,  // url from which data will be loaded
-                        function () {                                   // function is executed when response comes from url
-                            $("#detailedStudentInformation").dialog('open');
-                        });
+            });
 
-                });
+            $(".updateInfo").click(function () {
 
-                $(".updateInfo").click(function () {
+                var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                window.location.href = "/tutor/updateStudent/" + userId;
 
-                    var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
-                    window.location.href = "/tutor/updateStudent?userId="+userId;
+                // var xhr = new XMLHttpRequest();
+                // xhr.open('GET',"/tutor/updateStudent?userId="+userId,false);
+                // xhr.send();
 
-                    // var xhr = new XMLHttpRequest();
-                    // xhr.open('GET',"/tutor/updateStudent?userId="+userId,false);
-                    // xhr.send();
+            });
+        });
 
-                });
+        // Apply the search
+        myTable.columns().every( function () {
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that
+                        .search( this.value )
+                        .draw();
+                }
+            } );
         } );
 
     }
 
-    function filterRows(element) {
-        var mySearchValue = element.getAttribute("id") + '=' + element.options[element.selectedIndex].value;
-        alert(mySearchValue);
-        $.post("/tutor/getStudents",
+    function fillFaculty(element) {
+        year = element.getAttribute("value");
+
+        $.get("/tutor/getFaculties",
             {
-                mySearchValue: mySearchValue
+                "year": year
+            },
+            function (data) {
+                alert(data);
+
+                $('#faculty-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for (var i = 0; i < Object.keys(data).length; i++) {
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value = data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value = 'fillProfession(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("faculty").add(option);
+                }
             }
-        )
+        );
+
     }
 
+    function fillProfession(element) {
+        faculty = element.getAttribute("value");
+
+        $.get("/tutor/getProfessions",
+            {
+                "year": year,
+                "faculty": faculty
+            },
+            function (data) {
+                alert(data);
+
+                $('#profession-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for (var i = 0; i < Object.keys(data).length; i++) {
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value = data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value = 'fillSection(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("profession").add(option);
+                }
+            });
+    }
+
+    function fillSection(element) {
+        profession = element.getAttribute("value");
+        $.get("/tutor/getSections",
+            {
+                "year": year,
+                "faculty": faculty,
+                "profession": profession
+            },
+            function (data) {
+                alert(data);
+
+                $('#section-select-id')
+                    .find('option')
+                    .remove()
+                    .end();
+
+                for (var i = 0; i < Object.keys(data).length; i++) {
+                    var option = document.createElement("option");
+                    var valueAttr = document.createAttribute("value");
+                    valueAttr.value = data[i];
+                    var onclickAttr = document.createAttribute("onclick");
+                    onclickAttr.value = 'fillSection(this)';
+                    option.setAttributeNode(valueAttr);
+                    option.setAttributeNode(onclickAttr);
+                    option.innerText = data[i];
+                    document.getElementById("section").add(option);
+                }
+            })
+
+    }
 
 </script>
 
 </body>
 </html>
-
-<%--href='/tutor/updateStudent?userId='"+myTable.row(this.parents('tr')).data()[0]+--%>

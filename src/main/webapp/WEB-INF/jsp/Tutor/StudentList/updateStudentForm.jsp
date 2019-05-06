@@ -1,20 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <html>
 <head>
     <title>Update Student</title>
-    <%--For jquery-ui (pop-up)--%>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <!--For Flatpickr-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <style>
-        .error {
-            color: red;
-        }
-    </style>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"><!--For Flatpickr-->
+    <style> .error {color: red;} </style>
 </head>
 <body>
 <% request.setAttribute("currentYear", LocalDate.now().getYear()); %>
@@ -77,7 +70,7 @@
     <label>Social status: </label> <br/><br/>
     <label>Sehid ailesi: </label>
     <form:checkbox path="socialStatusSet" value="1"/> <br/>
-    <label>Qacqin: </label>
+    <label>Mecburi kockun: </label>
     <form:checkbox path="socialStatusSet" value="2"/> <br/>
     <label>Asagi teminatli: </label>
     <form:checkbox path="socialStatusSet" value="3"/>
@@ -159,7 +152,6 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <%--Flatpickr--%>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> <%--popup--%>
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script> <%--popup--%>
-
 <script>
 
     $(document).ready(function () {
