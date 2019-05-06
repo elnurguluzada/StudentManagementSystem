@@ -36,11 +36,6 @@ public class TutorServiceImpl implements TutorService {
     }
 
     @Override
-    public List<Student> getFilteredStudentList(String searchValue) {
-        return tutorRepository.getFilteredStudentList(searchValue);
-    }
-
-    @Override
     public int getNumberOfAllStudents() {
         return tutorRepository.getNumberOfAllStudents();
     }
@@ -61,11 +56,6 @@ public class TutorServiceImpl implements TutorService {
     }
 
     @Override
-    public int getNumberOfFilteredStudents(String searchValue) {
-        return tutorRepository.getNumberOfFilteredStudents(searchValue);
-    }
-
-    @Override
     public Set<String> getProfessionSet(int year, String faculty) {
         return tutorRepository.getProfessionSet(year, faculty);
     }
@@ -73,6 +63,16 @@ public class TutorServiceImpl implements TutorService {
     @Override
     public Set<String> getSectionSet(int year, String faculty, String profession) {
         return tutorRepository.getSectionSet(year, faculty, profession);
+    }
+
+    @Override
+    public List<Student> getFilteredStudentList(int beginRow, int endRow, String searchValueForName, String searchValueForSurname, String searchValueForFatherName, String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace, String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore, String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection) {
+        return tutorRepository.getFilteredStudentList(beginRow, endRow,  searchValueForName,  searchValueForSurname,  searchValueForFatherName,  searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,  searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore, searchValueForFaculty,  searchValueForProfession,  searchValueForGroup,  searchValueForSection);
+    }
+
+    @Override
+    public int getNumberOfFilteredStudents(String searchValueForName, String searchValueForSurname, String searchValueForFatherName, String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace, String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore, String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection) {
+        return tutorRepository.getNumberOfFilteredStudents( searchValueForName,  searchValueForSurname,  searchValueForFatherName,  searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,  searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore,  searchValueForFaculty,  searchValueForProfession,  searchValueForGroup,  searchValueForSection);
     }
 
 

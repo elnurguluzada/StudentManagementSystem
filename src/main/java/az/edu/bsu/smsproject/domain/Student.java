@@ -3,18 +3,20 @@ package az.edu.bsu.smsproject.domain;
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Student extends User implements Serializable {
     private static final long serialVersionUID = 3743824363989869865L;
 
     private String fatherName;
+    @DateTimeFormat(pattern = "yyyy/MM/dd")
     private LocalDate birthDate;
     private String birthPlace;
     private String livingPlace;
@@ -26,18 +28,18 @@ public class Student extends User implements Serializable {
     private String graduatedSchool;
     private int entryIdNumber;
     private int entryScore;
-    Set<Integer> socialStatusSet;
+    private Set<Integer> socialStatusSet;
     private String educationType;
     private boolean presidentialScholarship;            // true -> prezident teqaudcusu
     private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
     private int entryYear;
     private String profession;
     private String section;
-    private String group;
+    private int groupId;
     private int scholarshipStatus;
 
 
-    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, String group, int scholarshipStatus) {
+    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, int groupId, int scholarshipStatus) {
         super(id, name, status, roleId, surname, email, password, phoneNumber, faculty, gender);
         this.fatherName = fatherName;
         this.birthDate = birthDate;
@@ -58,7 +60,7 @@ public class Student extends User implements Serializable {
         this.entryYear = entryYear;
         this.profession = profession;
         this.section = section;
-        this.group = group;
+        this.groupId = groupId;
         this.scholarshipStatus = scholarshipStatus;
     }
 
@@ -78,7 +80,6 @@ public class Student extends User implements Serializable {
         this.dovletSifarisli = false;
         this.profession = "";
         this.section = "";
-        this.group = "";
         this.gender = ' '; //otherwise spring initializes gender and when gender isn't selected in addStudent form,
         //it is validated as correct
     }
@@ -115,7 +116,7 @@ public class Student extends User implements Serializable {
                 ", entryYear=" + entryYear +
                 ", profession='" + profession + '\'' +
                 ", section='" + section + '\'' +
-                ", group='" + group + '\'' +
+                ", groupId='" + groupId + '\'' +
                 ", scholarshipStatus=" + scholarshipStatus +
                 '}';
     }
@@ -264,12 +265,12 @@ public class Student extends User implements Serializable {
         this.section = section;
     }
 
-    public String getGroup() {
-        return group;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public int getScholarshipStatus() {

@@ -50,7 +50,7 @@ public class StudentValidation implements Validator {
             if ( student.getName().length() > 100 )
                 errors.rejectValue("name","addStudent.name.maxLength");
 
-            if ( isNameValid(student.getName() ) )
+            if ( !isNameValid(student.getName() ) )
                 errors.rejectValue("name","addStudent.name.invalid");
 //Surname
             if ( student.getSurname().length() < 3 )
@@ -59,26 +59,26 @@ public class StudentValidation implements Validator {
             if ( student.getSurname().length() > 100 )
                 errors.rejectValue("name","addStudent.surname.maxLength");
 
-            if ( isNameValid(student.getSurname() ) )
+            if ( !isNameValid(student.getSurname() ) )
                 errors.rejectValue("surname","addStudent.surname.invalid");
 //Email
-            if ( emailValidator.isValid(student.getEmail())  )
+            if ( !emailValidator.isValid(student.getEmail())  )
                 errors.rejectValue("email","addStudent.email.invalid");
 //Password
             if ( student.getPassword().length() < 8 )
-                errors.rejectValue("name","addStudent.password.minLength");
+                errors.rejectValue("password","addStudent.password.minLength");
 
             if ( student.getPassword().equals("weak") ) //todo
-                errors.rejectValue("name","addStudent.password.weak");
+                errors.rejectValue("password","addStudent.password.weak");
 //Phone number
-            if ( isPhoneNumberValid( student.getPhoneNumber() ) )
-                errors.rejectValue("name","addStudent.phoneNumber.invalid");
+            if ( !isPhoneNumberValid( student.getPhoneNumber() ) )
+                errors.rejectValue("phoneNumber","addStudent.phoneNumber.invalid");
 //Father name
             if ( student.getFatherName().length() < 3 )
-                errors.rejectValue("name","addStudent.fatherName.minLength");
+                errors.rejectValue("fatherName","addStudent.fatherName.minLength");
 
             if ( student.getFatherName().length() > 100 )
-                errors.rejectValue("name","addStudent.fatherName.maxLength");
+                errors.rejectValue("fatherName","addStudent.fatherName.maxLength");
 
             if ( !isNameValid( student.getFatherName()) )
                 errors.rejectValue("fatherName","addStudent.fatherName.invalid");
@@ -94,7 +94,7 @@ public class StudentValidation implements Validator {
 //            todo if (student.getBirthDate())
 //                errors.rejectValue("birthDate", "addStudent.birthDate.invalid");
 //Parent's phone number
-            if ( isPhoneNumberValid( student.getParentPhoneNumber() ) )
+            if ( !isPhoneNumberValid( student.getParentPhoneNumber() ) )
                 errors.rejectValue("parentPhoneNumber","addStudent.parentPhoneNumber.invalid");
 
         }
@@ -112,16 +112,14 @@ public class StudentValidation implements Validator {
     }
 
     private boolean isPhoneNumberValid(String number){
-
         if ( number.charAt(0) == '0' && number.length()!=10 )
             return false;
-        if ( number.charAt(0) !=0 && number.length()!=9 )
+        else if ( number.charAt(0) !='0' && number.length()!=9 )
             return false;
-
+        System.out.println(number.toCharArray());
         for ( char c: number.toCharArray() ) {
-            if ( c>=48 && c<=57)
-                continue;
-            else return false;
+            if ( c<'0' || c>'9')
+                return false;
         }
         return true;
     }
