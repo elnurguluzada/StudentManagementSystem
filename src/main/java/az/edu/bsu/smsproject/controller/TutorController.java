@@ -65,7 +65,7 @@ public class TutorController {
         ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
-            if ( tutorService.addStudent( student ) ){
+            if ( studentService.addStudent( student ).isPresent() ){
                 modelAndView.addObject("success", true);
             }
             else{
@@ -80,18 +80,18 @@ public class TutorController {
 
     @ResponseBody @GetMapping("/getFaculties")
     public Set<String> getFaculties( @RequestParam(name="year") int year ){
-        return tutorService.getFacultySet(year);
+        return commonService.getFacultySet(year);
     }
 
     @ResponseBody @GetMapping("/getProfessions")
     public Set<String> getProfessions(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty){
-        return tutorService.getProfessionSet(year, faculty);
+        return commonService.getProfessionSet(year, faculty);
     }
 
     @ResponseBody @GetMapping("/getSections")
     public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession
     ){
-        return tutorService.getSectionSet(year, faculty, profession);
+        return commonService.getSectionSet(year, faculty, profession);
     }
  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentsList")
@@ -120,14 +120,14 @@ public class TutorController {
             @RequestParam(name = "columns[16][search][value]") String searchValueForSection
     ) {
 
-        int numberOfAllStudents = tutorService.getNumberOfAllStudents();
+        int numberOfAllStudents = studentService.getNumberOfAllStudents();
 
-        List<Student > filteredStudentList = tutorService.getFilteredStudentList( start, start+length,
+        List<Student > filteredStudentList = studentService.getFilteredStudentList( start, start+length,
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection);
 
-        int numberOfFilteredStudents = tutorService.getNumberOfFilteredStudents(
+        int numberOfFilteredStudents = studentService.getNumberOfFilteredStudents(
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
@@ -176,13 +176,13 @@ public class TutorController {
 
     @GetMapping("/getStudentInfoPopup/{userId}")
     public String getPersonalStudentInfo( @PathVariable("userId") long userId, Model model) {
-        model.addAttribute("student", tutorService.getStudentById(userId));
+        model.addAttribute("student", studentService.getStudentById(userId));
         return "Tutor/StudentList/studentPersonalInfo";
     }
 
     @GetMapping("/updateStudent/{userId}")
     public String showUpdateStudent( @PathVariable("userId") int userId, Model model){
-        model.addAttribute("student", tutorService.getStudentById(userId));
+        model.addAttribute("student", studentService.getStudentById(userId));
         return "Tutor/StudentList/updateStudentForm";
     }
 
@@ -192,12 +192,10 @@ public class TutorController {
 
         ModelAndView modelAndView = new ModelAndView("Tutor/StudentList/updateStudentForm");
         if ( !bindingResult.hasErrors() ){
-            boolean success = tutorService.updateStudent(student) == 1;
+            boolean success = studentService.updateStudent(student).isPresent();
             modelAndView.addObject("success", success);
         }
         return modelAndView;
     }
-
-
 
 }
