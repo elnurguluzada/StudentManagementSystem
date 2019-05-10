@@ -1,9 +1,11 @@
 package az.edu.bsu.smsproject.controller;
 
 import az.edu.bsu.smsproject.Service.CommonService;
+import az.edu.bsu.smsproject.Service.GroupService;
 import az.edu.bsu.smsproject.Service.StudentService;
 import az.edu.bsu.smsproject.Service.TutorService;
 import az.edu.bsu.smsproject.domain.DataTable;
+import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.domain.StudentValidation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +28,15 @@ public class TutorController {
     private final CommonService commonService;
     private final StudentService studentService;
     private final TutorService tutorService;
+    private final GroupService groupService;
     private final StudentValidation studentValidation;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, StudentValidation studentValidation) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
+        this.groupService = groupService;
         this.studentValidation = studentValidation;
     }
 
@@ -198,6 +202,41 @@ public class TutorController {
         return modelAndView;
     }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 
+    @GetMapping("/groups")
+    public String groupList(){
+        return "Tutor/groupList";
+    }
+
+    @GetMapping("/getGroups")
+    @ResponseBody
+    public DataTable showGroups(
+            @RequestParam(name = "draw") int draw,
+            @RequestParam(name = "start") int start,
+            @RequestParam(name = "length") int length
+    ){
+        int numberOfAllGroups = groupService.getNumberOfAllGroups();
+
+        List<Group> filteredGroupList = groupService.getFilteredGroupList();
+
+        int numberOfFilteredStudents = groupService.getNumberOfAllGroups(); //todo
+
+        if ( start+length > filteredGroupList.size() )
+            length = numberOfFilteredStudents - start;
+
+        String[][] data = new String[length][7];
+        for (int i=0; i<filteredGroupList.size(); i++){
+            Group group = filteredGroupList.get(i);
+            data[i][0] = String.valueOf(group.getGroupId());
+            data[i][1] = group.getGroupName();
+            data[i][2] = String.valueOf(group.getCreationYear());
+            data[i][3] = group.getFaculty();
+            data[i][4] = group.getProfession();
+            data[i][5] = String.valueOf(group.getSectionList());
+        }
+
+        return new DataTable(draw, numberOfAllGroups, numberOfFilteredStudents, data);
+    }
 
 }
