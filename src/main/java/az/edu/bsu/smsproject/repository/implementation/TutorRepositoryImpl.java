@@ -1,5 +1,6 @@
 package az.edu.bsu.smsproject.repository.implementation;
 
+import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.RoleRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -16,9 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class TutorRepositoryImpl implements TutorRepository {
@@ -406,12 +405,401 @@ public class TutorRepositoryImpl implements TutorRepository {
         }
     }
 
+
+    private class GroupMapper implements RowMapper<Group> {
+
+
+        @Override
+        public Group mapRow(ResultSet resultSet, int i) throws SQLException {
+            Group group = new Group();
+            group.setId(resultSet.getLong("group_id"));
+            group.setName(resultSet.getString("group_name"));
+            group.setCreationYear(resultSet.getString("creation_year"));
+            group.setFaculty(resultSet.getString("faculty"));
+            group.setProfession(resultSet.getString("profession"));
+            group.setSection(resultSet.getString("section"));
+            group.setStudentNumer(resultSet.getInt("student_number"));
+
+            return group;
+        }
+    }
+
+
     private Set<Integer> getSocialStatusSetById( long userId ){
         List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
                 ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
         return new HashSet<>(socialStatusList);
     }
+
+
+
+    @Override
+    public int getNumberOfAllGroups() {
+        System.out.println("getNumberOfAllGroups");
+        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_ALL_GROUPS,
+                ((resultSet, i) -> resultSet.getInt(1))
+        ).get(0);
+
+    }
+
+
+    @Override
+    public int getNumberOfFilteredGroups(String searchParam) {
+        String myQuery = " SELECT count(*) FROM groups  WHERE LOWER(group_name) like LOWER (?)";
+        return jdbcTemplate.query(myQuery, (resultSet , i) -> resultSet.getInt(1), "%"+searchParam+"%").get(0);
+    }
+
+
+    @Override
+    public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow) {
+
+        String myquery = "select * from(" +
+                "select row_number() over(order by group_id) as rownum, * " +
+                "from groups " +
+                "where lower(group_name) like lower(?) " +
+                ") as sub  " +
+                "where sub.rownum between ? and ? ";
+
+        List<Group> groupsList = jdbcTemplate.query(myquery, new GroupMapper() , "%"+searchParam+"%" , startRow , endRow);
+
+        System.out.println(groupsList);
+        return groupsList;
+    }
+
+
+
+
+
+//-----------------------------------------------------------------------------------------------
+
+
+    @Override
+    public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
+
+        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_STUDENTS_OF_IDENTICAL_GROUP,
+                (resultSet, i) -> resultSet.getInt(1),
+                groupId).get(0);
+
+    }
+
+
+    @Override
+    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId) {
+        String sql = "select count(*) " +
+                "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                "where lower(bu.name) like lower(?) and group_id = ? ";
+
+        return jdbcTemplate.query(sql,
+                (resultSet, i) -> resultSet.getInt(1),
+                "%"+searchValue+"%",
+                groupId
+        ).get(0);
+    }
+
+
+
+    @Override
+    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
+
+        String sql = " select * from( " +
+                "select row_number() over(order by s.user_id) as rownum, * " +
+                "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                "where lower(bu.name) like lower(?) and s.group_id = ? " +
+                ") as sub " +
+                "where sub.rownum between ? and ?";
+
+        List<Student> studentList = jdbcTemplate.query(sql, new StudentMapper(), "%"+searchParam+"%",
+                groupId,
+                startRow,
+                endRow);
+
+        System.out.println("in getStudentsOfIdenticalGroup metod " + studentList);
+
+        return  studentList;
+    }
+
+
+//---------------------------------------------------------------------------------------------------
+
+
+    // to create a group
+    @Override
+    public int getNumberOfAllStudentsNotGrouped() {
+        return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_STUDENTS_NOT_GROUPED,
+                ((resultSet, i) -> resultSet.getInt(1))
+        ).get(0);
+    }
+
+    @Override
+    public int getNumberOfFilteredStudentsNotGrouped(String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+                                                     String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+                                                     String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+                                                     String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    ) {
+
+        String sql =
+                "select count(*) " +
+                        "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                        "where lower(bu.name) like lower(?) and " +
+                        "lower(bu.surname) like lower(?) and " +
+                        "lower(s.father_name) like lower(?) and " +
+                        "to_char(s.birth_date, 'yyyy-mm-dd') like ? and " +
+                        "lower(s.birth_place) like lower(?) and " +
+                        "lower(s.living_place) like lower(?) and " +
+                        "to_char(s.entry_year, '9999') like ? and " +
+                        "lower(s.graduation_region) like lower(?) and " +
+                        "to_char(s.entry_score, '999') like ? and " +
+                        "lower(bu.faculty) like lower(?) and " +
+                        "lower(s.profession) like lower(?) and " +
+                        "/*lower(s.group_id) like lower(?) and*/ " +
+                        "lower(s.section) like lower(?) and s.group_id is null ";
+
+
+        return jdbcTemplate.query(sql,
+                ((resultSet, i)-> resultSet.getInt(1)),
+                "%"+searchValueForName+"%",
+                "%"+searchValueForSurname+"%",
+                "%"+searchValueForFatherName+"%",
+                "%"+searchValueForBirthDate+"%",
+                "%"+searchValueForBirthPlace+"%",
+                "%"+searchValueForLivingPlace+"%",
+                "%"+searchValueForEntryYear+"%",
+                "%"+searchValueForGraduationRegion+"%",
+                "%"+searchValueForEntryScore+"%",
+                "%"+searchValueForFaculty+"%",
+                "%"+searchValueForProfession+"%",
+//                "%"+searchValueForGroup+"%",
+                "%"+searchValueForSection+"%").get(0);
+
+    }
+
+
+    @Override
+    public List<Student> getFilteredStudentListNotGrouped(int beginRow, int endRow,
+                                                          String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+                                                          String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+                                                          String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+                                                          String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    ) {
+
+
+        String sql =
+                "select * from( " +
+                        "select row_number() over(order by s.user_id) as rownum, * " +
+                        "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                        "where lower(bu.name) like lower(?) and " +
+                        "lower(bu.surname) like lower(?) and " +
+                        "lower(s.father_name) like lower(?) and " +
+                        "to_char(s.birth_date, 'yyyy-mm-dd') like ? and  " +
+                        "lower(s.birth_place) like lower(?) and " +
+                        "lower(s.living_place) like lower(?) and " +
+                        "to_char(s.entry_year, '9999') like ? and " +
+                        "lower(s.graduation_region) like lower(?) and " +
+                        "to_char(s.entry_score, '999') like ? and " +
+                        "lower(bu.faculty) like lower(?) and " +
+                        "lower(s.profession) like lower(?) and " +
+                        "/*lower(s.group_id) like lower(?) and*/ " +
+                        "lower(s.section) like lower(?) and s.group_id is null " +
+                        ") as sub " +
+                        "where sub.rownum between ? and ?";
+
+        List<Student> studentList = jdbcTemplate.query(sql,
+                new StudentMapper(),
+                "%"+searchValueForName+"%",
+                "%"+searchValueForSurname+"%",
+                "%"+searchValueForFatherName+"%",
+                "%"+searchValueForBirthDate+"%",
+                "%"+searchValueForBirthPlace+"%",
+                "%"+searchValueForLivingPlace+"%",
+                "%"+searchValueForEntryYear+"%",
+                "%"+searchValueForGraduationRegion+"%",
+                "%"+searchValueForEntryScore+"%",
+                "%"+searchValueForFaculty+"%",
+                "%"+searchValueForProfession+"%",
+//                "%"+searchValueForGroup+"%",
+                "%"+searchValueForSection+"%",
+                beginRow,
+                endRow);
+
+
+        return studentList;
+    }
+
+
+    @Override
+    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
+//            long firstId = idList.get(0);
+//
+//            String queryForProfession = "select profession " +
+//                    "from student where user_id = ? ";
+//
+//
+//
+//            String queryForSection = "select section " +
+//                    " from student where user_id = ? " ;
+
+        Student student = new Student();
+        List<Student> higherScoredStudentList = new ArrayList<>();
+        List<Student> middleScoredStudentList = new ArrayList<>();
+        List<Student> lowerScoredStudentList = new ArrayList<>();
+
+
+        int counter = 0;
+        int groupCount =  groupIdList.size();
+        int groupCapacity;
+        int totalStudentCount = studentList.size();
+
+        Collections.sort(studentList , new Student.SortbyEntryScore());
+
+
+
+        if(totalStudentCount % groupCount == 0){
+
+            groupCapacity = totalStudentCount / groupCount;
+
+
+            while( counter < groupCapacity){
+                higherScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+            while(counter < (studentList.size()-groupCapacity)){
+                middleScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+
+            while(counter < studentList.size()){
+
+                lowerScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+
+
+            for (int j = 0; j < groupCount; j++){
+
+                counter = 0;
+                int currentMemberCount = 0;
+
+                while(counter != groupCapacity){
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+
+                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+                    counter++;
+                }
+
+            }
+
+
+        } else {
+
+            int increment;
+            int increasedStudentCount  = 0;
+            int i = 1;
+            while(totalStudentCount % groupCount != 0) {
+                i++;
+                increasedStudentCount = totalStudentCount + i;
+            }
+
+
+            increment = i;
+
+            Student student1 = new Student();
+
+            while(i != 0){
+                studentList.add(student1);
+                i--;
+            }
+
+
+            groupCapacity = totalStudentCount / groupCount;
+
+
+            while( counter < groupCapacity){
+
+                while(totalStudentCount == increasedStudentCount){
+                    studentList.remove(increasedStudentCount);
+                    increasedStudentCount--;
+                }
+                higherScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+            while(counter < (studentList.size()-groupCapacity)){
+                middleScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+
+            while(counter < studentList.size()){
+
+                lowerScoredStudentList.add(studentList.get(counter));
+                counter++;
+            }
+
+
+            for (int j = 0; j < groupCount; j++){
+
+                counter = 0;
+                int currentMemberCount = 0;
+
+                while(counter != groupCapacity){
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+
+                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+
+                    counter++;
+                }
+
+            }
+
+
+
+        }
+
+
+        return null;
+    }
+
+
+    //---------------------------------------------------------------------------------------------------
+
+
+
+
+
+
 
 
 
