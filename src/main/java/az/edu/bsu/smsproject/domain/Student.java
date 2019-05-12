@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,11 +36,11 @@ public class Student extends User implements Serializable {
     private int entryYear;
     private String profession;
     private String section;
-    private int groupId;
+    private long groupId;
     private int scholarshipStatus;
 
 
-    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, int groupId, int scholarshipStatus) {
+    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, long groupId, int scholarshipStatus) {
         super(id, name, status, roleId, surname, email, password, phoneNumber, faculty, gender);
         this.fatherName = fatherName;
         this.birthDate = birthDate;
@@ -265,11 +266,11 @@ public class Student extends User implements Serializable {
         this.section = section;
     }
 
-    public int getGroupId() {
+    public long getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(int groupId) {
+    public void setGroupId(long groupId) {
         this.groupId = groupId;
     }
 
@@ -288,4 +289,14 @@ public class Student extends User implements Serializable {
     public void setSocialStatusSet(Set<Integer> socialStatusSet) {
         this.socialStatusSet = socialStatusSet;
     }
+
+    public static class SortbyEntryScore extends Student implements Comparator<Student>
+    {
+
+        public int compare(Student a, Student b)
+        {
+            return a.entryScore - b.entryScore;
+        }
+    }
+
 }
