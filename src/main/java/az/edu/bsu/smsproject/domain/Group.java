@@ -9,30 +9,31 @@ public class Group extends  BaseDomain implements Serializable {
 
 
     private static final long serialVersionUID = 522454508097397247L;
-    private String creationYear;
+    private int creationYear;
     private String faculty;
     private String profession;
     private String section;
+    private String eduType;
     private int studentNumer;
 
 
-    public Group(long id, String name, Status status, String creationYear, String faculty, String profession, String section, int studentNumer) {
-        super(id, name, status);
+    public Group(int creationYear, String faculty, String profession, String section, String eduType, int studentNumer) {
         this.creationYear = creationYear;
         this.faculty = faculty;
         this.profession = profession;
         this.section = section;
+        this.eduType = eduType;
         this.studentNumer = studentNumer;
     }
 
     public Group() {
     }
 
-    public String getCreationYear() {
+    public int getCreationYear() {
         return creationYear;
     }
 
-    public void setCreationYear(String creationYear) {
+    public void setCreationYear(int creationYear) {
         this.creationYear = creationYear;
     }
 
@@ -60,6 +61,14 @@ public class Group extends  BaseDomain implements Serializable {
         this.section = section;
     }
 
+    public String getEduType() {
+        return eduType;
+    }
+
+    public void setEduType(String eduType) {
+        this.eduType = eduType;
+    }
+
     public int getStudentNumer() {
         return studentNumer;
     }
@@ -72,32 +81,32 @@ public class Group extends  BaseDomain implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Group groups = (Group) o;
-        return creationYear == groups.creationYear &&
-                studentNumer == groups.studentNumer &&
-                Objects.equals(faculty, groups.faculty) &&
-                Objects.equals(profession, groups.profession) &&
-                Objects.equals(section, groups.section);
+        Group group = (Group) o;
+        return studentNumer == group.studentNumer &&
+                Objects.equals(creationYear, group.creationYear) &&
+                Objects.equals(faculty, group.faculty) &&
+                Objects.equals(profession, group.profession) &&
+                Objects.equals(section, group.section) &&
+                Objects.equals(eduType, group.eduType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(creationYear, faculty, profession, section, studentNumer);
+        return Objects.hash(creationYear, faculty, profession, section, eduType, studentNumer);
     }
-
 
     @Override
     public String toString() {
-        return "Groups{" +
-                "creationYear=" + creationYear +
+        return "Group{" +
+                "creationYear='" + creationYear + '\'' +
                 ", faculty='" + faculty + '\'' +
                 ", profession='" + profession + '\'' +
                 ", section='" + section + '\'' +
+                ", eduType='" + eduType + '\'' +
                 ", studentNumer=" + studentNumer +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 '}';
     }
-
 }

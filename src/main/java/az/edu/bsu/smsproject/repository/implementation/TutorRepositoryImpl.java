@@ -14,6 +14,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -414,7 +415,7 @@ public class TutorRepositoryImpl implements TutorRepository {
             Group group = new Group();
             group.setId(resultSet.getLong("group_id"));
             group.setName(resultSet.getString("group_name"));
-            group.setCreationYear(resultSet.getString("creation_year"));
+            group.setCreationYear(resultSet.getInt("creation_year"));
             group.setFaculty(resultSet.getString("faculty"));
             group.setProfession(resultSet.getString("profession"));
             group.setSection(resultSet.getString("section"));
@@ -627,28 +628,232 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
 
+//    @Override
+//    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
+////            long firstId = idList.get(0);
+////
+////            String queryForProfession = "select profession " +
+////                    "from student where user_id = ? ";
+////
+////
+////
+////            String queryForSection = "select section " +
+////                    " from student where user_id = ? " ;
+//
+//        Student student = new Student();
+//        List<Student> higherScoredStudentList = new ArrayList<>();
+//        List<Student> middleScoredStudentList = new ArrayList<>();
+//        List<Student> lowerScoredStudentList = new ArrayList<>();
+//
+//
+//        int counter = 0;
+//        int groupCount =  groupIdList.size();
+//        int groupCapacity;
+//        int totalStudentCount = studentList.size();
+//
+//        Collections.sort(studentList , new Student.SortbyEntryScore());
+//
+//
+//
+//        if(totalStudentCount % groupCount == 0){
+//
+//            groupCapacity = totalStudentCount / groupCount;
+//
+//
+//            while( counter < groupCapacity){
+//                higherScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//            while(counter < (studentList.size()-groupCapacity)){
+//                middleScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//
+//            while(counter < studentList.size()){
+//
+//                lowerScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//
+//
+//            for (int j = 0; j < groupCount; j++){
+//
+//                counter = 0;
+//                int currentMemberCount = 0;
+//
+//                while(counter != groupCapacity){
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//
+//                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//                    counter++;
+//                }
+//
+//            }
+//
+//
+//        } else {
+//
+//            int increment;
+//            int increasedStudentCount  = 0;
+//            int i = 1;
+//            while(totalStudentCount % groupCount != 0) {
+//                i++;
+//                increasedStudentCount = totalStudentCount + i;
+//            }
+//
+//
+//            increment = i;
+//
+//            Student student1 = new Student();
+//
+//            while(i != 0){
+//                studentList.add(student1);
+//                i--;
+//            }
+//
+//
+//            groupCapacity = totalStudentCount / groupCount;
+//
+//
+//            while( counter < groupCapacity){
+//
+//                while(totalStudentCount == increasedStudentCount){
+//                    studentList.remove(increasedStudentCount);
+//                    increasedStudentCount--;
+//                }
+//                higherScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//            while(counter < (studentList.size()-groupCapacity)){
+//                middleScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//
+//            while(counter < studentList.size()){
+//
+//                lowerScoredStudentList.add(studentList.get(counter));
+//                counter++;
+//            }
+//
+//
+//            for (int j = 0; j < groupCount; j++){
+//
+//                counter = 0;
+//                int currentMemberCount = 0;
+//
+//                while(counter != groupCapacity){
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//                    ++currentMemberCount;
+//                    if(currentMemberCount > groupCapacity)
+//                        break;
+//
+//                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+//
+//                    counter++;
+//                }
+//
+//            }
+//
+//
+//
+//        }
+//
+//
+//        return null;
+//    }
+
+
+    //---------------------------------------------------------------------------------------------------
+
+
+
+    //TODO 1) qrup cedvelinde yeni qrup yarat ve hemen yaradilan
+    //TODO    qrupun id'sini gotur metod vasitesi ile return et.
+    public long createGroup(String profession , String section , String eduType, int year , int studentCount){
+
+        String sql = " INSERT INTO public.groups(" +
+                "group_id, group_name, creation_year, faculty, profession, section, student_number, education_type)" +
+                "VALUES (nextval('group_sequence'), null , ? , 'Physics', ? , ? , ? , ?) " +
+                "returning group_id ";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, year);
+            ps.setString(2, profession);
+            ps.setString(3,section);
+            ps.setInt(4, studentCount);
+            ps.setString(5,eduType);
+            return ps;
+        } , keyHolder);
+
+
+        System.out.println(keyHolder.getKey());
+        return (long) keyHolder.getKey();
+    }
+
     @Override
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
-//            long firstId = idList.get(0);
-//
-//            String queryForProfession = "select profession " +
-//                    "from student where user_id = ? ";
-//
-//
-//
-//            String queryForSection = "select section " +
-//                    " from student where user_id = ? " ;
+    public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCnt) {
+
+        String sql = " select * " +
+                "from student s full outer join bdu_user bu on s.user_id = bu.user_id\n" +
+                "where s.profession = ? and s.section = ? and s.education_type = ? " ;
+        List<Student>  studentList = new ArrayList<>();
+                studentList = jdbcTemplate.query(sql,
+                new StudentMapper(),
+                profession,
+                section,
+                eduType);
+
+
+
+
 
         Student student = new Student();
         List<Student> higherScoredStudentList = new ArrayList<>();
         List<Student> middleScoredStudentList = new ArrayList<>();
         List<Student> lowerScoredStudentList = new ArrayList<>();
-
+        List<Group> newGroups = new ArrayList<>();
+        Group group = new Group();
 
         int counter = 0;
-        int groupCount =  groupIdList.size();
+        int groupCount = groupCnt;
         int groupCapacity;
         int totalStudentCount = studentList.size();
+        long groupId;
+        int currentMemberCount = 0;
 
         Collections.sort(studentList , new Student.SortbyEntryScore());
 
@@ -680,33 +885,44 @@ public class TutorRepositoryImpl implements TutorRepository {
 
             for (int j = 0; j < groupCount; j++){
 
+                groupId = createGroup(profession , section  , eduType , year , groupCapacity);
+                group.setId(groupId);
+                group.setProfession(profession);
+                group.setSection(section);
+                group.setEduType(eduType);
+                group.setCreationYear(year);
+                group.setStudentNumer(groupCapacity);
+                newGroups.add(group);
                 counter = 0;
-                int currentMemberCount = 0;
+
+
 
                 while(counter != groupCapacity){
 
                     ++currentMemberCount;
                     if(currentMemberCount > groupCapacity)
                         break;
-                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+                    higherScoredStudentList.get(counter).setGroupId(groupId);
 
 
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
 
                     ++currentMemberCount;
                     if(currentMemberCount > groupCapacity)
                         break;
+                    middleScoredStudentList.get(counter).setGroupId(groupId);
 
-                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+                    ++currentMemberCount;
+                    if(currentMemberCount > groupCapacity)
+                        break;
+
+                    lowerScoredStudentList.get(counter).setGroupId(groupId);
 
                     counter++;
                 }
 
             }
 
+            return newGroups;
 
         } else {
 
@@ -757,27 +973,36 @@ public class TutorRepositoryImpl implements TutorRepository {
 
             for (int j = 0; j < groupCount; j++){
 
+                groupId = createGroup(profession , section  , eduType , year , groupCapacity);
+                group.setId(groupId);
+                group.setProfession(profession);
+                group.setSection(section);
+                group.setEduType(eduType);
+                group.setCreationYear(year);
+                group.setStudentNumer(groupCapacity);
+                newGroups.add(group);
                 counter = 0;
-                int currentMemberCount = 0;
+
+
 
                 while(counter != groupCapacity){
 
                     ++currentMemberCount;
                     if(currentMemberCount > groupCapacity)
                         break;
-                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+                    higherScoredStudentList.get(counter).setGroupId(groupId);
 
 
                     ++currentMemberCount;
                     if(currentMemberCount > groupCapacity)
                         break;
-                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+                    middleScoredStudentList.get(counter).setGroupId(groupId);
 
                     ++currentMemberCount;
                     if(currentMemberCount > groupCapacity)
                         break;
 
-                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
+                    lowerScoredStudentList.get(counter).setGroupId(groupId);
 
                     counter++;
                 }
@@ -785,17 +1010,10 @@ public class TutorRepositoryImpl implements TutorRepository {
             }
 
 
-
+            return null;
         }
 
-
-        return null;
     }
-
-
-    //---------------------------------------------------------------------------------------------------
-
-
 
 
 

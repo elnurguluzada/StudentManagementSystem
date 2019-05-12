@@ -30,7 +30,6 @@ public interface TutorService {
             String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
 
-
     public int getNumberOfAllGroups();
     public  List<Group> getFilteredGroupList(String searchParam , int startRow , int endRow);
     public int getNumberOfFilteredGroups(String searchParam);
@@ -50,5 +49,9 @@ public interface TutorService {
                                                            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
                                                            String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
+
+
+    public List<Group> groupStudents(String profession, String section , String eduType, int year ,int groupCount );
+
 
 }

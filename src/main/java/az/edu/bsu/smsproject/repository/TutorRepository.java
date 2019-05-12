@@ -53,5 +53,5 @@ public interface TutorRepository {
 
 
 
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList);
+    public List<Group> groupStudents(String profession, String section , String eduType, int year ,int groupCount );
 }
