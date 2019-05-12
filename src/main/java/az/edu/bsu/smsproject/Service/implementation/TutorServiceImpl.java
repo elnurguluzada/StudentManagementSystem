@@ -75,5 +75,33 @@ public class TutorServiceImpl implements TutorService {
         return tutorRepository.getNumberOfFilteredStudents( searchValueForName,  searchValueForSurname,  searchValueForFatherName,  searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,  searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore,  searchValueForFaculty,  searchValueForProfession,  searchValueForGroup,  searchValueForSection);
     }
 
+    public List<Student> getFilteredStudentListOfSelectedGroup(
+            int beginRow, int endRow,
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    ){
+        return tutorRepository.getFilteredStudentListOfSelectedGroup(
+                beginRow, endRow,
+                searchValueForName,  searchValueForSurname,  searchValueForFatherName,
+                searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,
+                searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore,
+                searchValueForFaculty,  searchValueForProfession,  groupId,  searchValueForSection
+        );
+    }
+    public int getNumberOfFilteredStudentsOfSelectedGroup(
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    ){
+        return tutorRepository.getNumberOfFilteredStudentsOfSelectedGroup(
+                 searchValueForName,  searchValueForSurname,  searchValueForFatherName,
+                 searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,
+                 searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore,
+                 searchValueForFaculty,  searchValueForProfession,  groupId,  searchValueForSection
+        );
+    }
 
 }

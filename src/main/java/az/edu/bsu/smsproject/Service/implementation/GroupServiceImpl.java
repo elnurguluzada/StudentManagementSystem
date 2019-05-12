@@ -4,12 +4,16 @@ import az.edu.bsu.smsproject.Service.GroupService;
 import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class GroupServiceImpl implements GroupService {
-    @Autowired
-    private GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
+
+    public GroupServiceImpl(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
+    }
 
     @Override
     public Group add(Group group) {
@@ -27,8 +31,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<Group> getFilteredGroupList() {
-        return groupRepository.getFilteredGroupList();
+    public List<Group> getFilteredGroupList(int begin, int end,String name, String year, String faculty, String profession, String section) {
+        return groupRepository.getFilteredGroupList( begin, end, name, year, faculty, profession, section);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public int getNumberOfFilteredGroups() {
-        return groupRepository.getNumberOfFilteredGroups();
+    public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section) {
+        return groupRepository.getNumberOfFilteredGroups( name, year, faculty, profession, section);
     }
 }

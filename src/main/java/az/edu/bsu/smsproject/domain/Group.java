@@ -1,44 +1,27 @@
 package az.edu.bsu.smsproject.domain;
 
+import az.edu.bsu.smsproject.domain.Enums.Status;
+
 import java.io.Serializable;
 import java.util.List;
 
-public class Group implements Serializable {
+public class Group extends BaseDomain implements Serializable {
     private static final long serialVersionUID = -2309096077691341278L;
 
-    private long groupId;
-    private String groupName;
     private int creationYear;
     private String faculty;
     private String profession;
-    private List<String> sectionList;
+    private String section;
 
-    public Group(long groupId, String groupName, int creationYear, String faculty, String profession, List<String> sectionList) {
-        this.groupId = groupId;
-        this.groupName = groupName;
+    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section) {
+        super(id, name, status);
         this.creationYear = creationYear;
         this.faculty = faculty;
         this.profession = profession;
-        this.sectionList = sectionList;
+        this.section = section;
     }
 
     public Group() {
-    }
-
-    public long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(long groupId) {
-        this.groupId = groupId;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
     }
 
     public int getCreationYear() {
@@ -65,11 +48,24 @@ public class Group implements Serializable {
         this.profession = profession;
     }
 
-    public List<String> getSectionList() {
-        return sectionList;
+    public String getSection() {
+        return section;
     }
 
-    public void setSectionList(List<String> sectionList) {
-        this.sectionList = sectionList;
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "creationYear=" + creationYear +
+                ", faculty='" + faculty + '\'' +
+                ", profession='" + profession + '\'' +
+                ", section='" + section + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

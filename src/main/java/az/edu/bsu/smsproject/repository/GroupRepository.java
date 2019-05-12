@@ -7,11 +7,11 @@ public interface GroupRepository {
     public Group add(Group group);
     public Group getGroupById(long groupId);
     public List<Group> getAllGroupList();
-    public List<Group> getFilteredGroupList();
+    public List<Group> getFilteredGroupList(int begin, int end,String name, String year, String faculty, String profession, String section);
     public Group updateGroup(Group group);
     public boolean deleteGroup(long groupId);
 
     public int getNumberOfAllGroups();
-    public int getNumberOfFilteredGroups();
+    public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section);
 
 }

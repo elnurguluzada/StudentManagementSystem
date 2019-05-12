@@ -28,4 +28,17 @@ public interface TutorRepository {
             String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
             String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
+    public List<Student> getFilteredStudentListOfSelectedGroup(
+            int beginRow, int endRow,
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    );
+    public int getNumberOfFilteredStudentsOfSelectedGroup(
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    );
 }

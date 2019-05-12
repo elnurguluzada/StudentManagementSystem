@@ -123,7 +123,6 @@ public class TutorController {
             @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
             @RequestParam(name = "columns[16][search][value]") String searchValueForSection
     ) {
-
         int numberOfAllStudents = tutorService.getNumberOfAllStudents();
 
         List<Student > filteredStudentList = tutorService.getFilteredStudentList( start, start+length,
@@ -136,7 +135,7 @@ public class TutorController {
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
         );
-
+        System.out.println("numberOfFilteredStudents = "+numberOfFilteredStudents);
         if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents % length;
 
@@ -214,29 +213,111 @@ public class TutorController {
     public DataTable showGroups(
             @RequestParam(name = "draw") int draw,
             @RequestParam(name = "start") int start,
-            @RequestParam(name = "length") int length
+            @RequestParam(name = "length") int length,
+            @RequestParam(name = "columns[1][search][value]") String searchValueForName,
+            @RequestParam(name = "columns[2][search][value]") String searchValueForYear,
+            @RequestParam(name = "columns[3][search][value]") String searchValueForFaculty,
+            @RequestParam(name = "columns[4][search][value]") String searchValueForProfession,
+            @RequestParam(name = "columns[5][search][value]") String searchValueForSection
     ){
         int numberOfAllGroups = groupService.getNumberOfAllGroups();
 
-        List<Group> filteredGroupList = groupService.getFilteredGroupList();
+        List<Group> filteredGroupList = groupService.getFilteredGroupList(start, start+length, searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
+        int numberOfFilteredStudents = groupService.getNumberOfFilteredGroups(searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
 
-        int numberOfFilteredStudents = groupService.getNumberOfAllGroups(); //todo
-
-        if ( start+length > filteredGroupList.size() )
+        if ( start+length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
         String[][] data = new String[length][7];
-        for (int i=0; i<filteredGroupList.size(); i++){
+        for (int i=0; i<length; i++){
             Group group = filteredGroupList.get(i);
-            data[i][0] = String.valueOf(group.getGroupId());
-            data[i][1] = group.getGroupName();
+            data[i][0] = String.valueOf(group.getId());
+            data[i][1] = group.getName();
             data[i][2] = String.valueOf(group.getCreationYear());
             data[i][3] = group.getFaculty();
             data[i][4] = group.getProfession();
-            data[i][5] = String.valueOf(group.getSectionList());
+            data[i][5] = String.valueOf(group.getSection());
         }
 
         return new DataTable(draw, numberOfAllGroups, numberOfFilteredStudents, data);
     }
+
+    @ResponseBody @GetMapping("/getGroupStudents")
+    public DataTable showStudentsOfGroup(
+            @RequestParam(name = "draw") int draw,
+            @RequestParam(name = "start") int start,
+            @RequestParam(name = "length") int length,
+            @RequestParam(name = "search[value]") String searchValue,
+            @RequestParam(name = "columns[1][search][value]") String searchValueForName,
+            @RequestParam(name = "columns[2][search][value]") String searchValueForSurname,
+            @RequestParam(name = "columns[3][search][value]") String searchValueForFatherName,
+            @RequestParam(name = "columns[4][search][value]") String searchValueForBirthDate,
+            @RequestParam(name = "columns[5][search][value]") String searchValueForBirthPlace,
+            @RequestParam(name = "columns[6][search][value]") String searchValueForLivingPlace,
+            @RequestParam(name = "columns[11][search][value]") String searchValueForEntryYear,
+            @RequestParam(name = "columns[12][search][value]") String searchValueForGraduationRegion,
+            @RequestParam(name = "columns[15][search][value]") String searchValueForEntryScore,
+            @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
+            @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
+            @RequestParam(name = "groupId") int groupId,
+            @RequestParam(name = "columns[16][search][value]") String searchValueForSection
+    ) {
+
+        int numberOfAllStudents = tutorService.getNumberOfAllStudents();
+
+        List<Student > filteredStudentList = tutorService.getFilteredStudentListOfSelectedGroup( start, start+length,
+                searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
+                searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
+                searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, groupId, searchValueForSection);
+
+
+        int numberOfFilteredStudents = tutorService.getNumberOfFilteredStudentsOfSelectedGroup(
+                searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
+                searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
+                searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, groupId, searchValueForSection
+        );
+
+        if ( start + length > numberOfFilteredStudents )
+            length = numberOfFilteredStudents - start;
+
+        String[][] data = new String[length][25];
+        for (int i=0; i<length; i++){
+            Student student = filteredStudentList.get(i);
+            data[i][0] = String.valueOf(student.getId());
+            data[i][1] = student.getName();
+            data[i][2] = student.getSurname();
+            data[i][3] = student.getFatherName();
+            data[i][4] = student.getBirthDate().toString();
+            data[i][5] = student.getBirthPlace();
+            data[i][6] = student.getLivingPlace();
+            data[i][7] = student.getOfficialHome();
+            data[i][8] = student.getEmail();
+            data[i][9] = student.getPhoneNumber();
+            data[i][10] = student.getParentPhoneNumber();
+            data[i][11] = String.valueOf(student.getEntryYear());
+            data[i][12] = student.getGraduatedRegion();
+            data[i][13] = student.getGraduatedRegion();
+            data[i][14] = String.valueOf(student.getEntryIdNumber());
+            data[i][15] = String.valueOf(student.getEntryScore());
+            data[i][16] = student.getSection();
+            data[i][17] = student.getFaculty();
+            data[i][18] = student.getProfession();
+            data[i][19] = String.valueOf(student.getGroupId());
+            data[i][20] = student.getEducationType();
+            data[i][21] = student.getIdCardNumber();
+            data[i][22] = student.getIdCardFinCode();
+            data[i][23] = String.valueOf(student.getGender());
+            data[i][24] = student.getSocialStatusSet().toString();
+//            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
+
+            /*
+            <%--todo scholarship status--%>
+             */
+        }
+
+        return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
+    }
+
+
 
 }
