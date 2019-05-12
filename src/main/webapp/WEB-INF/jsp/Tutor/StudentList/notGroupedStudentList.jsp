@@ -1,7 +1,4 @@
 <%@ page import="java.time.LocalDate" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <html>
 <head>
     <title>Students</title>
@@ -10,12 +7,10 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/plug-ins/1.10.19/sorting/numeric-comma.js"><%--For jquery-ui (pop-up)--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"><%--For jquery-ui (pop-up)--%>
+
 </head>
 <body>
 <% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
-
-
-
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->
     <thead>
@@ -192,7 +187,7 @@
 <script type="text/javascript" src="JS/jquery-3.2.1.js"></script>
 
 
-<script type="text/javascript" lang="javascript">
+<script>
 
 //    $(document).ready(function () {
 //        $("#submitButton").click(function() {
@@ -200,12 +195,6 @@
 //            return false;
 //        });
 //    });
-
-
-
-</script>
-
-<script>
 
 
     $(document).ready(function () {
@@ -262,7 +251,6 @@
 
         $("#errorDiv").html(errorMessage);
         if (errorCounter == 0) {
-            alert('Qrup yaradildi !');
             return true;
         }
         else
@@ -427,24 +415,6 @@
 
     function createGroups(){
 
-        // $("#ajaxSubmit").click( function(){
-        //     var sel = document.getElementById("groupAmount");
-        //     alert(sel.value);
-        //
-        //     //todo get or post?
-        //     $.get("/tutor/createGroup",
-        //         {
-        //             "numberOfGroups": "sel.value"
-        //
-        //         },
-        //         function (data) {
-        //             alert(data);
-        //         }
-        //     )
-        //
-        // });
-
-
         $("#submitButton").click(function() {
             ValidateAll();
             var profession = $( "#professionSelect" ).val();
@@ -454,21 +424,20 @@
             var educationType =  $( "#eduTypeSelect" ).val();
 
 
-            $get("/tutor/getNewCreatedGroup",
+            $.get("/tutor/getNewCreatedGroup",
                 {
-                    profession: profession,
-                    section: section,
-                    year: year,
-                    educationType: educationType,
-                    groupCount: groupCount
+                    "profession": profession,
+                    "section": section,
+                    "year": year,
+                    "educationType": educationType,
+                    "groupCount": groupCount
                 }
-            )
+        )
         });
 
     }
 
 </script>
-
 </body>
 </html>
 

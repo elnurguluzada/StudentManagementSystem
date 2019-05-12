@@ -474,14 +474,15 @@ public class TutorController {
                                     @RequestParam (name = "educationType") String eduType,
                                     @RequestParam (name = "groupCount") int groupCount,
                                      HttpSession httpSession) {
-        ModelAndView modelAndView = new ModelAndView();
+
+        System.out.println(profession + " " + section + year + " " + eduType + " " + groupCount);
+      //  ModelAndView modelAndView = new ModelAndView();
         httpSession.setAttribute("profession" , profession );
         httpSession.setAttribute("section" , section );
         httpSession.setAttribute("year" , year );
         httpSession.setAttribute("eduType" , eduType );
         httpSession.setAttribute("groupCount" , groupCount );
-        modelAndView.setViewName("Tutor/Group/createdGroupList");
-        return modelAndView;
+        return new ModelAndView("Tutor/Group/createdGroupList");
     }
 
 

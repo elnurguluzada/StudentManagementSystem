@@ -1,10 +1,4 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: elnurquluzade
-  Date: 2019-05-02
-  Time: 11:12
-  To change this template use File | Settings | File Templates.
---%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
@@ -74,21 +68,6 @@
             "processing": true,
             "serverSide": true,
             "ajax": "/tutor/getGroups"
-            // "columnDefs": [ {
-            //     "targets": -1,
-            //     "data": null,
-            //     "defaultContent": "<button>Click!</button>",
-            //     "initComplete": function () {
-            //
-            //         $('#group-list').on('click', 'button', function () {
-            //             var groupId = table.row( $(this).parents('tr') ).data()[0];
-            //             $.setAttribute( "groupId" , groupId);
-            //             window.location.href = "Tutor/studentList";
-            //         })
-            //
-            //
-            //     }
-            //     } ]
         } );
     } ;
 
