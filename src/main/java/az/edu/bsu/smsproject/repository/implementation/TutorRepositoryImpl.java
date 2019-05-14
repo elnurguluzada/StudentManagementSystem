@@ -35,19 +35,19 @@ public class TutorRepositoryImpl implements TutorRepository {
     //------------------------------------------------------------------------------------------------------
     @Override
     public boolean addStudent(Student student) {
-        long userId = insertIntoUserTable( student );
-        student.setId( userId );
+        long userId = insertIntoUserTable(student);
+        student.setId(userId);
 
         return insertIntoStudentTable(student, userId) == 1 &&
                 insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size();
     }
 
-    private long insertIntoUserTable(Student student ){
+    private long insertIntoUserTable(Student student) {
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
 
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE ,Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
         factory.setReturnGeneratedKeys(true);
-        PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
+        PreparedStatementCreator creator = factory.newPreparedStatementCreator(new Object[]{
                 roleIdOfStudent,
                 student.getName(),
                 student.getSurname(),
@@ -56,18 +56,18 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getPhoneNumber(),
                 student.getFaculty(),
                 student.getGender()
-        } );
+        });
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update( creator, keyHolder );
+        jdbcTemplate.update(creator, keyHolder);
         long userId = (long) keyHolder.getKeyList().get(0).get("user_id");
         return userId;
     }
 
-    private int insertIntoStudentTable( Student student, long userId ){
+    private int insertIntoStudentTable(Student student, long userId) {
 
-        return jdbcTemplate.update( SQLqueries.INSERT_STUDENT_INTO_STUDENT_TABLE,
+        return jdbcTemplate.update(SQLqueries.INSERT_STUDENT_INTO_STUDENT_TABLE,
                 userId,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -90,7 +90,7 @@ public class TutorRepositoryImpl implements TutorRepository {
 
     }
 
-    private int insertIntoStudentSocialStatusTable( Student student ) {
+    private int insertIntoStudentSocialStatusTable(Student student) {
 
         int numOfInserts = 0;
         for (int socialStatusId : student.getSocialStatusSet()) {
@@ -98,7 +98,8 @@ public class TutorRepositoryImpl implements TutorRepository {
         }
         return numOfInserts;
     }
-//------------------------------------------------------------------------------------------------------
+
+    //------------------------------------------------------------------------------------------------------
     @Override
     public List<Student> getStudentList() {
 
@@ -110,7 +111,7 @@ public class TutorRepositoryImpl implements TutorRepository {
     @Override
     public Student getStudentById(long studentId) {
 
-        Student studentUltimate = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID ,
+        Student studentUltimate = jdbcTemplate.query(SQLqueries.GET_STUDENT_INFO_BY_ID,
 //                ((resultSet, i) -> {
 //                    Student student = new Student();
 //                    student.setName( resultSet.getString("name") );
@@ -129,7 +130,7 @@ public class TutorRepositoryImpl implements TutorRepository {
 //
 //                })
                 new StudentMapper()
-                ,new Object[]{studentId} ).get(0);
+                , new Object[]{studentId}).get(0);
 
         return studentUltimate;
     }
@@ -146,15 +147,15 @@ public class TutorRepositoryImpl implements TutorRepository {
     @Override
     public List<Student> getFilteredStudentList(String searchValue, int beginRow, int endRow) {
         String sql = "select * from( " +
-                        "select row_number() over(order by s.user_id) as rownum, * " +
-                        "from bdu_user bu join student s on bu.user_id = s.user_id " +
-                        "where lower(bu.name) like lower(?) " +
+                "select row_number() over(order by s.user_id) as rownum, * " +
+                "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                "where lower(bu.name) like lower(?) " +
                 ") as sub " +
                 "where sub.rownum between ? and ?";
 
         return jdbcTemplate.query(sql,
                 new StudentMapper(),
-                "%"+searchValue+"%",
+                "%" + searchValue + "%",
                 beginRow,
                 endRow);
     }
@@ -169,9 +170,9 @@ public class TutorRepositoryImpl implements TutorRepository {
     ) {
         String sql =
                 "select * from( " +
-                    "select row_number() over(order by s.user_id) as rownum, * " +
-                    "from bdu_user bu join student s on bu.user_id = s.user_id " +
-                    "where lower(bu.name) like lower(?) and " +
+                        "select row_number() over(order by s.user_id) as rownum, * " +
+                        "from bdu_user bu join student s on bu.user_id = s.user_id " +
+                        "where lower(bu.name) like lower(?) and " +
                         "lower(bu.surname) like lower(?) and " +
                         "lower(s.father_name) like lower(?) and " +
                         "to_char(s.birth_date, 'yyyy-mm-dd') like ? and  " +
@@ -184,24 +185,24 @@ public class TutorRepositoryImpl implements TutorRepository {
                         "lower(s.profession) like lower(?) and " +
                         "/*lower(s.group_id) like lower(?) and*/ " +
                         "lower(s.section) like lower(?)" +
-                ") as sub " +
-                "where sub.rownum between ? and ?";
+                        ") as sub " +
+                        "where sub.rownum between ? and ?";
 
         return jdbcTemplate.query(sql,
                 new StudentMapper(),
-                "%"+searchValueForName+"%",
-                "%"+searchValueForSurname+"%",
-                "%"+searchValueForFatherName+"%",
-                "%"+searchValueForBirthDate+"%",
-                "%"+searchValueForBirthPlace+"%",
-                "%"+searchValueForLivingPlace+"%",
-                "%"+searchValueForEntryYear+"%",
-                "%"+searchValueForGraduationRegion+"%",
-                "%"+searchValueForEntryScore+"%",
-                "%"+searchValueForFaculty+"%",
-                "%"+searchValueForProfession+"%",
+                "%" + searchValueForName + "%",
+                "%" + searchValueForSurname + "%",
+                "%" + searchValueForFatherName + "%",
+                "%" + searchValueForBirthDate + "%",
+                "%" + searchValueForBirthPlace + "%",
+                "%" + searchValueForLivingPlace + "%",
+                "%" + searchValueForEntryYear + "%",
+                "%" + searchValueForGraduationRegion + "%",
+                "%" + searchValueForEntryScore + "%",
+                "%" + searchValueForFaculty + "%",
+                "%" + searchValueForProfession + "%",
 //                "%"+searchValueForGroup+"%",
-                "%"+searchValueForSection+"%",
+                "%" + searchValueForSection + "%",
                 beginRow,
                 endRow);
     }
@@ -231,34 +232,34 @@ public class TutorRepositoryImpl implements TutorRepository {
                         "lower(s.section) like lower(?)";
 
         return jdbcTemplate.query(sql,
-                ((resultSet, i)-> resultSet.getInt(1)),
-                "%"+searchValueForName+"%",
-                "%"+searchValueForSurname+"%",
-                "%"+searchValueForFatherName+"%",
-                "%"+searchValueForBirthDate+"%",
-                "%"+searchValueForBirthPlace+"%",
-                "%"+searchValueForLivingPlace+"%",
-                "%"+searchValueForEntryYear+"%",
-                "%"+searchValueForGraduationRegion+"%",
-                "%"+searchValueForEntryScore+"%",
-                "%"+searchValueForFaculty+"%",
-                "%"+searchValueForProfession+"%",
+                ((resultSet, i) -> resultSet.getInt(1)),
+                "%" + searchValueForName + "%",
+                "%" + searchValueForSurname + "%",
+                "%" + searchValueForFatherName + "%",
+                "%" + searchValueForBirthDate + "%",
+                "%" + searchValueForBirthPlace + "%",
+                "%" + searchValueForLivingPlace + "%",
+                "%" + searchValueForEntryYear + "%",
+                "%" + searchValueForGraduationRegion + "%",
+                "%" + searchValueForEntryScore + "%",
+                "%" + searchValueForFaculty + "%",
+                "%" + searchValueForProfession + "%",
 //                "%"+searchValueForGroup+"%",
-                "%"+searchValueForSection+"%").get(0);
+                "%" + searchValueForSection + "%").get(0);
     }
 
-//------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------
     @Override
     public int updateStudent(Student student) {
 
-        if ( updateStudentInBduUser( student ) == 1 && updateStudentInStudent( student ) == 1 &&
-                updateStudentInStudentSocialStatus( student ) == 1 )
+        if (updateStudentInBduUser(student) == 1 && updateStudentInStudent(student) == 1 &&
+                updateStudentInStudentSocialStatus(student) == 1)
             return 1;
         else
             return 0;
     }
 
-    private int updateStudentInBduUser( Student student ){
+    private int updateStudentInBduUser(Student student) {
 //        "update bdu_user set name = ?, surname = ?,email = ?,phone_num = ?,faculty = ?,gender = ? where user_id = ?"
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_BDU_USER_TABLE,
                 student.getName(),
@@ -270,7 +271,7 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getId());
     }
 
-    private int updateStudentInStudent( Student student ){
+    private int updateStudentInStudent(Student student) {
 
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_STUDENT_TABLE,
                 student.getIdCardNumber(),
@@ -294,25 +295,25 @@ public class TutorRepositoryImpl implements TutorRepository {
                 student.getId()); //todo social_status_id
     }
 
-    private int updateStudentInStudentSocialStatus( Student student ){
+    private int updateStudentInStudentSocialStatus(Student student) {
         Set<Integer> updatedStatus = student.getSocialStatusSet();
         Set<Integer> currentStatusInDB = getSocialStatusSetById(student.getId());
         Set<Integer> statusToAdd = new HashSet<>();
         Set<Integer> statusToRemove = new HashSet<>();
 
 //which statuses will be added
-        for (Integer i: updatedStatus){
-            boolean flag=false;
-            for (Integer j: currentStatusInDB) {
+        for (Integer i : updatedStatus) {
+            boolean flag = false;
+            for (Integer j : currentStatusInDB) {
                 if (i.equals(j)) flag = true;
             }
             if (!flag)
                 statusToAdd.add(i);
         }
 //which statuses will be removed
-        for (Integer i: currentStatusInDB){
-            boolean flag=false;
-            for (Integer j: updatedStatus) {
+        for (Integer i : currentStatusInDB) {
+            boolean flag = false;
+            for (Integer j : updatedStatus) {
                 if (i.equals(j)) flag = true;
             }
             if (!flag)
@@ -339,8 +340,9 @@ public class TutorRepositoryImpl implements TutorRepository {
 
         return 1;
     }
-//------------------------------------------------------------------------------------------------------
-    public Set<String> getFacultySet(int creationYear){
+
+    //------------------------------------------------------------------------------------------------------
+    public Set<String> getFacultySet(int creationYear) {
         String sql = "SELECT distinct(faculty) FROM groups WHERE creation_year = ?";
 
         List<String> facultyList = jdbcTemplate.query(sql,
@@ -350,7 +352,7 @@ public class TutorRepositoryImpl implements TutorRepository {
         return new HashSet<>(facultyList);
     }
 
-    public Set<String> getProfessionSet(int creationYear, String faculty){
+    public Set<String> getProfessionSet(int creationYear, String faculty) {
         String sql = "SELECT distinct(profession) FROM groups WHERE creation_year = ? and faculty=?";
 
         List<String> professionList = jdbcTemplate.query(sql,
@@ -360,7 +362,7 @@ public class TutorRepositoryImpl implements TutorRepository {
         return new HashSet<>(professionList);
     }
 
-    public Set<String> getSectionSet(int creationYear, String faculty, String profession){
+    public Set<String> getSectionSet(int creationYear, String faculty, String profession) {
         String sql = "SELECT distinct(section) FROM groups WHERE creation_year = ? and faculty=? and profession=?";
 
         List<String> sectionList = jdbcTemplate.query(sql,
@@ -375,11 +377,11 @@ public class TutorRepositoryImpl implements TutorRepository {
         @Override
         public Student mapRow(ResultSet resultSet, int i) throws SQLException {
             Student student = new Student();
-            student.setId( resultSet.getLong("user_id") );
+            student.setId(resultSet.getLong("user_id"));
             student.setSurname(resultSet.getString("surname"));
-            student.setName( resultSet.getString("name") );
+            student.setName(resultSet.getString("name"));
             student.setEmail(resultSet.getString("email"));
-            student.setRoleId( resultSet.getInt("role_id") );
+            student.setRoleId(resultSet.getInt("role_id"));
             student.setPassword(resultSet.getString("password"));
             student.setPhoneNumber(resultSet.getString("phone_num"));
             student.setFaculty(resultSet.getString("faculty"));
@@ -391,7 +393,7 @@ public class TutorRepositoryImpl implements TutorRepository {
             student.setBirthPlace(resultSet.getString("birth_place"));
             student.setLivingPlace(resultSet.getString("living_place"));
             student.setOfficialHome(resultSet.getString("official_home"));
-            student.setSocialStatusSet( getSocialStatusSetById( resultSet.getLong("user_id")));
+            student.setSocialStatusSet(getSocialStatusSetById(resultSet.getLong("user_id")));
             student.setParentPhoneNumber(resultSet.getString("parent_num"));
             student.setGraduatedRegion(resultSet.getString("graduation_school"));
             student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
@@ -426,13 +428,12 @@ public class TutorRepositoryImpl implements TutorRepository {
     }
 
 
-    private Set<Integer> getSocialStatusSetById( long userId ){
-        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+    private Set<Integer> getSocialStatusSetById(long userId) {
+        List<Integer> socialStatusList = jdbcTemplate.query(SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
                 ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
         return new HashSet<>(socialStatusList);
     }
-
 
 
     @Override
@@ -448,7 +449,7 @@ public class TutorRepositoryImpl implements TutorRepository {
     @Override
     public int getNumberOfFilteredGroups(String searchParam) {
         String myQuery = " SELECT count(*) FROM groups  WHERE LOWER(group_name) like LOWER (?)";
-        return jdbcTemplate.query(myQuery, (resultSet , i) -> resultSet.getInt(1), "%"+searchParam+"%").get(0);
+        return jdbcTemplate.query(myQuery, (resultSet, i) -> resultSet.getInt(1), "%" + searchParam + "%").get(0);
     }
 
 
@@ -462,14 +463,11 @@ public class TutorRepositoryImpl implements TutorRepository {
                 ") as sub  " +
                 "where sub.rownum between ? and ? ";
 
-        List<Group> groupsList = jdbcTemplate.query(myquery, new GroupMapper() , "%"+searchParam+"%" , startRow , endRow);
+        List<Group> groupsList = jdbcTemplate.query(myquery, new GroupMapper(), "%" + searchParam + "%", startRow, endRow);
 
         System.out.println(groupsList);
         return groupsList;
     }
-
-
-
 
 
 //-----------------------------------------------------------------------------------------------
@@ -486,22 +484,21 @@ public class TutorRepositoryImpl implements TutorRepository {
 
 
     @Override
-    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId) {
+    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue, long groupId) {
         String sql = "select count(*) " +
                 "from bdu_user bu join student s on bu.user_id = s.user_id " +
                 "where lower(bu.name) like lower(?) and group_id = ? ";
 
         return jdbcTemplate.query(sql,
                 (resultSet, i) -> resultSet.getInt(1),
-                "%"+searchValue+"%",
+                "%" + searchValue + "%",
                 groupId
         ).get(0);
     }
 
 
-
     @Override
-    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
+    public List<Student> getStudentsOfIdenticalGroup(long groupId, String searchParam, int startRow, int endRow) {
 
         String sql = " select * from( " +
                 "select row_number() over(order by s.user_id) as rownum, * " +
@@ -510,14 +507,14 @@ public class TutorRepositoryImpl implements TutorRepository {
                 ") as sub " +
                 "where sub.rownum between ? and ?";
 
-        List<Student> studentList = jdbcTemplate.query(sql, new StudentMapper(), "%"+searchParam+"%",
+        List<Student> studentList = jdbcTemplate.query(sql, new StudentMapper(), "%" + searchParam + "%",
                 groupId,
                 startRow,
                 endRow);
 
         System.out.println("in getStudentsOfIdenticalGroup metod " + studentList);
 
-        return  studentList;
+        return studentList;
     }
 
 
@@ -558,20 +555,20 @@ public class TutorRepositoryImpl implements TutorRepository {
 
 
         return jdbcTemplate.query(sql,
-                ((resultSet, i)-> resultSet.getInt(1)),
-                "%"+searchValueForName+"%",
-                "%"+searchValueForSurname+"%",
-                "%"+searchValueForFatherName+"%",
-                "%"+searchValueForBirthDate+"%",
-                "%"+searchValueForBirthPlace+"%",
-                "%"+searchValueForLivingPlace+"%",
-                "%"+searchValueForEntryYear+"%",
-                "%"+searchValueForGraduationRegion+"%",
-                "%"+searchValueForEntryScore+"%",
-                "%"+searchValueForFaculty+"%",
-                "%"+searchValueForProfession+"%",
+                ((resultSet, i) -> resultSet.getInt(1)),
+                "%" + searchValueForName + "%",
+                "%" + searchValueForSurname + "%",
+                "%" + searchValueForFatherName + "%",
+                "%" + searchValueForBirthDate + "%",
+                "%" + searchValueForBirthPlace + "%",
+                "%" + searchValueForLivingPlace + "%",
+                "%" + searchValueForEntryYear + "%",
+                "%" + searchValueForGraduationRegion + "%",
+                "%" + searchValueForEntryScore + "%",
+                "%" + searchValueForFaculty + "%",
+                "%" + searchValueForProfession + "%",
 //                "%"+searchValueForGroup+"%",
-                "%"+searchValueForSection+"%").get(0);
+                "%" + searchValueForSection + "%").get(0);
 
     }
 
@@ -607,19 +604,19 @@ public class TutorRepositoryImpl implements TutorRepository {
 
         List<Student> studentList = jdbcTemplate.query(sql,
                 new StudentMapper(),
-                "%"+searchValueForName+"%",
-                "%"+searchValueForSurname+"%",
-                "%"+searchValueForFatherName+"%",
-                "%"+searchValueForBirthDate+"%",
-                "%"+searchValueForBirthPlace+"%",
-                "%"+searchValueForLivingPlace+"%",
-                "%"+searchValueForEntryYear+"%",
-                "%"+searchValueForGraduationRegion+"%",
-                "%"+searchValueForEntryScore+"%",
-                "%"+searchValueForFaculty+"%",
-                "%"+searchValueForProfession+"%",
+                "%" + searchValueForName + "%",
+                "%" + searchValueForSurname + "%",
+                "%" + searchValueForFatherName + "%",
+                "%" + searchValueForBirthDate + "%",
+                "%" + searchValueForBirthPlace + "%",
+                "%" + searchValueForLivingPlace + "%",
+                "%" + searchValueForEntryYear + "%",
+                "%" + searchValueForGraduationRegion + "%",
+                "%" + searchValueForEntryScore + "%",
+                "%" + searchValueForFaculty + "%",
+                "%" + searchValueForProfession + "%",
 //                "%"+searchValueForGroup+"%",
-                "%"+searchValueForSection+"%",
+                "%" + searchValueForSection + "%",
                 beginRow,
                 endRow);
 
@@ -797,48 +794,57 @@ public class TutorRepositoryImpl implements TutorRepository {
     //---------------------------------------------------------------------------------------------------
 
 
-
-    //TODO 1) qrup cedvelinde yeni qrup yarat ve hemen yaradilan
-    //TODO    qrupun id'sini gotur metod vasitesi ile return et.
-    public long createGroup(String profession , String section , String eduType, int year , int studentCount){
+    public long createGroup(String profession, String section, String eduType, int year, int studentCount) {
 
         String sql = " INSERT INTO public.groups(" +
                 "group_id, group_name, creation_year, faculty, profession, section, student_number, education_type)" +
                 "VALUES (nextval('group_sequence'), null , ? , 'Physics', ? , ? , ? , ?) " +
                 "returning group_id ";
 
+
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(sql, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR);
+        factory.setReturnGeneratedKeys(true);
+        PreparedStatementCreator creator = factory.newPreparedStatementCreator(new Object[]{
+                year,
+                profession,
+                section,
+                studentCount,
+                eduType,
+
+        });
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, year);
-            ps.setString(2, profession);
-            ps.setString(3,section);
-            ps.setInt(4, studentCount);
-            ps.setString(5,eduType);
-            return ps;
-        } , keyHolder);
-
-
-        System.out.println(keyHolder.getKey());
-        return (long) keyHolder.getKey();
+        jdbcTemplate.update(creator, keyHolder);
+        long groupId = (long) keyHolder.getKeyList().get(0).get("group_id");
+        return groupId;
     }
+
+    private int updateStudentGroupID(long studentId, long groupId) {
+        String sql = "UPDATE student " +
+                "SET   group_id = ? " +
+                "WHERE user_id = ? ";
+
+        return jdbcTemplate.update(sql,
+                groupId,
+                studentId
+        );
+
+    }
+
 
     @Override
     public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCnt) {
 
         String sql = " select * " +
                 "from student s full outer join bdu_user bu on s.user_id = bu.user_id\n" +
-                "where s.profession = ? and s.section = ? and s.education_type = ? " ;
-        List<Student>  studentList = new ArrayList<>();
-                studentList = jdbcTemplate.query(sql,
+                "where s.profession = ? and s.section = ? and s.education_type = ?  and group_id is null ";
+        List<Student> studentList = new ArrayList<>();
+        studentList = jdbcTemplate.query(sql,
                 new StudentMapper(),
                 profession,
                 section,
                 eduType);
-
-
-
 
 
         Student student = new Student();
@@ -848,44 +854,109 @@ public class TutorRepositoryImpl implements TutorRepository {
         List<Group> newGroups = new ArrayList<>();
         Group group = new Group();
 
+        Random random = new Random();
         int counter = 0;
         int groupCount = groupCnt;
         int groupCapacity;
         int totalStudentCount = studentList.size();
         long groupId;
         int currentMemberCount = 0;
-
-        Collections.sort(studentList , new Student.SortbyEntryScore());
-
-
-
-        if(totalStudentCount % groupCount == 0){
-
-            groupCapacity = totalStudentCount / groupCount;
+        int i = 0;
+        int index = 0;
 
 
-            while( counter < groupCapacity){
+        Collections.sort(studentList, new Student.SortbyEntryScore());
+
+
+        for (Student student1 : studentList) {
+            System.out.println(student1.getEntryScore());
+        }
+
+        System.out.println("totalStudentCount = " + totalStudentCount);
+
+
+
+
+        int listsize;
+        int listsize2;
+        if(totalStudentCount % 3 == 0){
+
+            listsize = totalStudentCount / 3;
+
+            while(higherScoredStudentList.size() != listsize){
                 higherScoredStudentList.add(studentList.get(counter));
                 counter++;
             }
 
-            while(counter < (studentList.size()-groupCapacity)){
+
+            while(middleScoredStudentList.size() != listsize){
                 middleScoredStudentList.add(studentList.get(counter));
                 counter++;
             }
 
-
-            while(counter < studentList.size()){
-
+            while (lowerScoredStudentList.size() != listsize){
                 lowerScoredStudentList.add(studentList.get(counter));
                 counter++;
             }
 
+        } else {
 
 
-            for (int j = 0; j < groupCount; j++){
+               listsize = totalStudentCount / 3;
 
-                groupId = createGroup(profession , section  , eduType , year , groupCapacity);
+                while(higherScoredStudentList.size() != listsize){
+                    higherScoredStudentList.add(studentList.get(counter));
+                    counter++;
+                }
+
+                while(middleScoredStudentList.size() != listsize){
+                    middleScoredStudentList.add(studentList.get(counter));
+                    counter++;
+                }
+
+
+                listsize2 = studentList.size() - (higherScoredStudentList.size() + middleScoredStudentList.size());
+                while(lowerScoredStudentList.size() != listsize2) {
+                    lowerScoredStudentList.add(studentList.get(counter));
+                    counter++;
+                }
+
+
+
+            System.out.println("studentList size = " + studentList.size());
+            System.out.println("High Scored Students' id ");
+            for (Student student1 : higherScoredStudentList) {
+                System.out.println(student1.getId());
+            }
+
+
+            System.out.println("Middle Scored Students' id ");
+            for (Student student1 : middleScoredStudentList) {
+                System.out.println(student1.getId());
+            }
+
+
+            System.out.println("Low Scored Students' id ");
+            for (Student student1 : lowerScoredStudentList) {
+                System.out.println(student1.getId());
+            }
+
+            System.out.println("Size of higherScoredStudentList =  " + higherScoredStudentList.size());
+            System.out.println("Size of middleScoredStudentList =  " + middleScoredStudentList.size());
+            System.out.println("Size of lowerScoredStudentList =  " + lowerScoredStudentList.size());
+
+
+        }
+
+
+        if (totalStudentCount % groupCount == 0) {
+
+            groupCapacity = totalStudentCount / groupCount;
+
+            for (int j = 0; j < groupCount; j++) {
+
+                groupId = createGroup(profession, section, eduType, year, groupCapacity);
+                System.out.println("group id = " + groupId);
                 group.setId(groupId);
                 group.setProfession(profession);
                 group.setSection(section);
@@ -893,87 +964,68 @@ public class TutorRepositoryImpl implements TutorRepository {
                 group.setCreationYear(year);
                 group.setStudentNumer(groupCapacity);
                 newGroups.add(group);
-                counter = 0;
+
+                currentMemberCount = 0;
 
 
+                while (currentMemberCount < groupCapacity) {
 
-                while(counter != groupCapacity){
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    higherScoredStudentList.get(counter).setGroupId(groupId);
-
-
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    middleScoredStudentList.get(counter).setGroupId(groupId);
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
+                    if (currentMemberCount == groupCapacity)
                         break;
 
-                    lowerScoredStudentList.get(counter).setGroupId(groupId);
 
-                    counter++;
+                    if (!higherScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        i++;
+                        index = random.nextInt(higherScoredStudentList.size());
+                        updateStudentGroupID(higherScoredStudentList.get(index).getId(), groupId);
+                        System.out.println(i + ")" + higherScoredStudentList.get(index).getId() + " " + groupId);
+                        higherScoredStudentList.remove(index);
+                    }
+
+                    if (currentMemberCount == groupCapacity)
+                        break;
+
+
+                    if (!middleScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        i++;
+                        index = random.nextInt(middleScoredStudentList.size());
+                        updateStudentGroupID(middleScoredStudentList.get(index).getId(), groupId);
+                        System.out.println(i + ")" + middleScoredStudentList.get(index).getId() + " " + groupId);
+                        middleScoredStudentList.remove(index);
+                    }
+
+                    if (currentMemberCount == groupCapacity)
+                        break;
+
+
+                    if (!lowerScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        i++;
+                        index = random.nextInt(lowerScoredStudentList.size());
+                        updateStudentGroupID(lowerScoredStudentList.get(index).getId(), groupId);
+                        System.out.println(i + ")" + lowerScoredStudentList.get(index).getId() + " " + groupId);
+                        lowerScoredStudentList.remove(index);
+
+                    }
                 }
-
             }
-
             return newGroups;
 
         } else {
 
-            int increment;
-            int increasedStudentCount  = 0;
-            int i = 1;
-            while(totalStudentCount % groupCount != 0) {
-                i++;
-                increasedStudentCount = totalStudentCount + i;
-            }
+            groupCapacity = totalStudentCount / groupCnt;
+            index = studentList.size();
 
+            for (int j = 0; j < groupCount; j++) {
 
-            increment = i;
-
-            Student student1 = new Student();
-
-            while(i != 0){
-                studentList.add(student1);
-                i--;
-            }
-
-
-            groupCapacity = totalStudentCount / groupCount;
-
-
-            while( counter < groupCapacity){
-
-                while(totalStudentCount == increasedStudentCount){
-                    studentList.remove(increasedStudentCount);
-                    increasedStudentCount--;
+                if(higherScoredStudentList.isEmpty() && middleScoredStudentList.isEmpty() && lowerScoredStudentList.isEmpty()){
+                    System.out.println(" if scope  in for loop ");
+                    break;
                 }
-                higherScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-            while(counter < (studentList.size()-groupCapacity)){
-                middleScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-            while(counter < studentList.size()){
-
-                lowerScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-            for (int j = 0; j < groupCount; j++){
-
-                groupId = createGroup(profession , section  , eduType , year , groupCapacity);
+                groupId = createGroup(profession, section, eduType, year, groupCapacity);
+                System.out.println("group id = " + groupId);
                 group.setId(groupId);
                 group.setProfession(profession);
                 group.setSection(section);
@@ -981,44 +1033,81 @@ public class TutorRepositoryImpl implements TutorRepository {
                 group.setCreationYear(year);
                 group.setStudentNumer(groupCapacity);
                 newGroups.add(group);
-                counter = 0;
+
+                currentMemberCount = 0;
 
 
+                while (index >= 0) {
 
-                while(counter != groupCapacity){
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
+                    if(higherScoredStudentList.isEmpty() && middleScoredStudentList.isEmpty() && lowerScoredStudentList.isEmpty()){
+                        System.out.println("first if scope in while loop ");
                         break;
-                    higherScoredStudentList.get(counter).setGroupId(groupId);
+                    }
 
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
+                    if (currentMemberCount > groupCapacity) {
+                        System.out.println("if scope before  !higherScoredStudentList.isEmpty() ");
                         break;
-                    middleScoredStudentList.get(counter).setGroupId(groupId);
+                    }
 
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
+
+                    if (!higherScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        index--;
+                        i++;
+                        index = random.nextInt(higherScoredStudentList.size());
+                        updateStudentGroupID(higherScoredStudentList.get(index).getId(), groupId);
+                        System.out.println( i + ")" + higherScoredStudentList.get(index).getId() + " " + groupId);
+                        higherScoredStudentList.remove(index);
+
+                    }
+
+
+                    if (currentMemberCount > groupCapacity) {
+                        System.out.println("if scope before  !middleScoredStudentList.isEmpty() ");
                         break;
 
-                    lowerScoredStudentList.get(counter).setGroupId(groupId);
+                    }
 
-                    counter++;
+                    if (!middleScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        index--;
+                        i++;
+                        index = random.nextInt(middleScoredStudentList.size());
+                        updateStudentGroupID(middleScoredStudentList.get(index).getId(), groupId);
+                        System.out.println(i + ")" + middleScoredStudentList.get(index).getId() + " " + groupId);
+                        middleScoredStudentList.remove(index);
+                    }
+
+
+
+                    if (currentMemberCount > groupCapacity) {
+                        System.out.println("if scope before  !lowerScoredStudentList.isEmpty() ");
+                        break;
+
+                    }
+
+
+                    if (!lowerScoredStudentList.isEmpty()) {
+                        ++currentMemberCount;
+                        index--;
+                        i++;
+                        index = random.nextInt(lowerScoredStudentList.size());
+                        updateStudentGroupID(lowerScoredStudentList.get(index).getId(), groupId);
+                        System.out.println(i + ")" + lowerScoredStudentList.get(index).getId() + " " + groupId);
+                        lowerScoredStudentList.remove(index);
+                    }
+
+                    if(higherScoredStudentList.isEmpty() && middleScoredStudentList.isEmpty() && lowerScoredStudentList.isEmpty()){
+                        System.out.println("last if scope ");
+                        break;
+                    }
+
                 }
-
             }
-
-
-            return null;
+            return newGroups;
         }
 
     }
-
-
-
-
-
-
-
 }
+
+

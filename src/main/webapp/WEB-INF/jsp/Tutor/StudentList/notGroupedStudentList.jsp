@@ -423,16 +423,18 @@
             var groupCount =  $( "#groupCountSelect" ).val();
             var educationType =  $( "#eduTypeSelect" ).val();
 
+            window.location.href = "/tutor/getNewCreatedGroup?profession=" + profession +"&section=" + section + "&year=" + year + "&groupCount=" + groupCount + "&educationType=" + educationType;
 
-            $.get("/tutor/getNewCreatedGroup",
-                {
-                    "profession": profession,
-                    "section": section,
-                    "year": year,
-                    "educationType": educationType,
-                    "groupCount": groupCount
-                }
-        )
+            // $.get("/tutor/getNewCreatedGroup",
+            //     {
+            //         "profession": profession,
+            //         "section": section,
+            //         "year": year,
+            //         "educationType": educationType,
+            //         "groupCount": groupCount
+            //     }
+   //     )
+
         });
 
     }

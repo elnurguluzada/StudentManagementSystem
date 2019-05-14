@@ -221,6 +221,7 @@ public class TutorController {
                                 @RequestParam(name = "search[value]") String searchValue) {
 
 
+        System.out.println("/getGroups");
         DataTable dataTable = new DataTable();
         dataTable.setDraw(draw);
 
@@ -471,29 +472,32 @@ public class TutorController {
     public ModelAndView getNewGroups(@RequestParam (name = "profession") String profession,
                                     @RequestParam (name = "section") String section,
                                     @RequestParam (name = "year") int year,
+                                     @RequestParam (name = "groupCount") int groupCount,
                                     @RequestParam (name = "educationType") String eduType,
-                                    @RequestParam (name = "groupCount") int groupCount,
                                      HttpSession httpSession) {
 
-        System.out.println(profession + " " + section + year + " " + eduType + " " + groupCount);
-      //  ModelAndView modelAndView = new ModelAndView();
+        System.out.println("/getNewCreatedGroup");
+        System.out.println(profession + " " + section  + " " + year + " " + eduType + " " + groupCount);
         httpSession.setAttribute("profession" , profession );
         httpSession.setAttribute("section" , section );
         httpSession.setAttribute("year" , year );
         httpSession.setAttribute("eduType" , eduType );
         httpSession.setAttribute("groupCount" , groupCount );
-        return new ModelAndView("Tutor/Group/createdGroupList");
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("Tutor/Group/createdGroupList");
+        return modelAndView;
     }
 
 
     @ResponseBody
-    @GetMapping("/createGroup")
+    @GetMapping("/createNewGroup")
     public DataTable createGroup(@RequestParam(name = "draw") int draw,
                                  @RequestParam(name = "start") int start,
                                  @RequestParam(name = "length") int length,
                                  @RequestParam(name = "search[value]") String searchValue,
                                   HttpSession httpSession){
 
+        System.out.println("/createGroup");
         String profession = (String) httpSession.getAttribute("profession");
         String section = (String) httpSession.getAttribute("section");
         int year = (int) httpSession.getAttribute("year");
@@ -535,11 +539,11 @@ public class TutorController {
         }
 
         dataTable.setData(data);
-        httpSession.removeAttribute("profession");
-        httpSession.removeAttribute("section");
-        httpSession.removeAttribute("year");
-        httpSession.removeAttribute("eduType");
-        httpSession.removeAttribute("groupCount");
+//        httpSession.removeAttribute("profession");
+//        httpSession.removeAttribute("section");
+//        httpSession.removeAttribute("year");
+//        httpSession.removeAttribute("eduType");
+//        httpSession.removeAttribute("groupCount");
         return dataTable;
     }
 
