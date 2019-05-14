@@ -78,7 +78,7 @@
     </tfoot>
 </table>
 
-<div id="detailedStudentInformation" title="Student Information"></div>
+<div id="detailedStudentInformation" title="Student Information" ></div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
@@ -91,6 +91,7 @@
 
     $(document).ready(function () {
         $("#detailedStudentInformation").dialog({
+            minWidth: 600,
             autoOpen: false
         });
         drawTable();

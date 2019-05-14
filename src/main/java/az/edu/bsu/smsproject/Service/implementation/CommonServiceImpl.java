@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -18,19 +19,20 @@ public class CommonServiceImpl implements CommonService {
         this.commonRepository = commonRepository;
     }
 
+    @Override
+    public Set<String> getFacultySet(int year) {
+        return commonRepository.getFacultySet(year);
+    }
+
+
 
     @Override
-    public List<String> getSectionList(int year) {
-        return commonRepository.getSectionList( year );
+    public Set<String> getProfessionSet(int year, String faculty) {
+        return commonRepository.getProfessionSet(year, faculty);
     }
 
     @Override
-    public List<String> getFacultyList(int year) {
-        return commonRepository.getFacultyList( year );
-    }
-
-    @Override
-    public List<String> getGroupList(int year) {
-        return commonRepository.getGroupList( year );
+    public Set<String> getSectionSet(int year, String faculty, String profession) {
+        return commonRepository.getSectionSet(year, faculty, profession);
     }
 }

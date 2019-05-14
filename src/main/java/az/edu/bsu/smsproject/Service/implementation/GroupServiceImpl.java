@@ -45,13 +45,25 @@ public class GroupServiceImpl implements GroupService {
         return groupRepository.deleteGroup(groupId);
     }
 
+
+    @Override
+    public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section) {
+        return groupRepository.getNumberOfFilteredGroups( name, year, faculty, profession, section);
+    }
+
     @Override
     public int getNumberOfAllGroups() {
         return groupRepository.getNumberOfAllGroups();
     }
 
     @Override
-    public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section) {
-        return groupRepository.getNumberOfFilteredGroups( name, year, faculty, profession, section);
+    public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow) {
+        return groupRepository.getFilteredGroupList(searchParam, startRow, endRow);
     }
+
+    @Override
+    public int getNumberOfFilteredGroups(String searchParam) {
+        return groupRepository.getNumberOfFilteredGroups(searchParam);
+    }
+
 }

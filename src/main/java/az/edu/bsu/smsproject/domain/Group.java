@@ -12,13 +12,15 @@ public class Group extends BaseDomain implements Serializable {
     private String faculty;
     private String profession;
     private String section;
+    private int studentNumber;
 
-    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section) {
+    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section, int studentNumber) {
         super(id, name, status);
         this.creationYear = creationYear;
         this.faculty = faculty;
         this.profession = profession;
         this.section = section;
+        this.studentNumber = studentNumber;
     }
 
     public Group() {
@@ -56,6 +58,14 @@ public class Group extends BaseDomain implements Serializable {
         this.section = section;
     }
 
+    public int getStudentNumber() {
+        return studentNumber;
+    }
+
+    public void setStudentNumber(int studentNumber) {
+        this.studentNumber = studentNumber;
+    }
+
     @Override
     public String toString() {
         return "Group{" +
@@ -63,6 +73,7 @@ public class Group extends BaseDomain implements Serializable {
                 ", faculty='" + faculty + '\'' +
                 ", profession='" + profession + '\'' +
                 ", section='" + section + '\'' +
+                ", studentNumber=" + studentNumber +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +

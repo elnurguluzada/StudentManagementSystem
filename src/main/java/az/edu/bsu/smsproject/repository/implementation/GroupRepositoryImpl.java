@@ -3,6 +3,7 @@ package az.edu.bsu.smsproject.repository.implementation;
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.repository.GroupRepository;
+import az.edu.bsu.smsproject.repository.SQLqueries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,6 +18,7 @@ public class GroupRepositoryImpl implements GroupRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public GroupRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -61,16 +63,6 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     @Override
-    public Group updateGroup(Group group) {
-        return null;
-    }
-
-    @Override
-    public boolean deleteGroup(long groupId) {
-        return false;
-    }
-
-    @Override
     public int getNumberOfAllGroups() {
         String sql = "SELECT count(*) FROM groups";
         return jdbcTemplate.query(sql,
@@ -95,6 +87,44 @@ public class GroupRepositoryImpl implements GroupRepository {
                 "%"+section+"%").get(0);
     }
 
+    //    ***********************************
+    @Override
+    public int getNumberOfFilteredGroups(String searchParam) {
+        String myQuery = " SELECT count(*) FROM groups  WHERE LOWER(group_name) like LOWER (?)";
+        return jdbcTemplate.query(myQuery, (resultSet , i) -> resultSet.getInt(1), "%"+searchParam+"%").get(0);
+    }
+
+
+    @Override
+    public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow) {
+
+        String myquery = "select * from(" +
+                "select row_number() over(order by group_id) as rownum, * " +
+                "from groups " +
+                "where lower(group_name) like lower(?) " +
+                ") as sub  " +
+                "where sub.rownum between ? and ? ";
+
+        List<Group> groupsList = jdbcTemplate.query(myquery, groupMapper , "%"+searchParam+"%" , startRow , endRow);
+
+        System.out.println(groupsList);
+        return groupsList;
+    }
+
+//    ***********************************
+
+    @Override
+    public Group updateGroup(Group group) {
+        return null;
+    }
+
+    @Override
+    public boolean deleteGroup(long groupId) {
+        return false;
+    }
+
+
+
     private RowMapper<Group> groupMapper = (resultSet, i) -> {
         long groupId = resultSet.getLong("group_id");
         String groupName = resultSet.getString("group_name");
@@ -102,7 +132,10 @@ public class GroupRepositoryImpl implements GroupRepository {
         String faculty = resultSet.getString("faculty");
         String profession = resultSet.getString("profession");
         String section = resultSet.getString("section");
-        return new Group(groupId, groupName, Status.ACTIVE, creationYear, faculty, profession, section);
+        int studentNumber = resultSet.getInt("student_number"); //todo
+        return new Group(groupId, groupName, Status.ACTIVE, creationYear, faculty, profession, section, studentNumber);
     };
+
+
 
 }

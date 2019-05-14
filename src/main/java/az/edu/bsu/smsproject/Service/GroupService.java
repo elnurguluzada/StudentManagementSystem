@@ -15,4 +15,9 @@ public interface GroupService {
     public int getNumberOfAllGroups();
     public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section);
 
+//    **********************
+//    public int getNumberOfAllGroups();
+    public int getNumberOfFilteredGroups(String searchParam);
+    public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow);
+//************************
 }
