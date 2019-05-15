@@ -20,6 +20,11 @@
 <br/> <br/>
 <a href="/tutor/studentsList">Students List</a>
 <br/> <br/>
+<a href="/tutor/groups">Groups</a>
+<br/> <br/>
+<a href="/tutor/getNotGroupedStudent">Ungrouped Students</a>
+
+
 <%--<button onclick="connect()">Connect</button>--%>
 <br/> <br/>
 <input type="text" id="input-id" />
@@ -71,7 +76,7 @@
 
     function sendMessage() {
         var time = new Date();
-        var localTime = new Date(time.getTime()-time.getTimezoneOffset()*60*1000); //because JSON Stringify changes time of date because of UTC https://stackoverflow.com/questions/1486476/json-stringify-changes-time-of-date-because-of-utc
+        var localTime = new Date(time.getTime()-time.getTimezoneOffset()*60*1000); // https://stackoverflow.com/questions/1486476/json-stringify-changes-time-of-date-because-of-utc
         var instantMessage = {
             'content': $("#input-id").val(),
             'sender': "tutor",

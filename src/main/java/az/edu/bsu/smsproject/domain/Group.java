@@ -3,9 +3,10 @@ package az.edu.bsu.smsproject.domain;
 import az.edu.bsu.smsproject.domain.Enums.Status;
 
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.List;
 
-public class Group extends  BaseDomain implements Serializable {
+public class Group extends BaseDomain implements Serializable {
+    private static final long serialVersionUID = -2309096077691341278L;
 
 
     private static final long serialVersionUID = 522454508097397247L;
@@ -13,11 +14,10 @@ public class Group extends  BaseDomain implements Serializable {
     private String faculty;
     private String profession;
     private String section;
-    private String eduType;
-    private int studentNumer;
+    private int studentNumber;
 
-
-    public Group(int creationYear, String faculty, String profession, String section, String eduType, int studentNumer) {
+    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section, int studentNumber) {
+        super(id, name, status);
         this.creationYear = creationYear;
         this.faculty = faculty;
         this.profession = profession;

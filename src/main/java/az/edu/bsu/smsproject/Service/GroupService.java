@@ -1,0 +1,23 @@
+package az.edu.bsu.smsproject.Service;
+
+import az.edu.bsu.smsproject.domain.Group;
+
+import java.util.List;
+
+public interface GroupService {
+    public Group add(Group group);
+    public Group getGroupById(long groupId);
+    public List<Group> getAllGroupList();
+    public List<Group> getFilteredGroupList(int begin, int end,String name, String year, String faculty, String profession, String section);
+    public Group updateGroup(Group group);
+    public boolean deleteGroup(long groupId);
+
+    public int getNumberOfAllGroups();
+    public int getNumberOfFilteredGroups(String name, String year, String faculty, String profession, String section);
+
+//    **********************
+//    public int getNumberOfAllGroups();
+    public int getNumberOfFilteredGroups(String searchParam);
+    public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow);
+//************************
+}

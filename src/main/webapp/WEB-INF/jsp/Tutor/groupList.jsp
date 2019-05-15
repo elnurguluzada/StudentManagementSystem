@@ -1,13 +1,39 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Students</title>
+    <title>Groups</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"><%--For datatable--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css"><%--For datatable buttons--%>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
 </head>
+<%--Read more: https://datatables.net/blog/2016-03-25--%>
 <body>
 
+<table id="group-list-table" class="display" style="width: 80%"> <!--display is a class in the imported dataTables.min.css-->
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Faculty</th>
+        <th>Profession</th>
+        <th>Section</th>
+        <th>Students</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Faculty</th>
+        <th>Profession</th>
+        <th>Section</th>
+        <th>Students</th>
+    </tr>
+    </tfoot>
+</table>
+<br/><br/>
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->
     <thead>
@@ -77,8 +103,8 @@
     </tr>
     </tfoot>
 </table>
-
-<div id="detailedStudentInformation" title="Student Information" ></div>
+<br/><br/>
+<div id="detailedStudentInformation" title="Student Information"></div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
@@ -88,39 +114,87 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script>
+    var groupTable;
+    var studentsTable;
+    var selectedGroupId=0;
 
     $(document).ready(function () {
-        $("#detailedStudentInformation").dialog({
-            minWidth: 600,
-            autoOpen: false
-        });
-        drawTable();
+        drawGroupsTable();
+        drawStudentsTable();
     });
 
-    function drawTable() {
+    function drawGroupsTable() {
 
-        // Setup - add a text input to each footer cell
-        $('#student-list-table tfoot th').each( function () {
-
+        $('#group-list-table tfoot th').each( function () { // Setup - add a text input to each footer cell
             var title = $(this).text();
-            if (title === 'Name' || title === 'Surname' || title === 'Father name' || title === 'Birth date' || title === 'Birth place' ||
-                title === 'Living place' || title === 'Entry year' || title === 'Graduation region' || title === 'Entry score' ||
-                title === 'Faculty' || title === 'Profession' || title === 'Group' || title === 'Section'){
-
+            if (title === 'Name' || title === 'Year' || title === 'Faculty' || title === 'Profession' || title === 'Section'){
                 $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-            }
-            else{
-                $(this).html( '<input type="text" hidden placeholder="Search '+title+'" />' );
             }
         } );
 
-        var myTable = $("#student-list-table").DataTable({
+        groupTable = $("#group-list-table").DataTable({
             "processing": true,
             "serverSide": true,
             "ordering": true,
-            "ajax": "/tutor/getStudents",
+            "ajax": "/tutor/getGroups",
             "dom": 'Bfrtip',
-            // "initComplete": , it works when the table is initialized for the 1st time, but not when you move to next page
+            "buttons": [
+                'colvis'
+            ],
+            "columnDefs": [
+                {
+                    "targets": [-1],
+                    "visible": true,
+                    "defaultContent": "<button class='detailed-button'>Detailed!</button>"
+                }
+            ]
+        });
+
+        groupTable.on('draw', function () { //The draw event is fired whenever the table is redrawn on the page, at the same point as drawCallback.
+            $(".detailed-button").click(function () {
+                selectedGroupId = groupTable.row($(this).parents('tr')).data()[0];
+                studentsTable.ajax.reload();
+            });
+        });
+
+        groupTable.columns().every( function () { // Apply the search
+            var that = this;
+
+            $( 'input', this.footer() ).on( 'keyup change', function () {
+                if ( that.search() !== this.value ) {
+                    that
+                        .search( this.value )
+                        .draw();
+                }
+            } );
+        } );
+
+    }
+
+    function drawStudentsTable() {
+        $('#student-list-table tfoot th').each( function () { // Setup - add a text input to each footer cell
+            var title = $(this).text();
+            if (title === 'Name' || title === 'Surname' || title === 'Father name' || title === 'Birth date' || title === 'Birth place' ||
+                title === 'Living place' || title === 'Entry year' || title === 'Graduation region' || title === 'Entry score' ||
+                title === 'Faculty' || title === 'Profession' || title === 'Section'){
+
+                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            }
+
+        } );
+
+        studentsTable = $("#student-list-table").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ordering": true,
+            "ajax":{
+                url: "/tutor/getGroupStudents",
+                type: 'get',
+                data: function ( d ) {
+                        d.groupId = selectedGroupId;
+                    }
+            } ,
+            "dom": 'Bfrtip',
             "buttons": [
                 'colvis'
             ],
@@ -193,40 +267,29 @@
                 {
                     "targets": [-1],
                     "visible": true,
-                    "defaultContent": "<button class='detailedInfo'>Detailed!</button> &nbsp " +
-                        "<a><button class='updateInfo'>Update!</button></a>"
+                    "defaultContent": "<button class='detailedInfo'>Detailed!</button> &nbsp "
                 }
             ]
         });
 
-        //The draw event is fired whenever the table is redrawn on the page, at the same point as drawCallback.
-        myTable.on('draw', function () {
+        studentsTable.on('draw', function () {  //The draw event is fired whenever the table is redrawn on the page, at the same point as drawCallback.
 
             $(".detailedInfo").click(function () {
 
-                var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                var userId = studentsTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+
                 $("#detailedStudentInformation").load(
                     "/tutor/getStudentInfoPopup/" + userId,  // url from which data will be loaded
                     function () {                                   // function is executed when response comes from url
+                        $("#detailedStudentInformation").dialog({ autoOpen: false});
                         $("#detailedStudentInformation").dialog('open');
                     });
-
-            });
-
-            $(".updateInfo").click(function () {
-
-                var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
-                window.location.href = "/tutor/updateStudent/" + userId;
-
-                // var xhr = new XMLHttpRequest();
-                // xhr.open('GET',"/tutor/updateStudent?userId="+userId,false);
-                // xhr.send();
 
             });
         });
 
         // Apply the search
-        myTable.columns().every( function () {
+        studentsTable.columns().every( function () {
             var that = this;
 
             $( 'input', this.footer() ).on( 'keyup change', function () {
@@ -237,99 +300,6 @@
                 }
             } );
         } );
-
-    }
-
-    function fillFaculty(element) {
-        year = element.getAttribute("value");
-
-        $.get("/tutor/getFaculties",
-            {
-                "year": year
-            },
-            function (data) {
-                alert(data);
-
-                $('#faculty-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillProfession(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("faculty").add(option);
-                }
-            }
-        );
-
-    }
-
-    function fillProfession(element) {
-        faculty = element.getAttribute("value");
-
-        $.get("/tutor/getProfessions",
-            {
-                "year": year,
-                "faculty": faculty
-            },
-            function (data) {
-                alert(data);
-
-                $('#profession-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillSection(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("profession").add(option);
-                }
-            });
-    }
-
-    function fillSection(element) {
-        profession = element.getAttribute("value");
-        $.get("/tutor/getSections",
-            {
-                "year": year,
-                "faculty": faculty,
-                "profession": profession
-            },
-            function (data) {
-                alert(data);
-
-                $('#section-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillSection(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("section").add(option);
-                }
-            })
-
     }
 
 </script>

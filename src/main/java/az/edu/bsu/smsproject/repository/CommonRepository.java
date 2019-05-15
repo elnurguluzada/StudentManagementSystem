@@ -1,13 +1,13 @@
 package az.edu.bsu.smsproject.repository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CommonRepository {
 
-    public List<String> getSectionList(int year);
+    public Set<String> getFacultySet(int year);
+    public Set<String> getProfessionSet(int year, String faculty);
+    public Set<String> getSectionSet(int year, String faculty, String profession);
 
-    public List<String> getFacultyList(int year);
-
-    public List<String> getGroupList(int year);
 
 }

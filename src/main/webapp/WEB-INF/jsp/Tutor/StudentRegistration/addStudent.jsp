@@ -9,7 +9,7 @@
     <style> .error{ color: red; } </style>
 </head>
 <body>
-
+<a href="/tutor/">Back to main page</a>
 <h3>Add New Student Data</h3>
 <% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
 
@@ -104,13 +104,11 @@
         <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
     <form:select path="entryYear" id="entry-year" >
-
         <form:option value="${currentYear}"  onclick="fillFaculty(this)" />
         <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-2}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-3}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-4}" onclick="fillFaculty(this)"/>
-
     </form:select>
         <br/><br/>
     <%--value attribute should be empty not 'Select one', otherwise spring validation will accept
@@ -214,7 +212,6 @@
                 "year": year
             },
             function (data) {
-                alert(data);
 
                 $('#faculty-select-id')
                     .find('option')
@@ -261,7 +258,6 @@
                 "faculty": faculty
             },
             function (data) {
-                alert(data);
 
                 $('#profession-select-id')
                     .find('option')
@@ -291,7 +287,6 @@
                 "profession": profession
             },
             function (data) {
-                alert(data);
 
                 $('#section-select-id')
                     .find('option')
@@ -302,10 +297,7 @@
                     var option = document.createElement("option");
                     var valueAttr = document.createAttribute("value");
                     valueAttr.value=data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value='fillSection(this)';
                     option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
                     option.innerText = data[i];
                     document.getElementById("section-select-id").add(option);
                 }
