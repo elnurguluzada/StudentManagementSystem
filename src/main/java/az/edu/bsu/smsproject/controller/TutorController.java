@@ -8,6 +8,7 @@ import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.domain.StudentValidation;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -573,6 +576,96 @@ public class TutorController {
 
 
 //------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    @GetMapping("/getNewCreatedGroup")
+    public ModelAndView getNewGroups(@RequestParam (name = "profession") String profession,
+                                     @RequestParam (name = "section") String section,
+                                     @RequestParam (name = "year") int year,
+                                     @RequestParam (name = "groupCount") int groupCount,
+                                     @RequestParam (name = "educationType") String eduType,
+                                     HttpSession httpSession) {
+
+//        System.out.println("/getNewCreatedGroup");
+//        System.out.println(profession + " " + section  + " " + year + " " + eduType + " " + groupCount);
+//        httpSession.setAttribute("profession" , profession );
+//        httpSession.setAttribute("section" , section );
+//        httpSession.setAttribute("year" , year );
+//        httpSession.setAttribute("eduType" , eduType );
+//        httpSession.setAttribute("groupCount" , groupCount );
+//        ModelAndView modelAndView = new ModelAndView();
+//        modelAndView.setViewName("Tutor/Group/createdGroupList");
+
+        List<Group> groupList = new ArrayList<>();
+        groupList = tutorService.groupStudents(profession, section , eduType , year , groupCount);
+
+        httpSession.setAttribute("groupList", groupList);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("Tutor/Group/createdGroupList");
+
+        return modelAndView;
+    }
+
+
+    @ResponseBody
+    @GetMapping("/createNewGroup")
+    public DataTable createGroup(@RequestParam(name = "draw") int draw,
+                                 @RequestParam(name = "start") int start,
+                                 @RequestParam(name = "length") int length,
+                                 @RequestParam(name = "search[value]") String searchValue,
+                                 HttpSession httpSession){
+
+//        System.out.println("/createGroup");
+//        String profession = (String) httpSession.getAttribute("profession");
+//        String section = (String) httpSession.getAttribute("section");
+//        int year = (int) httpSession.getAttribute("year");
+//        String eduType = (String) httpSession.getAttribute("eduType");
+//        int groupCount = (int) httpSession.getAttribute("groupCount");
+
+        DataTable dataTable = new DataTable();
+        dataTable.setDraw(draw);
+
+
+
+       List<Group> groupList = new ArrayList<>();
+//       groupList = tutorService.groupStudents(profession, section , eduType , year , groupCount);
+
+        groupList = (List<Group>) httpSession.getAttribute("groupList");
+        int amountOfAllGroups = groupList.size();
+        dataTable.setRecordsTotal(amountOfAllGroups);
+
+        int amountOfFilteredGroups = groupList.size();
+        dataTable.setRecordsFiltered(amountOfFilteredGroups);
+
+        if (start + length > amountOfFilteredGroups) {
+            length = amountOfFilteredGroups % length;
+        }
+
+
+        String[][] data = new String[length][8];
+        for (int i = 0; i < length; i++) {
+            Group groups = groupList.get(i);
+            System.out.println(groups);
+            data[i][0] = String.valueOf(groups.getId());
+            data[i][1] = groups.getName();
+            data[i][2] = String.valueOf(groups.getCreationYear());
+            data[i][3] = groups.getFaculty();
+            data[i][4] = groups.getProfession();
+            data[i][5] = groups.getSection();
+            data[i][6] = String.valueOf(groups.getStudentNumer());
+            data[i][7] = "<a href=\"/tutor/getGroupMembers?groupId=" + groups.getId() + "\">View Group Members</a>";
+
+        }
+
+        dataTable.setData(data);
+//        httpSession.removeAttribute("profession");
+//        httpSession.removeAttribute("section");
+//        httpSession.removeAttribute("year");
+//        httpSession.removeAttribute("eduType");
+//        httpSession.removeAttribute("groupCount");
+        return dataTable;
+    }
 
 
     }

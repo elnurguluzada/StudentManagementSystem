@@ -1,7 +1,4 @@
 <%@ page import="java.time.LocalDate" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <html>
 <head>
     <title>Students</title>
@@ -10,12 +7,10 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/plug-ins/1.10.19/sorting/numeric-comma.js"><%--For jquery-ui (pop-up)--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"><%--For jquery-ui (pop-up)--%>
+
 </head>
 <body>
 <% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
-
-
-
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->
     <thead>
@@ -87,66 +82,97 @@
 </table>
 
 
-<table id="groups"></table>
+<div id="content">
+    <h1>Create group</h1>
+    <div id="errorDiv"></div>
+    <table>
+
+        <tr>
+            <td>Profession</td>
+            <td>
+                <select id="professionSelect">
+                    <option value="Select">Select Profession</option>
+                    <option value="physics">Physics</option>
+                    <option value="physics teacher">Physics Teacher</option>
+                </select>
+            </td>
+        </tr>
 
 
-<label for="groupAmount">Select the amount of groups</label>
-<select id ="groupAmount" name="groupAmount">
-    <option value="1" >1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-</select> <br/>
-<button id="ajaxSubmit" value="Select"  >Create Groups</button>
 
-<br/><br/>
+        <tr>
+            <td>Section</td>
+            <td>
+                <select id="sectionSelect">
+                    <option value="Select">Select Section</option>
+                    <option value="az">Az</option>
+                    <option value="eng teacher">Eng </option>
+                    <option value="rus">Rus </option>
+                </select>
+            </td>
+        </tr>
 
-<button id="divide-students" onclick="$('#mini-form').toggle()">Fill groups</button>
-<div id="mini-form">
-    <form>
-        <label for="entry-year">Entry Year</label>
-        <select id="entry-year" >
-            <option value="${currentYear}"  onclick="fillFaculty(this)" >${currentYear}</option>
-            <option value="${currentYear-1}" onclick="fillFaculty(this)" >${currentYear-1}</option>
-            <option value="${currentYear-2}" onclick="fillFaculty(this)" >${currentYear-2}</option>
-            <option value="${currentYear-3}" onclick="fillFaculty(this)" >${currentYear-3}</option>
-            <option value="${currentYear-4}" onclick="fillFaculty(this)" >${currentYear-4}</option>
-        </select>
-        <br/><br/>
-        <label >Faculty</label>
-        <select id="faculty-select-id">
-            <option value="" label="Select one"/>
-        </select> <br/>
-        <br/><br/>
-        <label >Profession</label>
-        <select id="profession-select-id" >
-            <option value="" label="Select one"/>
-        </select> <br/>
-        <br/><br/>
-        <label>Section</label>
-        <select id="section-select-id">
-            <option value="" label="Select one"/>
-        </select> <br/>
-        <br/><br/>
-        <label path="educationType">Education Type</label> <br/>
-        <label path="educationType" >Eyani</label>
-        <radiobutton path="educationType" value="Eyani"/> <br/>
-        <label path="educationType" >Qiyabi</label>
-        <radiobutton path="educationType" value="Qiyabi"/>
-        <br/><br/>
 
-    </form>
+
+        <tr>
+            <td>Year</td>
+            <td>
+                <select id="entryYearSelect" >
+                    <option value="Select">Select Year</option>
+                    <option value="${currentYear}"  onclick="fillFaculty(this)" >${currentYear}</option>
+                    <option value="${currentYear-1}" onclick="fillFaculty(this)" >${currentYear-1}</option>
+                    <option value="${currentYear-2}" onclick="fillFaculty(this)" >${currentYear-2}</option>
+                    <option value="${currentYear-3}" onclick="fillFaculty(this)" >${currentYear-3}</option>
+                    <option value="${currentYear-4}" onclick="fillFaculty(this)" >${currentYear-4}</option>
+                </select>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td>Education type</td>
+            <td>
+                <select id="eduTypeSelect">
+                    <option value="Select">Select Education Type </option>
+                    <option value="d">Distance</option>
+                    <option value="c">Correspondence</option>
+                </select>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td>Group Count</td>
+            <td>
+                <select id="groupCountSelect">
+                    <option value="Select">Select Group Count</option>
+                    <option value="1">1</option>
+                    <option value="2">2 </option>
+                    <option value="3">3 </option>
+                    <option value="4">4 </option>
+                    <option value="5">5 </option>
+                    <option value="6">6 </option>
+                    <option value="7">7 </option>
+                    <option value="8">8 </option>
+                    <option value="9">9 </option>
+                    <option value="10">10 </option>
+                    <option value="11">11 </option>
+                    <option value="12">12 </option>
+                    <option value="13">13 </option>
+                    <option value="14">14 </option>
+                    <option value="15">15 </option>
+                </select>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td colspan="2"><input type="submit" id="submitButton" value="Create"/></td>
+        </tr>
+
+
+    </table>
 </div>
 
 
@@ -158,15 +184,80 @@
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js "></script><%--buttons for dataTables--%>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
+<script type="text/javascript" src="JS/jquery-3.2.1.js"></script>
+
+
 <script>
+
+//    $(document).ready(function () {
+//        $("#submitButton").click(function() {
+//            ValidateAll();
+//            return false;
+//        });
+//    });
+
 
     $(document).ready(function () {
         $("#detailedStudentInformation").dialog({autoOpen: false});
+
         createGroups();
         drawTable();
         $("#mini-form").hide();
     });
+    function ValidateAll() {
+        var errorCounter = 0;
+        var errorMessage = "";
 
+
+
+        //Profession
+        if ($("#professionSelect").val() == 'Select') {
+            errorMessage += " Please select profession <br/>";
+            errorCounter++;
+        }
+        //End
+
+        //Year
+        if ($("#entryYearSelect").val() == 'Select') {
+            errorMessage += " Please select year <br/>";
+            errorCounter++;
+        }
+        //End
+
+
+        //Section
+        if ($("#sectionSelect").val() == 'Select') {
+            errorMessage += " Please select section <br/>";
+            errorCounter++;
+        }
+        //End
+
+
+
+        //Education type
+        if ($("#eduTypeSelect").val() == 'Select') {
+            errorMessage += " Please select section <br/>";
+            errorCounter++;
+        }
+
+
+        //Group Count
+        if ($("#groupCountSelect").val() == 'Select') {
+            errorMessage += " Please select group count <br/>";
+            errorCounter++;
+        }
+        //End
+
+
+        $("#errorDiv").html(errorMessage);
+        if (errorCounter == 0) {
+            return true;
+        }
+        else
+        {
+
+        }
+    }
     function drawTable() {
 
         // Setup - add a text input to each footer cell
@@ -320,120 +411,35 @@
 
     }
 
-    function fillFaculty(element) {
-        year = element.getAttribute("value");
 
-        $.get("/tutor/getFaculties",
-            {
-                "year": year
-            },
-            function (data) {
-                alert(data);
-
-                $('#faculty-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillProfession(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("faculty").add(option);
-                }
-            }
-        );
-
-    }
-
-    function fillProfession(element) {
-        faculty = element.getAttribute("value");
-
-        $.get("/tutor/getProfessions",
-            {
-                "year": year,
-                "faculty": faculty
-            },
-            function (data) {
-                alert(data);
-
-                $('#profession-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillSection(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("profession").add(option);
-                }
-            });
-    }
-
-    function fillSection(element) {
-        profession = element.getAttribute("value");
-        $.get("/tutor/getSections",
-            {
-                "year": year,
-                "faculty": faculty,
-                "profession": profession
-            },
-            function (data) {
-                alert(data);
-
-                $('#section-select-id')
-                    .find('option')
-                    .remove()
-                    .end();
-
-                for (var i = 0; i < Object.keys(data).length; i++) {
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
-                    valueAttr.value = data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value = 'fillSection(this)';
-                    option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
-                    option.innerText = data[i];
-                    document.getElementById("section").add(option);
-                }
-            })
-
-    }
 
     function createGroups(){
 
-        $("#ajaxSubmit").click( function(){
-            var sel = document.getElementById("groupAmount");
-            alert(sel.value);
+        $("#submitButton").click(function() {
+            ValidateAll();
+            var profession = $( "#professionSelect" ).val();
+            var year =  $( "#entryYearSelect" ).val();
+            var section =  $( "#sectionSelect" ).val();
+            var groupCount =  $( "#groupCountSelect" ).val();
+            var educationType =  $( "#eduTypeSelect" ).val();
 
-            //todo get or post?
-            $.get("/tutor/createGroup",
-                {
-                    "numberOfGroups": "sel.value"
-                },
-                function (data) {
-                    alert(data);
-                }
-            )
+            window.location.href = "/tutor/getNewCreatedGroup?profession=" + profession +"&section=" + section + "&year=" + year + "&groupCount=" + groupCount + "&educationType=" + educationType;
+
+            // $.get("/tutor/getNewCreatedGroup",
+            //     {
+            //         "profession": profession,
+            //         "section": section,
+            //         "year": year,
+            //         "educationType": educationType,
+            //         "groupCount": groupCount
+            //     }
+   //     )
 
         });
 
     }
 
 </script>
-
 </body>
 </html>
 

@@ -8,6 +8,8 @@ import java.util.List;
 public class Group extends BaseDomain implements Serializable {
     private static final long serialVersionUID = -2309096077691341278L;
 
+
+    private static final long serialVersionUID = 522454508097397247L;
     private int creationYear;
     private String faculty;
     private String profession;
@@ -20,7 +22,8 @@ public class Group extends BaseDomain implements Serializable {
         this.faculty = faculty;
         this.profession = profession;
         this.section = section;
-        this.studentNumber = studentNumber;
+        this.eduType = eduType;
+        this.studentNumer = studentNumer;
     }
 
     public Group() {
@@ -58,22 +61,49 @@ public class Group extends BaseDomain implements Serializable {
         this.section = section;
     }
 
-    public int getStudentNumber() {
-        return studentNumber;
+    public String getEduType() {
+        return eduType;
     }
 
-    public void setStudentNumber(int studentNumber) {
-        this.studentNumber = studentNumber;
+    public void setEduType(String eduType) {
+        this.eduType = eduType;
+    }
+
+    public int getStudentNumer() {
+        return studentNumer;
+    }
+
+    public void setStudentNumer(int studentNumer) {
+        this.studentNumer = studentNumer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return studentNumer == group.studentNumer &&
+                Objects.equals(creationYear, group.creationYear) &&
+                Objects.equals(faculty, group.faculty) &&
+                Objects.equals(profession, group.profession) &&
+                Objects.equals(section, group.section) &&
+                Objects.equals(eduType, group.eduType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(creationYear, faculty, profession, section, eduType, studentNumer);
     }
 
     @Override
     public String toString() {
         return "Group{" +
-                "creationYear=" + creationYear +
+                "creationYear='" + creationYear + '\'' +
                 ", faculty='" + faculty + '\'' +
                 ", profession='" + profession + '\'' +
                 ", section='" + section + '\'' +
-                ", studentNumber=" + studentNumber +
+                ", eduType='" + eduType + '\'' +
+                ", studentNumer=" + studentNumer +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +

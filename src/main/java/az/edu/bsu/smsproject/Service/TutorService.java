@@ -8,4 +8,8 @@ import java.util.Set;
 
 public interface TutorService {
 
+
+    public List<Group> groupStudents(String profession, String section , String eduType, int year ,int groupCount );
+
+
 }

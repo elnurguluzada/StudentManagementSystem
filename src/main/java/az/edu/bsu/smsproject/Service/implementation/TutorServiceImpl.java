@@ -30,8 +30,10 @@ public class TutorServiceImpl implements TutorService {
 
 
 
-
-
+    @Override
+    public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCount) {
+        return tutorRepository.groupStudents(profession , section , eduType , year , groupCount);
+    }
 
 
 }
