@@ -62,7 +62,15 @@
         var table = $('#newGroup-list').DataTable( {
             "processing": true,
             "serverSide": true,
-            "ajax": "/tutor/createNewGroup"
+            "orderable": false,
+            "ajax": "/tutor/createNewGroup",
+            "targets": [1,2,3],
+            "columnDefs": [
+                {
+                    "orderable": false,
+                    "targets": [2]
+                }
+                ]
         } );
     } ;
 
