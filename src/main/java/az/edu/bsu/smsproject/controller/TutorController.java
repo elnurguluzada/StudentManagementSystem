@@ -470,21 +470,29 @@ public class TutorController {
 
     @GetMapping("/getNewCreatedGroup")
     public ModelAndView getNewGroups(@RequestParam (name = "profession") String profession,
-                                    @RequestParam (name = "section") String section,
-                                    @RequestParam (name = "year") int year,
+                                     @RequestParam (name = "section") String section,
+                                     @RequestParam (name = "year") int year,
                                      @RequestParam (name = "groupCount") int groupCount,
-                                    @RequestParam (name = "educationType") String eduType,
+                                     @RequestParam (name = "educationType") String eduType,
                                      HttpSession httpSession) {
 
-        System.out.println("/getNewCreatedGroup");
-        System.out.println(profession + " " + section  + " " + year + " " + eduType + " " + groupCount);
-        httpSession.setAttribute("profession" , profession );
-        httpSession.setAttribute("section" , section );
-        httpSession.setAttribute("year" , year );
-        httpSession.setAttribute("eduType" , eduType );
-        httpSession.setAttribute("groupCount" , groupCount );
+//        System.out.println("/getNewCreatedGroup");
+//        System.out.println(profession + " " + section  + " " + year + " " + eduType + " " + groupCount);
+//        httpSession.setAttribute("profession" , profession );
+//        httpSession.setAttribute("section" , section );
+//        httpSession.setAttribute("year" , year );
+//        httpSession.setAttribute("eduType" , eduType );
+//        httpSession.setAttribute("groupCount" , groupCount );
+//        ModelAndView modelAndView = new ModelAndView();
+//        modelAndView.setViewName("Tutor/Group/createdGroupList");
+
+        List<Group> groupList = new ArrayList<>();
+        groupList = tutorService.groupStudents(profession, section , eduType , year , groupCount);
+
+        httpSession.setAttribute("groupList", groupList);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("Tutor/Group/createdGroupList");
+
         return modelAndView;
     }
 
@@ -495,14 +503,14 @@ public class TutorController {
                                  @RequestParam(name = "start") int start,
                                  @RequestParam(name = "length") int length,
                                  @RequestParam(name = "search[value]") String searchValue,
-                                  HttpSession httpSession){
+                                 HttpSession httpSession){
 
-        System.out.println("/createGroup");
-        String profession = (String) httpSession.getAttribute("profession");
-        String section = (String) httpSession.getAttribute("section");
-        int year = (int) httpSession.getAttribute("year");
-        String eduType = (String) httpSession.getAttribute("eduType");
-        int groupCount = (int) httpSession.getAttribute("groupCount");
+//        System.out.println("/createGroup");
+//        String profession = (String) httpSession.getAttribute("profession");
+//        String section = (String) httpSession.getAttribute("section");
+//        int year = (int) httpSession.getAttribute("year");
+//        String eduType = (String) httpSession.getAttribute("eduType");
+//        int groupCount = (int) httpSession.getAttribute("groupCount");
 
         DataTable dataTable = new DataTable();
         dataTable.setDraw(draw);
@@ -510,8 +518,9 @@ public class TutorController {
 
 
        List<Group> groupList = new ArrayList<>();
-       groupList = tutorService.groupStudents(profession, section , eduType , year , groupCount);
+//       groupList = tutorService.groupStudents(profession, section , eduType , year , groupCount);
 
+        groupList = (List<Group>) httpSession.getAttribute("groupList");
         int amountOfAllGroups = groupList.size();
         dataTable.setRecordsTotal(amountOfAllGroups);
 
