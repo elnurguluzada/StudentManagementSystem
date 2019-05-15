@@ -14,7 +14,7 @@ public class StudentController {
 
     @GetMapping(value = {"/", "/index"})
     public String index(){
-        return "Student/index";
+        return "student/index";
     }
 
 

@@ -115,11 +115,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
-        return studentRepository.groupStudents(studentList, groupIdList);
-    }
-
-    @Override
     public List<Student> getFilteredStudentList(String searchValue, int beginRow, int endRow) {
         return studentRepository.getFilteredStudentList(searchValue, beginRow, endRow);
     }

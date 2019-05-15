@@ -8,7 +8,8 @@
 </head>
 <%--Read more: https://datatables.net/blog/2016-03-25--%>
 <body>
-
+<a href="/tutor/index">Go Back</a>
+<br/><br/>
 <table id="group-list-table" class="display" style="width: 80%"> <!--display is a class in the imported dataTables.min.css-->
     <thead>
     <tr>

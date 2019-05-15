@@ -10,6 +10,8 @@
 
 </head>
 <body>
+<a href="/tutor/index">Go Back</a>
+<br/><br/>
 <% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->

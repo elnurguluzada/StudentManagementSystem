@@ -1,6 +1,5 @@
 package az.edu.bsu.smsproject.repository.implementation;
 
-import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.RoleRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -30,7 +29,6 @@ public class StudentRepositoryImpl implements StudentRepository {
         this.roleRepository = roleRepository;
     }
     //------------------------------------------------------------------------------------------------------
-
     @Override
     public boolean addStudent(Student student) {
         long userId = insertIntoUserTable(student);
@@ -338,7 +336,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     //------------------------------------------------------------------------------------------------------
     @Override
     public int updateStudent(Student student) {
-
+        System.out.println(student);
         if (updateStudentInBduUser(student) == 1 && updateStudentInStudent(student) == 1 &&
                 updateStudentInStudentSocialStatus(student) == 1)
             return 1;
@@ -359,7 +357,11 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
     private int updateStudentInStudent(Student student) {
-
+/*
+"UPDATE student SET id_card_num  = ?, id_card_fin_code  = ?, father_name  = ?, birth_date  = ?, " +
+            "birth_place  = ?, living_place  = ?, official_home  = ?, parent_num  = ?, graduation_region  = ?, graduation_school  = ?, " +
+            "entry_id_num  = ?, entry_score  = ?, education_type  = ?, profession  = ?, section  = ?, group_id  = ?, " +
+            "scholarship_status  = ?, entry_year  = ? WHERE user_id = ?"*/
         return jdbcTemplate.update(SQLqueries.UPDATE_STUDENT_IN_STUDENT_TABLE,
                 student.getIdCardNumber(),
                 student.getIdCardFinCode(),
@@ -535,171 +537,6 @@ public class StudentRepositoryImpl implements StudentRepository {
 
 
     @Override
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
-//            long firstId = idList.get(0);
-//
-//            String queryForProfession = "select profession " +
-//                    "from student where user_id = ? ";
-//
-//
-//
-//            String queryForSection = "select section " +
-//                    " from student where user_id = ? " ;
-
-        Student student = new Student();
-        List<Student> higherScoredStudentList = new ArrayList<>();
-        List<Student> middleScoredStudentList = new ArrayList<>();
-        List<Student> lowerScoredStudentList = new ArrayList<>();
-
-
-        int counter = 0;
-        int groupCount =  groupIdList.size();
-        int groupCapacity;
-        int totalStudentCount = studentList.size();
-
-        Collections.sort(studentList , new Student.SortbyEntryScore());
-
-
-
-        if(totalStudentCount % groupCount == 0){
-
-            groupCapacity = totalStudentCount / groupCount;
-
-
-            while( counter < groupCapacity){
-                higherScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-            while(counter < (studentList.size()-groupCapacity)){
-                middleScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-            while(counter < studentList.size()){
-
-                lowerScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-
-            for (int j = 0; j < groupCount; j++){
-
-                counter = 0;
-                int currentMemberCount = 0;
-
-                while(counter != groupCapacity){
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-
-                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-                    counter++;
-                }
-
-            }
-
-
-        } else {
-
-            int increment;
-            int increasedStudentCount  = 0;
-            int i = 1;
-            while(totalStudentCount % groupCount != 0) {
-                i++;
-                increasedStudentCount = totalStudentCount + i;
-            }
-
-
-            increment = i;
-
-            Student student1 = new Student();
-
-            while(i != 0){
-                studentList.add(student1);
-                i--;
-            }
-
-
-            groupCapacity = totalStudentCount / groupCount;
-
-
-            while( counter < groupCapacity){
-
-                while(totalStudentCount == increasedStudentCount){
-                    studentList.remove(increasedStudentCount);
-                    increasedStudentCount--;
-                }
-                higherScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-            while(counter < (studentList.size()-groupCapacity)){
-                middleScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-            while(counter < studentList.size()){
-
-                lowerScoredStudentList.add(studentList.get(counter));
-                counter++;
-            }
-
-
-            for (int j = 0; j < groupCount; j++){
-
-                counter = 0;
-                int currentMemberCount = 0;
-
-                while(counter != groupCapacity){
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    higherScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-                    middleScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-                    ++currentMemberCount;
-                    if(currentMemberCount > groupCapacity)
-                        break;
-
-                    lowerScoredStudentList.get(counter).setGroupId(groupIdList.get(j));
-
-                    counter++;
-                }
-
-            }
-
-
-
-        }
-
-
-        return null;
-    }
-
-    @Override
     public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
 
         return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_STUDENTS_OF_IDENTICAL_GROUP,
@@ -721,8 +558,6 @@ public class StudentRepositoryImpl implements StudentRepository {
                 groupId
         ).get(0);
     }
-
-
 
     @Override
     public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
@@ -748,7 +583,6 @@ public class StudentRepositoryImpl implements StudentRepository {
 
 
 
-
     private class StudentMapper implements RowMapper<Student> {
         @Override
         public Student mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -771,7 +605,7 @@ public class StudentRepositoryImpl implements StudentRepository {
             student.setOfficialHome(resultSet.getString("official_home"));
             student.setSocialStatusSet(getSocialStatusSetById(resultSet.getLong("user_id")));
             student.setParentPhoneNumber(resultSet.getString("parent_num"));
-            student.setGraduatedRegion(resultSet.getString("graduation_school"));
+            student.setGraduatedRegion(resultSet.getString("graduation_region"));
             student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
             student.setEntryScore(resultSet.getInt("entry_score"));
             student.setEducationType(resultSet.getString("education_type"));
@@ -780,6 +614,7 @@ public class StudentRepositoryImpl implements StudentRepository {
             student.setGroupId(resultSet.getInt("group_id"));
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
+            student.setGraduatedSchool(resultSet.getString("graduation_school"));
             return student;
         }
     }

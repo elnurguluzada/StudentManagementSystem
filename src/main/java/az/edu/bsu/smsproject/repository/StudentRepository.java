@@ -56,7 +56,6 @@ public boolean addStudent( Student student );
                                                           String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
                                                           String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList);
 
     public int getNumberOfStudentsOfIdenticalGroup(long groupId);
     public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);

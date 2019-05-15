@@ -29,9 +29,9 @@
     <br/><br/>
     <form:label path="email">Email</form:label>
     <form:input path="email" disabled="true"/> <br/>
-
+    <br/>
     <form:hidden path="password" disabled="true"/>
-
+    <br/>
     <form:label path="phoneNumber">Phone Number</form:label>
     <form:input path="phoneNumber" disabled="true"/> <br/>
     <br/><br/>

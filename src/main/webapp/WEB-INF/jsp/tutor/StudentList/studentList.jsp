@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
 </head>
 <body>
-
+<a href="/tutor/index">Go Back</a>
+<br/><br/>
 <table id="student-list-table" class="display" style="width: 100%">
     <!--display is a class in the imported dataTables.min.css-->
     <thead>

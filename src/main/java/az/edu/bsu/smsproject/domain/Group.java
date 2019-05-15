@@ -4,26 +4,26 @@ import az.edu.bsu.smsproject.domain.Enums.Status;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Group extends BaseDomain implements Serializable {
     private static final long serialVersionUID = -2309096077691341278L;
 
-
-    private static final long serialVersionUID = 522454508097397247L;
     private int creationYear;
     private String faculty;
     private String profession;
     private String section;
+    private String eduType;
     private int studentNumber;
 
-    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section, int studentNumber) {
+    public Group(long id, String name, Status status, int creationYear, String faculty, String profession, String section, String eduType, int studentNumber) {
         super(id, name, status);
         this.creationYear = creationYear;
         this.faculty = faculty;
         this.profession = profession;
         this.section = section;
         this.eduType = eduType;
-        this.studentNumer = studentNumer;
+        this.studentNumber = studentNumber;
     }
 
     public Group() {
@@ -69,12 +69,12 @@ public class Group extends BaseDomain implements Serializable {
         this.eduType = eduType;
     }
 
-    public int getStudentNumer() {
-        return studentNumer;
+    public int getStudentNumber() {
+        return studentNumber;
     }
 
-    public void setStudentNumer(int studentNumer) {
-        this.studentNumer = studentNumer;
+    public void setStudentNumber(int studentNumber) {
+        this.studentNumber = studentNumber;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Group extends BaseDomain implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Group group = (Group) o;
-        return studentNumer == group.studentNumer &&
+        return studentNumber == group.studentNumber &&
                 Objects.equals(creationYear, group.creationYear) &&
                 Objects.equals(faculty, group.faculty) &&
                 Objects.equals(profession, group.profession) &&
@@ -92,7 +92,7 @@ public class Group extends BaseDomain implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(creationYear, faculty, profession, section, eduType, studentNumer);
+        return Objects.hash(creationYear, faculty, profession, section, eduType, studentNumber);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class Group extends BaseDomain implements Serializable {
                 ", profession='" + profession + '\'' +
                 ", section='" + section + '\'' +
                 ", eduType='" + eduType + '\'' +
-                ", studentNumer=" + studentNumer +
+                ", studentNumber=" + studentNumber +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +

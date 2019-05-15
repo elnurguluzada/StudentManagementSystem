@@ -6,8 +6,6 @@ import az.edu.bsu.smsproject.domain.Student;
 import java.util.List;
 
 public interface StudentService {
-
-
 //    public Student update( Student student );
 //    public Student remove( Student student );
 
@@ -58,14 +56,9 @@ public interface StudentService {
                                                           String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
                                                           String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList);
 
     public int getNumberOfStudentsOfIdenticalGroup(long groupId);
     public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);
     public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow);
-
-
-
-
 
 }
