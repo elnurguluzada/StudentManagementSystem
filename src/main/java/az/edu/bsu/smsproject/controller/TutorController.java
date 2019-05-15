@@ -1,14 +1,12 @@
 package az.edu.bsu.smsproject.controller;
 
-import az.edu.bsu.smsproject.Service.CommonService;
-import az.edu.bsu.smsproject.Service.GroupService;
-import az.edu.bsu.smsproject.Service.StudentService;
-import az.edu.bsu.smsproject.Service.TutorService;
+import az.edu.bsu.smsproject.Service.*;
 import az.edu.bsu.smsproject.domain.DataTable;
 import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.domain.StudentValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,8 +15,18 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -30,14 +38,16 @@ public class TutorController {
     private final StudentService studentService;
     private final TutorService tutorService;
     private final GroupService groupService;
+    private final OrderService orderService;
     private final StudentValidation studentValidation;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, OrderService orderService, StudentValidation studentValidation) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
         this.groupService = groupService;
+        this.orderService = orderService;
         this.studentValidation = studentValidation;
     }
 
@@ -54,12 +64,12 @@ public class TutorController {
 
     @GetMapping(value = {"/index", "/"})
     public String index(){
-        return "Tutor/index";
+        return "tutor/index";
     }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
-        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
+        ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
         modelAndView.addObject("student", new Student());
         return modelAndView;
     }
@@ -67,7 +77,7 @@ public class TutorController {
     @PostMapping("/addStudent")
     public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
 
-        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
+        ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
             if ( studentService.addStudent( student ) ){
@@ -101,7 +111,7 @@ public class TutorController {
  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentsList")
     public String getStudentsForm(){
-        return "Tutor/StudentList/studentList";
+        return "tutor/StudentList/studentList";
     }
 
     @ResponseBody @GetMapping("/getStudents")
@@ -181,20 +191,20 @@ public class TutorController {
     @GetMapping("/getStudentInfoPopup/{userId}")
     public String getPersonalStudentInfo( @PathVariable("userId") long userId, Model model) {
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "Tutor/StudentList/studentPersonalInfo";
+        return "tutor/StudentList/studentPersonalInfo";
     }
 
     @GetMapping("/updateStudent/{userId}")
     public String showUpdateStudent( @PathVariable("userId") int userId, Model model){
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "Tutor/StudentList/updateStudentForm";
+        return "tutor/StudentList/updateStudentForm";
     }
 
     @PostMapping("/updateStudent")
     public ModelAndView updateStudent( @Valid @ModelAttribute(name = "student") Student student, BindingResult bindingResult ){
         bindingResult.getAllErrors().forEach(System.out::println);
 
-        ModelAndView modelAndView = new ModelAndView("Tutor/StudentList/updateStudentForm");
+        ModelAndView modelAndView = new ModelAndView("tutor/StudentList/updateStudentForm");
         if ( !bindingResult.hasErrors() ){
             boolean success = studentService.updateStudent(student) == 1;
             modelAndView.addObject("success", success);
@@ -206,7 +216,7 @@ public class TutorController {
 
     @GetMapping("/groups")
     public String groupList(){
-        return "Tutor/groupList";
+        return "tutor/groupList";
     }
 
     @ResponseBody @GetMapping("/getGroups")
@@ -324,7 +334,7 @@ public class TutorController {
 
 //    @GetMapping("/getGroupsList")
 //    public ModelAndView getGroups() {
-//        return new ModelAndView("Tutor/Group/groupList");
+//        return new ModelAndView("tutor/Group/groupList");
 //    }
 
 //    @ResponseBody @GetMapping("/getGroups")
@@ -385,7 +395,7 @@ public class TutorController {
 //        ModelAndView modelAndView = new ModelAndView();
 //        System.out.println(groupId);
 //        modelAndView.addObject("groupId" , groupId);
-//        modelAndView.setViewName( "Tutor/Group/groupMembers");
+//        modelAndView.setViewName( "tutor/Group/groupMembers");
 //        return  modelAndView;
 //    }
 
@@ -467,7 +477,7 @@ public class TutorController {
 
     @GetMapping("/getNotGroupedStudent")
     public ModelAndView getNotGroupedStudents(){
-        return new ModelAndView("Tutor/StudentList/notGroupedStudentList");
+        return new ModelAndView("tutor/StudentList/notGroupedStudentList");
     }
 
 
@@ -574,5 +584,80 @@ public class TutorController {
 
 //------------------------------------------------------------------------------------------------------------------------------
 
+    @GetMapping("/orders")
+    public String orders(){
+        return "/tutor/orders";
+    }
 
+    @ResponseBody @GetMapping("/showOrders")
+    public DataTable showOrders(
+            @RequestParam(name = "draw") int draw,
+            @RequestParam(name = "start") int start,
+            @RequestParam(name = "length") int length,
+            @RequestParam(name = "search[value]") String searchValue
+    ){
+        int numberOfAllOrders = orderService.getNumberOfAllOrders();
+        int numberOfFilteredOrders = orderService.getNumberOfAllOrders(); //todo
+        List<File> filteredFileList = orderService.getFilteredOrdersList();
+
+        if (start + length > numberOfFilteredOrders)
+            length = numberOfFilteredOrders - start;
+
+        String[][] data = new String[length][5];
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        for (int i=0; i<numberOfFilteredOrders; i++){
+            try {
+                File file = filteredFileList.get(i);
+                BasicFileAttributes attributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                data[i][0] = file.getName();
+                data[i][1] = dateFormat.format( new Date(attributes.creationTime().toMillis()) );
+                data[i][2] = dateFormat.format( new Date( attributes.creationTime().toMillis() ) );
+                data[i][3] = String.valueOf(attributes.size());
+                data[i][4] = "<a href='/tutor/orders/"+file.getName()+"'>Click</a>";
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+        return new DataTable(draw, numberOfAllOrders, numberOfFilteredOrders, data);
+    }
+
+    @GetMapping("/orders/{fileName}")
+    public void orders(@PathVariable("fileName") String fileName,
+                                      HttpServletResponse response){
+        String separator = File.separator;
+        String path = "C:"+separator+"Users"+separator+"isace"+separator+"Desktop"+separator+"Files"+separator+""+fileName;
+        try {
+            InputStream inputStream = new FileInputStream(path);
+            response.getOutputStream().write(inputStream.readAllBytes());
+            response.setContentType(Files.probeContentType(Paths.get(path)));
+        } catch (IOException e) { e.printStackTrace(); }
+
+    }
+
+    @GetMapping("/test")
+    public void test(){
+        File order = orderService.getOrderById(1);
+        System.out.println(order.getName());
+        System.out.println(order.getPath());
+        System.out.println(order.getTotalSpace());
+        System.out.println(order.getAbsoluteFile());
+        System.out.println(order.canWrite());
+        System.out.println(order.canRead());
+        System.out.println(order.exists());
+        System.out.println("------------------------------");
+
+        Path path = order.toPath();
+        try {
+            BasicFileAttributes attributes = Files.readAttributes( path, BasicFileAttributes.class);
+            System.out.println( attributes.creationTime() );
+            System.out.println( attributes.isRegularFile() );
+            System.out.println( attributes.isDirectory() );
+            System.out.println( attributes.lastAccessTime() );
+            System.out.println( attributes.lastModifiedTime() );
+            System.out.println( attributes.size() );
+            System.out.println(Files.probeContentType(order.toPath()));
+            Files.probeContentType(order.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
     }

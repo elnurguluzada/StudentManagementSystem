@@ -38,7 +38,6 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     }
 
 
-
     //TODO make sure
     @Override
     public boolean equals(Object obj) {
