@@ -852,7 +852,7 @@ public class TutorRepositoryImpl implements TutorRepository {
         List<Student> middleScoredStudentList = new ArrayList<>();
         List<Student> lowerScoredStudentList = new ArrayList<>();
         List<Group> newGroups = new ArrayList<>();
-        Group group = new Group();
+        Group[] group = new Group[groupCnt];
 
         Random random = new Random();
         int counter = 0;
@@ -957,13 +957,13 @@ public class TutorRepositoryImpl implements TutorRepository {
 
                 groupId = createGroup(profession, section, eduType, year, groupCapacity);
                 System.out.println("group id = " + groupId);
-                group.setId(groupId);
-                group.setProfession(profession);
-                group.setSection(section);
-                group.setEduType(eduType);
-                group.setCreationYear(year);
-                group.setStudentNumer(groupCapacity);
-                newGroups.add(group);
+                group[j] = new Group();
+                group[j].setId(groupId);
+                group[j].setProfession(profession);
+                group[j].setSection(section);
+                group[j].setEduType(eduType);
+                group[j].setCreationYear(year);
+
 
                 currentMemberCount = 0;
 
@@ -1010,7 +1010,10 @@ public class TutorRepositoryImpl implements TutorRepository {
 
                     }
                 }
+                group[j].setStudentNumer(currentMemberCount);
+                newGroups.add(group[j]);
             }
+
             return newGroups;
 
         } else {
@@ -1026,13 +1029,13 @@ public class TutorRepositoryImpl implements TutorRepository {
                 }
                 groupId = createGroup(profession, section, eduType, year, groupCapacity);
                 System.out.println("group id = " + groupId);
-                group.setId(groupId);
-                group.setProfession(profession);
-                group.setSection(section);
-                group.setEduType(eduType);
-                group.setCreationYear(year);
-                group.setStudentNumer(groupCapacity);
-                newGroups.add(group);
+                group[j] = new Group();
+                group[j].setId(groupId);
+                group[j].setProfession(profession);
+                group[j].setSection(section);
+                group[j].setEduType(eduType);
+                group[j].setCreationYear(year);
+
 
                 currentMemberCount = 0;
 
@@ -1086,7 +1089,6 @@ public class TutorRepositoryImpl implements TutorRepository {
 
                     }
 
-
                     if (!lowerScoredStudentList.isEmpty()) {
                         ++currentMemberCount;
                         index--;
@@ -1103,6 +1105,8 @@ public class TutorRepositoryImpl implements TutorRepository {
                     }
 
                 }
+                group[j].setStudentNumer(currentMemberCount);
+                newGroups.add(group[j]);
             }
             return newGroups;
         }
