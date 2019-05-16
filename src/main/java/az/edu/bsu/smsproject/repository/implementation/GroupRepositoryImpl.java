@@ -152,7 +152,7 @@ public class GroupRepositoryImpl implements GroupRepository {
     public boolean deleteGroup(long groupId) {
         return false;
     }
-
+//**********************************************************************************************************************
     @Override
     public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCnt) {
 
@@ -160,7 +160,7 @@ public class GroupRepositoryImpl implements GroupRepository {
                 "from student s full outer join bdu_user bu on s.user_id = bu.user_id\n" +
                 "where s.profession = ? and s.section = ? and s.education_type = ?  and group_id is null ";
         List<Student> studentList = new ArrayList<>();
-        studentList = jdbcTemplate.query(sql,
+               studentList = jdbcTemplate.query(sql,
                 new StudentMapper(),
                 profession,
                 section,
@@ -339,7 +339,7 @@ public class GroupRepositoryImpl implements GroupRepository {
         } else {
 
             groupCapacity = totalStudentCount / groupCnt;
-            index = studentList.size();
+
 
             for (int j = 0; j < groupCount; j++) {
 
@@ -375,7 +375,6 @@ public class GroupRepositoryImpl implements GroupRepository {
 
                     if (!higherScoredStudentList.isEmpty()) {
                         ++currentMemberCount;
-                        index--;
                         i++;
                         index = random.nextInt(higherScoredStudentList.size());
                         updateStudentGroupID(higherScoredStudentList.get(index).getId(), groupId);
@@ -393,7 +392,6 @@ public class GroupRepositoryImpl implements GroupRepository {
 
                     if (!middleScoredStudentList.isEmpty()) {
                         ++currentMemberCount;
-                        index--;
                         i++;
                         index = random.nextInt(middleScoredStudentList.size());
                         updateStudentGroupID(middleScoredStudentList.get(index).getId(), groupId);
@@ -411,7 +409,6 @@ public class GroupRepositoryImpl implements GroupRepository {
 
                     if (!lowerScoredStudentList.isEmpty()) {
                         ++currentMemberCount;
-                        index--;
                         i++;
                         index = random.nextInt(lowerScoredStudentList.size());
                         updateStudentGroupID(lowerScoredStudentList.get(index).getId(), groupId);
@@ -432,6 +429,7 @@ public class GroupRepositoryImpl implements GroupRepository {
         }
 
     }
+//**********************************************************************************************************************
 
     private int updateStudentGroupID(long studentId, long groupId) {
         String sql = "UPDATE student " +
