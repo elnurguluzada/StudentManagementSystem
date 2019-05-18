@@ -1,3 +1,4 @@
+<%@ page import="java.nio.file.Paths" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -7,10 +8,21 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
 </head>
 <body>
-
+<%--<img src="C:/Users/isace/Desktop/Files/Event Horizon.png">--%>
+<%--<img src="/C:/Users/isace/Desktop/Files/Event Horizon.png">--%>
+<%--<img src="/Users/isace/Desktop/Files/Event Horizon.png">--%>
+<%= Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png") %>
+<%--<img src='<%=request.getServletContext().getRealPath("/")%>+../../../../Files//Event Horizon.png' />--%> <br/>
+<%--<img src='<%=request.getServletContext().getRealPath("/")%>../../../Files//Event Horizon.png' />--%>
+<img src='<%= Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png"). %>' alt="absent"/>
+<br/>
+<img src='<%= "file:///"+Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png") %>' alt="absent"/>
+<br/>
+<img src="${pageContext.request.contextPath}" alt="absent"/>
 <table id="order-list-table" class="display" style="width: 80%"> <!--display is a class in the imported dataTables.min.css-->
     <thead>
     <tr>
+        <th>Image</th>
         <th>Name</th>
         <th>Creation Time</th>
         <th>Last Access Time</th>
@@ -20,6 +32,7 @@
     </thead>
     <tfoot>
     <tr>
+        <th>Image</th>
         <th>Name</th>
         <th>Creation Time</th>
         <th>Last Access Time</th>
@@ -28,7 +41,6 @@
     </tfoot>
 </table>
 <br/><br/>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script><%--dataTables libraries--%>
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script><%--buttons for dataTables--%>
@@ -36,8 +48,6 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script>
-
-
 
     $(document).ready(function () {
         drawOrdersTable();

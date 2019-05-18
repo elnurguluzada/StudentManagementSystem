@@ -102,7 +102,12 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.4</version>
         </dependency>
-
+<!--https://docs.spring.io/spring-boot/docs/2.1.4.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-configuration-processor</artifactId>-->
+<!--            <optional>true</optional>-->
+<!--        </dependency>-->
 
     </dependencies>
 
