@@ -584,10 +584,10 @@ public class TutorController {
 
 //------------------------------------------------------------------------------------------------------------------------------
 
-    @GetMapping("/orders")
-    public String orders() {
-        return "/tutor/orders";
-    }
+//    @GetMapping("/orders")
+//    public String orders() {
+//        return "/tutor/index";
+//    }
 
     @ResponseBody
     @GetMapping("/showOrders")
@@ -620,8 +620,8 @@ public class TutorController {
                 data[i][2] = dateFormat.format(new Date(attributes.creationTime().toMillis()));
                 data[i][3] = dateFormat.format(new Date(attributes.lastModifiedTime().toMillis()));
                 data[i][4] = String.valueOf(attributes.size());
-                data[i][5] = "<a href='/tutor/order/open/" + file.getName() + "'>Click</a>";
-                data[i][6] = "<a href='/tutor/order/download/" + file.getName() + "'>Click</a>";
+                data[i][5] = "<a href='/tutor/order/open/" + file.getName() + "'><button>Click</button></a>";
+                data[i][6] = "<a href='/tutor/order/download/" + file.getName() + "'><button>Click</button></a>";
             } catch (IOException e) { e.printStackTrace(); }
         }
         return new DataTable(draw, numberOfAllOrders, numberOfFilteredOrders, data);
@@ -643,7 +643,7 @@ public class TutorController {
     }
 
     @GetMapping("/order/download/{fileName}")
-    public ResponseEntity<Resource> downloaadFile(@PathVariable("fileName") String fileName){
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName){
         Resource resource = commonService.getOrderByName(fileName);
         String contentType = "";
         try {

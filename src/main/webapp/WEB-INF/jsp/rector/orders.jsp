@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Orders</title>
-    <link rel="stylesheet" href="/css/main.css"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
     <style>
         * {
             -webkit-box-sizing: border-box;
@@ -102,22 +102,28 @@
         <h2>File Upload</h2>
     </div>
     <div class="upload-content">
-        <h3>Upload Single File</h3>
-        <%--            <form id="singleUploadForm" name="singleUploadForm">--%>
-        <%--                <input id="singleFileUploadInput" type="file" name="file" class="file-input" required />--%>
-        <%--                <button type="submit" class="primary submit-btn">Submit</button>--%>
-        <%--            </form>--%>
+        <h3>Upload an Order</h3>
         <form action="/rector/file" method="post" enctype="multipart/form-data">
             <input type="file" name="file" placeholder="Upload a file"/> <br/><br/>
             <input type="submit" value="Submit File"/>
         </form>
     </div>
 </div>
-<%--<script src="/js/main.js"></script>--%>
+<div id="name-conflict" title="Name Conflict">There is a file with the same name</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
 <script>
-    if (${fileExist == true}) {
-        alert("There is a file with the same name")
-    }
+    $(document).ready(function () {
+        $("#name-conflict").hide();
+
+        if (${fileExist == true}) {
+            $("#name-conflict").dialog({autoOpen: false});
+            $("#name-conflict").dialog('open');
+        }
+    });
+
 </script>
 </body>
 </html>

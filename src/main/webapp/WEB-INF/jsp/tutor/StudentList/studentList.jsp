@@ -114,7 +114,7 @@
             }
         } );
 
-        var myTable = $("#student-list-table").DataTable({
+        let myTable = $("#student-list-table").DataTable({
             "processing": true,
             "serverSide": true,
             "ordering": true,
@@ -204,7 +204,7 @@
 
             $(".detailedInfo").click(function () {
 
-                var userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
+                let userId = myTable.row($(this).parents('tr')).data()[0]; //takes value of first column of the row in which button is clicked
                 $("#detailedStudentInformation").load(
                     "/tutor/getStudentInfoPopup/" + userId,  // url from which data will be loaded
                     function () {                                   // function is executed when response comes from url
