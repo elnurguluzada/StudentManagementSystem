@@ -71,7 +71,7 @@ public class TutorController {
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
-            if ( studentService.addStudent( student ) ){
+            if ( studentService.addStudent( student ).isPresent() ){
                 modelAndView.addObject("success", true);
             }
             else{
@@ -197,7 +197,7 @@ public class TutorController {
         System.out.println(student);
         ModelAndView modelAndView = new ModelAndView("tutor/StudentList/updateStudentForm");
         if ( !bindingResult.hasErrors() ){
-            boolean success = studentService.updateStudent(student) == 1;
+            boolean success = studentService.updateStudent(student).isPresent();
             modelAndView.addObject("success", success);
         }
         return modelAndView;

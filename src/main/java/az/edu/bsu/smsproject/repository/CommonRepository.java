@@ -9,5 +9,4 @@ public interface CommonRepository {
     public Set<String> getProfessionSet(int year, String faculty);
     public Set<String> getSectionSet(int year, String faculty, String profession);
 
-
 }

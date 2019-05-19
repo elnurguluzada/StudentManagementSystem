@@ -3,10 +3,8 @@ package az.edu.bsu.smsproject.Service.implementation;
 import az.edu.bsu.smsproject.Service.CommonService;
 import az.edu.bsu.smsproject.repository.CommonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -14,7 +12,6 @@ public class CommonServiceImpl implements CommonService {
 
     private final CommonRepository commonRepository;
 
-    @Autowired
     public CommonServiceImpl(CommonRepository commonRepository) {
         this.commonRepository = commonRepository;
     }

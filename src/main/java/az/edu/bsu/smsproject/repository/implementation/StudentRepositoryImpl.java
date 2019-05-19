@@ -15,7 +15,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class StudentRepositoryImpl implements StudentRepository {
@@ -28,22 +31,27 @@ public class StudentRepositoryImpl implements StudentRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.roleRepository = roleRepository;
     }
+
     //------------------------------------------------------------------------------------------------------
     @Override
-    public boolean addStudent(Student student) {
-        long userId = insertIntoUserTable(student);
-        student.setId(userId);
+    public Optional<Student> addStudent(Student student) {
+        long userId = insertIntoUserTable( student );
+        student.setId( userId );
 
-        return insertIntoStudentTable(student, userId) == 1 &&
-                insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size();
+        if (insertIntoStudentTable(student, userId) == 1 &&
+                insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size() )
+            return Optional.of(getStudentById(userId));
+
+        else
+            return Optional.empty();
     }
 
-    private long insertIntoUserTable(Student student) {
+    private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
 
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE , Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
         factory.setReturnGeneratedKeys(true);
-        PreparedStatementCreator creator = factory.newPreparedStatementCreator(new Object[]{
+        PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
                 roleIdOfStudent,
                 student.getName(),
                 student.getSurname(),
@@ -534,6 +542,49 @@ public class StudentRepositoryImpl implements StudentRepository {
 
         return studentList;
     }
+//------------------------------------------------------------------------------------------------------
+    private class StudentMapper implements RowMapper<Student> {
+    @Override
+    public Student mapRow(ResultSet resultSet, int i) throws SQLException {
+        Student student = new Student();
+        student.setId( resultSet.getLong("user_id") );
+        student.setSurname(resultSet.getString("surname"));
+        student.setName( resultSet.getString("name") );
+        student.setEmail(resultSet.getString("email"));
+        student.setRoleId( resultSet.getInt("role_id") );
+        student.setPassword(resultSet.getString("password"));
+        student.setPhoneNumber(resultSet.getString("phone_num"));
+        student.setFaculty(resultSet.getString("faculty"));
+        student.setGender(resultSet.getString("gender").charAt(0));
+        student.setIdCardNumber(resultSet.getString("id_card_num"));
+        student.setIdCardFinCode(resultSet.getString("id_card_fin_code"));
+        student.setFatherName(resultSet.getString("father_name")); //
+        student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
+        student.setBirthPlace(resultSet.getString("birth_place"));
+        student.setLivingPlace(resultSet.getString("living_place"));
+        student.setOfficialHome(resultSet.getString("official_home"));
+        student.setSocialStatusSet( getSocialStatusSetById( resultSet.getLong("user_id")));
+        student.setParentPhoneNumber(resultSet.getString("parent_num"));
+        student.setGraduatedRegion(resultSet.getString("graduation_school"));
+        student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
+        student.setEntryScore(resultSet.getInt("entry_score"));
+        student.setEducationType(resultSet.getString("education_type"));
+        student.setProfession(resultSet.getString("profession"));
+        student.setSection(resultSet.getString("section"));
+        student.setGroupId(resultSet.getInt("group_id"));
+        student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
+        student.setEntryYear(resultSet.getInt("entry_year"));
+        return student;
+    }
+}
+
+    private Set<Integer> getSocialStatusSetById( long userId ){
+        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+                ((resultSet, i) -> resultSet.getInt(1)),
+                userId);
+        return new HashSet<>(socialStatusList);
+    }
+
 
 
     @Override
