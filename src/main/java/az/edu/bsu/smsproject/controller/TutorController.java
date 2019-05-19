@@ -8,6 +8,7 @@ import az.edu.bsu.smsproject.domain.StudentValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -602,7 +603,7 @@ public class TutorController {
         if (start + length > numberOfFilteredOrders)
             length = numberOfFilteredOrders - start;
 
-        String[][] data = new String[length][6];
+        String[][] data = new String[length][7];
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         for (int i = 0; i < length; i++) {
             try {
@@ -619,15 +620,16 @@ public class TutorController {
                 data[i][2] = dateFormat.format(new Date(attributes.creationTime().toMillis()));
                 data[i][3] = dateFormat.format(new Date(attributes.lastModifiedTime().toMillis()));
                 data[i][4] = String.valueOf(attributes.size());
-                data[i][5] = "<a href='/tutor/order/" + file.getName() + "'>Click</a>";
+                data[i][5] = "<a href='/tutor/order/open/" + file.getName() + "'>Click</a>";
+                data[i][6] = "<a href='/tutor/order/download/" + file.getName() + "'>Click</a>";
             } catch (IOException e) { e.printStackTrace(); }
         }
         return new DataTable(draw, numberOfAllOrders, numberOfFilteredOrders, data);
     }
 
 
-    @GetMapping("/order/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName) {
+    @GetMapping("/order/open/{fileName}")
+    public ResponseEntity<Resource> openFile(@PathVariable("fileName") String fileName) {
         Resource resource = null;
         String contentType = "";
         try {
@@ -640,6 +642,19 @@ public class TutorController {
 
     }
 
+    @GetMapping("/order/download/{fileName}")
+    public ResponseEntity<Resource> downloaadFile(@PathVariable("fileName") String fileName){
+        Resource resource = commonService.getOrderByName(fileName);
+        String contentType = "";
+        try {
+            contentType = Files.probeContentType(resource.getFile().toPath());
+
+        } catch (IOException e) { e.printStackTrace(); }
+
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+resource.getFilename())
+                .body(resource);
+    }
 
 /*
     @GetMapping("/orders/{fileName}")

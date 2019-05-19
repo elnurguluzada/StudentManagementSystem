@@ -2,23 +2,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Groups</title>
+    <title>Orders</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"><%--For datatable--%>
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css"><%--For datatable buttons--%>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
 </head>
 <body>
-<%--<img src="C:/Users/isace/Desktop/Files/Event Horizon.png">--%>
-<%--<img src="/C:/Users/isace/Desktop/Files/Event Horizon.png">--%>
-<%--<img src="/Users/isace/Desktop/Files/Event Horizon.png">--%>
-<%= Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png") %>
-<%--<img src='<%=request.getServletContext().getRealPath("/")%>+../../../../Files//Event Horizon.png' />--%> <br/>
-<%--<img src='<%=request.getServletContext().getRealPath("/")%>../../../Files//Event Horizon.png' />--%>
-<img src='<%= Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png"). %>' alt="absent"/>
-<br/>
-<img src='<%= "file:///"+Paths.get(request.getServletContext().getRealPath("/")).resolve("C:/Users/isace/Desktop/Files/Event Horizon.png") %>' alt="absent"/>
-<br/>
-<img src="${pageContext.request.contextPath}" alt="absent"/>
+
 <table id="order-list-table" class="display" style="width: 80%"> <!--display is a class in the imported dataTables.min.css-->
     <thead>
     <tr>
@@ -27,7 +17,8 @@
         <th>Creation Time</th>
         <th>Last Access Time</th>
         <th>Size</th>
-        <th>Link</th>
+        <th>Open</th>
+        <th>Download</th>
     </tr>
     </thead>
     <tfoot>
@@ -37,7 +28,8 @@
         <th>Creation Time</th>
         <th>Last Access Time</th>
         <th>Size</th>
-        <th>Link</th></tr>
+        <th>Open</th>
+        <th>Download</th>
     </tfoot>
 </table>
 <br/><br/>
@@ -56,13 +48,13 @@
     function drawOrdersTable() {
 
         $('#order-list-table tfoot th').each( function () { // Setup - add a text input to each footer cell
-            var title = $(this).text();
+            let title = $(this).text();
             if (title === 'Name' || title === 'Creation Time' || title === 'Last Access Time' || title === 'Size'){
                 $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
             }
         } );
 
-        var orderTable = $("#order-list-table").DataTable({
+        let orderTable = $("#order-list-table").DataTable({
             "processing": true,
             "serverSide": true,
             "ordering": true,
@@ -74,7 +66,7 @@
         });
 
         groupTable.columns().every( function () { // Apply the search
-            var that = this;
+            let that = this;
 
             $( 'input', this.footer() ).on( 'keyup change', function () {
                 if ( that.search() !== this.value ) {
