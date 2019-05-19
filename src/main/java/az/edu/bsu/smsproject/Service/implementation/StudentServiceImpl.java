@@ -21,7 +21,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean addStudent(Student student) {
+    public Optional<Student> addStudent(Student student) {
         return studentRepository.addStudent( student );
     }
 
@@ -41,7 +41,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public int updateStudent(Student student) {
+    public Optional<Student> updateStudent(Student student) {
         return studentRepository.updateStudent( student );
     }
 
@@ -87,6 +87,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
         return  studentRepository.getStudentsOfIdenticalGroup(groupId , searchParam , startRow , endRow);
+    }
+
+    @Override
+    public boolean delete(long id) {
+        return studentRepository.delete(id);
     }
 
     @Override

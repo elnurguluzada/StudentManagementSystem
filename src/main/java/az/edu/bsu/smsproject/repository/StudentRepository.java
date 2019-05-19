@@ -13,7 +13,7 @@ public interface StudentRepository {
     public List<Student> getStudentList();
     public List<Student> getFilteredStudentList(String searchValue, int beginRow, int endRow);
     public int getNumberOfAllStudents();
-    public int updateStudent(Student student);
+    public Optional<Student> updateStudent(Student student);
     public List<Student> getFilteredStudentList(
             int beginRow, int endRow,
             String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
@@ -58,7 +58,7 @@ public interface StudentRepository {
     public int getNumberOfStudentsOfIdenticalGroup(long groupId);
     public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);
     public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow);
-
+    public boolean delete(long id);
 
 
 }

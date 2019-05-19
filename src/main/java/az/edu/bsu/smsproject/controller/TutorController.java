@@ -71,16 +71,13 @@ public class TutorController {
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
-            if ( studentService.addStudent( student ).isPresent() ){
+            if ( studentService.addStudent( student ).isPresent() )
                 modelAndView.addObject("success", true);
-            }
-            else{
+            else
                 modelAndView.addObject("success", false);
-            }
         }
-        else{
+        else
             modelAndView.addObject("success", false);
-        }
         return modelAndView;
     }
 

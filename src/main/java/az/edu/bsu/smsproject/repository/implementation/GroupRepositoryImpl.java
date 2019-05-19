@@ -57,7 +57,6 @@ public class GroupRepositoryImpl implements GroupRepository {
         return groupId;
     }
 
-
     @Override
     public Group getGroupById(long groupId) {
         return null;

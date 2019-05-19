@@ -343,13 +343,13 @@ public class StudentRepositoryImpl implements StudentRepository {
 
     //------------------------------------------------------------------------------------------------------
     @Override
-    public int updateStudent(Student student) {
+    public Optional<Student> updateStudent(Student student) {
         System.out.println(student);
         if (updateStudentInBduUser(student) == 1 && updateStudentInStudent(student) == 1 &&
                 updateStudentInStudentSocialStatus(student) == 1)
-            return 1;
+            return Optional.of(getStudentById(student.getId()));
         else
-            return 0;
+            return Optional.empty();
     }
 
     private int updateStudentInBduUser(Student student) {
@@ -543,47 +543,7 @@ public class StudentRepositoryImpl implements StudentRepository {
         return studentList;
     }
 //------------------------------------------------------------------------------------------------------
-    private class StudentMapper implements RowMapper<Student> {
-    @Override
-    public Student mapRow(ResultSet resultSet, int i) throws SQLException {
-        Student student = new Student();
-        student.setId( resultSet.getLong("user_id") );
-        student.setSurname(resultSet.getString("surname"));
-        student.setName( resultSet.getString("name") );
-        student.setEmail(resultSet.getString("email"));
-        student.setRoleId( resultSet.getInt("role_id") );
-        student.setPassword(resultSet.getString("password"));
-        student.setPhoneNumber(resultSet.getString("phone_num"));
-        student.setFaculty(resultSet.getString("faculty"));
-        student.setGender(resultSet.getString("gender").charAt(0));
-        student.setIdCardNumber(resultSet.getString("id_card_num"));
-        student.setIdCardFinCode(resultSet.getString("id_card_fin_code"));
-        student.setFatherName(resultSet.getString("father_name")); //
-        student.setBirthDate(resultSet.getDate("birth_date").toLocalDate());
-        student.setBirthPlace(resultSet.getString("birth_place"));
-        student.setLivingPlace(resultSet.getString("living_place"));
-        student.setOfficialHome(resultSet.getString("official_home"));
-        student.setSocialStatusSet( getSocialStatusSetById( resultSet.getLong("user_id")));
-        student.setParentPhoneNumber(resultSet.getString("parent_num"));
-        student.setGraduatedRegion(resultSet.getString("graduation_school"));
-        student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
-        student.setEntryScore(resultSet.getInt("entry_score"));
-        student.setEducationType(resultSet.getString("education_type"));
-        student.setProfession(resultSet.getString("profession"));
-        student.setSection(resultSet.getString("section"));
-        student.setGroupId(resultSet.getInt("group_id"));
-        student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
-        student.setEntryYear(resultSet.getInt("entry_year"));
-        return student;
-    }
-}
 
-    private Set<Integer> getSocialStatusSetById( long userId ){
-        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
-                ((resultSet, i) -> resultSet.getInt(1)),
-                userId);
-        return new HashSet<>(socialStatusList);
-    }
 
 
 
@@ -630,9 +590,27 @@ public class StudentRepositoryImpl implements StudentRepository {
         return  studentList;
     }
 
+    @Override
+    public boolean delete(long id) {
+        return deleteFromBduUser(id)==1 && deleteFromStudent(id)==1 && deleteFromStudentSocialStatus(id)>=1;
+    }
+
+    private int deleteFromBduUser(long id){
+        String sql = "DELETE FROM bdu_user WHERE user_id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
+    private int deleteFromStudent(long id){
+        String sql = "DELETE FROM student WHERE user_id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
+    private int deleteFromStudentSocialStatus(long id){
+        String sql = "DELETE FROM student_social_status WHERE user_id = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
 //    *******************************************************
-
-
 
     private class StudentMapper implements RowMapper<Student> {
         @Override
@@ -670,12 +648,11 @@ public class StudentRepositoryImpl implements StudentRepository {
         }
     }
 
-    private Set<Integer> getSocialStatusSetById(long userId ){
+    private Set<Integer> getSocialStatusSetById( long userId ){
         List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
                 ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
         return new HashSet<>(socialStatusList);
     }
-
 
 }

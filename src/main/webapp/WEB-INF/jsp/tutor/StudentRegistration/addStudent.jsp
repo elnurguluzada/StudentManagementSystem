@@ -141,6 +141,7 @@
     <small><form:errors path="educationType" cssClass="error"/> </small> <br/>
         <br/><br/>
     <form:button>Submit</form:button>
+    <button type="reset" >Reset</button>
 </form:form>
 
 <div id="dialog-success" title="Student Registration">Student was registered successfully</div>
@@ -182,9 +183,6 @@
         $( "#dialog-success" ).dialog({ autoOpen: false });
         $( "#dialog-fail" ).dialog({ autoOpen: false });
 
-        console.log( ${requestScope.success} );
-        console.log( ${requestScope.success== true} );
-
         if (${requestScope.success== true}){
             $("#dialog-success").show();
             $( "#dialog-success" ).dialog( "open" );
@@ -196,18 +194,15 @@
 
     }
 
-    var year;
-    var faculty;
-    var profession;
-    var section;
-
-    <%--<form:option value="${currentYear}"  onclick="fillFaculty(this)" />--%>
-<%--    <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>--%>
+    let year;
+    let faculty;
+    let profession;
+    let section;
 
     function fillFaculty(element) {
         year = element.getAttribute("value");
 
-        $.get("/tutor/getFaculties",
+        let tutor = $.get("/tutor/getFaculties",
             {
                 "year": year
             },
@@ -218,11 +213,11 @@
                     .remove()
                     .end();
 
-                for(var i=0; i<Object.keys(data).length; i++){
-                    var option = document.createElement("option");
-                    var valueAttr = document.createAttribute("value");
+                for(let i=0; i<Object.keys(data).length; i++){
+                    let option = document.createElement("option");
+                    let valueAttr = document.createAttribute("value");
                     valueAttr.value=data[i];
-                    var onclickAttr = document.createAttribute("onclick");
+                    let onclickAttr = document.createAttribute("onclick");
                     onclickAttr.value='fillProfession(this)';
                     option.setAttributeNode(valueAttr);
                     option.setAttributeNode(onclickAttr);

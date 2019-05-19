@@ -143,6 +143,7 @@
     <small><form:errors path="educationType" cssClass="error"/></small>
     <br/>
     <form:button>Update</form:button>
+    <button type="reset"></button>
 </form:form>
 
 <div id="update-success" title="Student update">Student was updated successfully</div>
