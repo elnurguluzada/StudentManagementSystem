@@ -21,7 +21,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Set<String> getFacultySet(int creationYear){
+    public Set<String> getFacultySet(int creationYear) {
         String sql = "SELECT distinct(faculty) FROM groups WHERE creation_year = ?";
 
         List<String> facultyList = jdbcTemplate.query(sql,
@@ -31,7 +31,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         return new HashSet<>(facultyList);
     }
 
-    public Set<String> getProfessionSet(int creationYear, String faculty){
+    public Set<String> getProfessionSet(int creationYear, String faculty) {
         String sql = "SELECT distinct(profession) FROM groups WHERE creation_year = ? and faculty=?";
 
         List<String> professionList = jdbcTemplate.query(sql,
@@ -41,7 +41,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         return new HashSet<>(professionList);
     }
 
-    public Set<String> getSectionSet(int creationYear, String faculty, String profession){
+    public Set<String> getSectionSet(int creationYear, String faculty, String profession) {
         String sql = "SELECT distinct(section) FROM groups WHERE creation_year = ? and faculty=? and profession=?";
 
         List<String> sectionList = jdbcTemplate.query(sql,

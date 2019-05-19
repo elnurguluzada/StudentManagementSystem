@@ -1,5 +1,6 @@
 package az.edu.bsu.smsproject.repository;
 
+import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public interface StudentRepository {
     public List<Student> getStudentList();
     public List<Student> getFilteredStudentList(String searchValue, int beginRow, int endRow);
     public int getNumberOfAllStudents();
+    public int updateStudent(Student student);
     public List<Student> getFilteredStudentList(
             int beginRow, int endRow,
             String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
@@ -25,6 +27,38 @@ public interface StudentRepository {
             String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
             String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
-    public Optional<Student> updateStudent(Student student);
-    public boolean delete(long userId);
+    public List<Student> getFilteredStudentListOfSelectedGroup(
+            int beginRow, int endRow,
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    );
+    public int getNumberOfFilteredStudentsOfSelectedGroup(
+            String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+            String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+            String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
+    );
+
+//    -------------------------------------
+    public int getNumberOfAllStudentsNotGrouped();
+    public int getNumberOfFilteredStudentsNotGrouped(String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+                                                     String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+                                                     String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+                                                     String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    );
+    public List<Student> getFilteredStudentListNotGrouped(int beginRow, int endRow,
+                                                          String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
+                                                          String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
+                                                          String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
+                                                          String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
+    );
+
+    public int getNumberOfStudentsOfIdenticalGroup(long groupId);
+    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);
+    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow);
+
+
+
 }

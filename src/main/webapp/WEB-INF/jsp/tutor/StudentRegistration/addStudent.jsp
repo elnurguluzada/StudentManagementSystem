@@ -1,203 +1,197 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-
-<html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <head>
-    <title>Update Student</title>
+    <title>Add Student</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"><%--For jquery-ui (pop-up)--%>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"><!--For Flatpickr-->
-    <style> .error {color: red;} </style>
+    <style> .error{ color: red; } </style>
 </head>
 <body>
-<% request.setAttribute("currentYear", LocalDate.now().getYear()); %>
-<a href="/tutor/studentsList"><button>Go back</button></a>
+<a href="/tutor/index">Go Back</a>
+<h3>Add New Student Data</h3>
+<% request.setAttribute("currentYear", LocalDate.now().getYear() ); %>
 
-<form:form action="/tutor/updateStudent" method="post" modelAttribute="student">
-    <form:hidden path="id"/>
-    <br/><br/>
+<form:form action="/tutor/addStudent" method="post" modelAttribute="student" >
     <form:label path="name">Name</form:label>
-    <form:input path="name"/> <br/>
+    <form:input path="name" /> <br/>
     <small><form:errors path="name" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="surname">Surname</form:label>
-    <form:input path="surname"/> <br/>
+    <form:input path="surname" /> <br/>
     <small><form:errors path="surname" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="birthDate">Birth Date</form:label>
     <form:input path="birthDate" id="birth-date-id"/> <br/>
     <small><form:errors path="birthDate" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="birthPlace">Birth Place</form:label>
-    <form:input path="birthPlace"/> <br/>
+    <form:input path="birthPlace" /> <br/>
     <small><form:errors path="birthPlace" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="email">Email</form:label>
-    <form:input path="email"/> <br/>
+    <form:input path="email" /> <br/>
     <small><form:errors path="email" cssClass="error"/></small>
-    <br/><br/>
-    <form:hidden path="password"/>
-    <br/><br/>
+        <br/><br/>
+    <form:label path="password">Password</form:label>
+    <form:password path="password" /> <br/>
+    <small><form:errors path="password" cssClass="error"/></small>
+        <br/><br/>
     <form:label path="phoneNumber">Phone Number</form:label>
-    <form:input path="phoneNumber"/> <br/>
+    <form:input path="phoneNumber" /> <br/>
     <small><form:errors path="phoneNumber" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="gender">Gender</form:label> <br/>
     Male: <form:radiobutton path="gender" value="M"/>
     Female: <form:radiobutton path="gender" value="F"/> <br/>
-    <small><form:errors path="gender" cssClass="error"/></small>
-    <br/><br/>
+    <small><form:errors path="gender" cssClass="error"/> </small>
+        <br/><br/>
     <form:label path="fatherName">Father Name</form:label>
-    <form:input path="fatherName"/> <br/>
+    <form:input path="fatherName" /> <br/>
     <small><form:errors path="fatherName" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="livingPlace">Living place</form:label>
-    <form:input path="livingPlace"/> <br/>
+    <form:input path="livingPlace" /> <br/>
     <small><form:errors path="livingPlace" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="officialHome">Official Address</form:label>
-    <form:input path="officialHome"/> <br/>
+    <form:input path="officialHome" /> <br/>
     <small><form:errors path="officialHome" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="idCardNumber">Id Card Number</form:label>
-    <form:input path="idCardNumber"/> <br/>
+    <form:input path="idCardNumber" /> <br/>
     <small><form:errors path="idCardNumber" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="idCardFinCode">Id Card Fin Code</form:label>
-    <form:input path="idCardFinCode"/> <br/>
+    <form:input path="idCardFinCode" /> <br/>
     <small><form:errors path="idCardFinCode" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <label>Social status: </label> <br/><br/>
-    <label>Sehid ailesi: </label>
-    <form:checkbox path="socialStatusSet" value="1"/> <br/>
+    <label >Sehid ailesi: </label>
+    <form:checkbox path="socialStatusSet" value="1" /> <br/>
     <label>Mecburi kockun: </label>
-    <form:checkbox path="socialStatusSet" value="2"/> <br/>
+    <form:checkbox path="socialStatusSet" value="2" /> <br/>
     <label>Asagi teminatli: </label>
-    <form:checkbox path="socialStatusSet" value="3"/>
-    <br/><br/>
+    <form:checkbox path="socialStatusSet" value="3" />
+        <br/><br/>
     <form:label path="parentPhoneNumber">Parent Phone Number</form:label>
-    <form:input path="parentPhoneNumber"/> <br/>
+    <form:input path="parentPhoneNumber" /> <br/>
     <small><form:errors path="parentPhoneNumber" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="graduatedRegion">Graduated Region</form:label>
-    <form:input path="graduatedRegion"/> <br/>
+    <form:input path="graduatedRegion" />  <br/>
     <small><form:errors path="graduatedRegion" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="graduatedSchool">Graduated School</form:label>
-    <form:input path="graduatedSchool"/> <br/>
+    <form:input path="graduatedSchool" /> <br/>
     <small><form:errors path="graduatedSchool" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="entryIdNumber">Entry Id Number</form:label>
-    <form:input path="entryIdNumber"/> <br/>
+    <form:input path="entryIdNumber" /> <br/>
     <small><form:errors path="entryIdNumber" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="entryScore">Entry Score</form:label>
-    <form:input path="entryScore"/> <br/>
+    <form:input path="entryScore" /> <br/>
     <small><form:errors path="entryScore" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="presidentialScholarship">Presidential Scholarship</form:label>
     <form:checkbox path="presidentialScholarship"/>
-    <br/><br/>
+        <br/><br/>
     <form:label path="dovletSifarisli">Dovlet Sifarisli</form:label>
     <form:checkbox path="dovletSifarisli"/>
-    <br/><br/>
-    <br/><br/>
+        <br/><br/>
+        <br/><br/>
     <form:label path="entryYear">Entry Year</form:label>
-    <form:select path="entryYear" id="entry-year">
-        <form:option value="${currentYear}" onclick="fillFaculty(this)"/>
+    <form:select path="entryYear" id="entry-year" >
+        <form:option value="${currentYear}"  onclick="fillFaculty(this)" />
         <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-2}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-3}" onclick="fillFaculty(this)"/>
         <form:option value="${currentYear-4}" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-5}" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-6}" onclick="fillFaculty(this)"/>
-        <form:option value="${currentYear-7}" onclick="fillFaculty(this)"/>
     </form:select>
-    <br/><br/>
+        <br/><br/>
     <%--value attribute should be empty not 'Select one', otherwise spring validation will accept
     'Select one' as faculty name--%>
-    <form:label path="faculty">Faculty</form:label>
+    <form:label path="faculty" >Faculty</form:label>
     <form:select path="faculty" id="faculty-select-id">
-        <form:option value="${student.faculty}"/>
+        <form:option value="" label="Select one"/>
     </form:select> <br/>
     <small><form:errors path="faculty" cssClass="error"/></small>
-    <br/><br/>
-    <form:label path="profession">Profession</form:label>
-    <form:select path="profession" id="profession-select-id">
-        <form:option value="${student.profession}"/>
+        <br/><br/>
+    <form:label path="profession" >Profession</form:label>
+    <form:select path="profession" id="profession-select-id" >
+        <form:option value="" label="Select one"/>
     </form:select> <br/>
     <small><form:errors path="profession" cssClass="error"/></small>
-    <br/><br/>
+        <br/><br/>
     <form:label path="section">Section</form:label>
     <form:select path="section" id="section-select-id">
-        <form:option value="${student.section}"/>
+        <form:option value="" label="Select one"/>
     </form:select> <br/>
-    <small><form:errors path="section" cssClass="error"/></small>
-    <br/><br/>
-    <form:label path="educationType">Education Type</form:label> <br/>
-    <form:label path="educationType">Eyani</form:label>
-    <form:radiobutton path="educationType" value="Eyani"/> <br/>
-    <form:label path="educationType">Qiyabi</form:label>
-    <form:radiobutton path="educationType" value="Qiyabi"/>
-    <br/><br/>
-    <small><form:errors path="educationType" cssClass="error"/></small>
-    <br/>
-    <form:button>Update</form:button>
+    <small><form:errors path="section" cssClass="error"/> </small>
+        <br/><br/>
+    <form:label path="educationType">Education Type</form:label>
+            <br/>
+        <form:label path="educationType" >Eyani</form:label>
+        <form:radiobutton path="educationType" value="Eyani"/>
+            <br/>
+        <form:label path="educationType" >Qiyabi</form:label>
+        <form:radiobutton path="educationType" value="Qiyabi"/>
+    <small><form:errors path="educationType" cssClass="error"/> </small> <br/>
+        <br/><br/>
+    <form:button>Submit</form:button>
 </form:form>
 
-<div id="update-success" title="Student update">Student was updated successfully</div>
-<div id="update-fail" title="Student update">An error occurred while updating</div>
+<div id="dialog-success" title="Student Registration">Student was registered successfully</div>
+<div id="dialog-fail" title="Student Registration">Error occurred while adding new student</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <%--jQuery--%>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> <%--Flatpickr--%>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> <%--popup--%>
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script> <%--popup--%>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--Inclode jQuery--%>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
+<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script><%--popup--%>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script><!--For Flatpickr-->
 <script>
 
     $(document).ready(function () {
-        $("#update-success").hide();
-        $("#update-fail").hide();
-        setEntryYear();
+        $("#dialog-success").hide();
+        $("#dialog-fail").hide();
         dateInput();
         popup();
     });
-
-    function setEntryYear() {
-        var select = document.getElementById("entry-year");
-        for (var i = 0; i < select; i++) {
-            var option = select.options[i];
-            if (parseInt(option.value) === parseInt(${student.entryYear})) {
-                option.selected = true;
-            }
-        }
-    }
 
     function dateInput() {
         flatpickr("#birth-date-id",
             {
                 // "altInput": true,
-                "dateFormat": "Y/m/d",
+                "dateFormat":"Y/m/d",
                 // "altDate": "dd-mm-yyyy",
-                "allowInput": true,
+                "allowInput":true,
                 "minDate": "1950/01/01",
                 "maxDate": "today",
-                "onOpen": function (selectedDates, dateStr, instance) {
+                // "defaultDate": "2000/01/01",
+                "onOpen": function(selectedDates, dateStr, instance) {
                     instance.setDate(instance.input.value, false);
                 }
             }
         );
-    }
+}
 
     function popup() {
-        $("#update-success").dialog({autoOpen: false});
-        $("#update-fail").dialog({autoOpen: false});
 
-        if (${requestScope.success == true}) {
-            $("#update-success").show();
-            $("#update-success").dialog("open");
-        } else if (${requestScope.success == false}) {
-            $("#update-fail").show();
-            $("#update-fail").dialog("open");
+        $( "#dialog-success" ).dialog({ autoOpen: false });
+        $( "#dialog-fail" ).dialog({ autoOpen: false });
+
+        console.log( ${requestScope.success} );
+        console.log( ${requestScope.success== true} );
+
+        if (${requestScope.success== true}){
+            $("#dialog-success").show();
+            $( "#dialog-success" ).dialog( "open" );
+        }
+        else if ( ${requestScope.get("success") == false} ) {
+            $("#dialog-fail").show();
+            $( "#dialog-fail" ).dialog( "open" );
         }
 
     }
@@ -207,6 +201,9 @@
     var profession;
     var section;
 
+    <%--<form:option value="${currentYear}"  onclick="fillFaculty(this)" />--%>
+<%--    <form:option value="${currentYear-1}" onclick="fillFaculty(this)"/>--%>
+
     function fillFaculty(element) {
         year = element.getAttribute("value");
 
@@ -215,7 +212,6 @@
                 "year": year
             },
             function (data) {
-                alert(data);
 
                 $('#faculty-select-id')
                     .find('option')
@@ -262,7 +258,6 @@
                 "faculty": faculty
             },
             function (data) {
-                alert(data);
 
                 $('#profession-select-id')
                     .find('option')
@@ -292,7 +287,6 @@
                 "profession": profession
             },
             function (data) {
-                alert(data);
 
                 $('#section-select-id')
                     .find('option')
@@ -303,10 +297,7 @@
                     var option = document.createElement("option");
                     var valueAttr = document.createAttribute("value");
                     valueAttr.value=data[i];
-                    var onclickAttr = document.createAttribute("onclick");
-                    onclickAttr.value='fillSection(this)';
                     option.setAttributeNode(valueAttr);
-                    option.setAttributeNode(onclickAttr);
                     option.innerText = data[i];
                     document.getElementById("section-select-id").add(option);
                 }
@@ -315,11 +306,4 @@
     }
 
 </script>
-
 </body>
-</html>
-
-
-
-
-

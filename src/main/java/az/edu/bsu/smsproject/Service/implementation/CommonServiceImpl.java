@@ -21,6 +21,8 @@ public class CommonServiceImpl implements CommonService {
         return commonRepository.getFacultySet(year);
     }
 
+
+
     @Override
     public Set<String> getProfessionSet(int year, String faculty) {
         return commonRepository.getProfessionSet(year, faculty);

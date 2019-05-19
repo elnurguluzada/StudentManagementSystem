@@ -47,4 +47,19 @@ public class SQLqueries {
 
     public static String UPDATE_STUDENT_IN_BDU_USER_TABLE = "update bdu_user set name = ?, surname = ?,email = ?,phone_num = ?,faculty = ?,gender = ? where user_id = ?";
 
+
+    public static String GET_THE_NUMBER_OF_ALL_GROUPS = "SELECT count(*) FROM groups";
+    public static String GET_THE_NUMBER_OF_STUDENTS_OF_IDENTICAL_GROUP = "SELECT count(*) FROM student WHERE group_id = ? ";
+
+    public static String GET_THE_NUMBER_OF_STUDENTS_NOT_GROUPED  = "select count(*) " +
+            "from bdu_user bu  full outer join student s on s.user_id = bu.user_id " +
+            "where s.group_id is null ";
+
+    public static String GET_STUDENTS_NOT_GROUPED = "select *  " +
+            "from bdu_user bu  full outer join student s on s.user_id = bu.user_id " +
+            "where s.group_id is null ";
+
+
+
+
 }

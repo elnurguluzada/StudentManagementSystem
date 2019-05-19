@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/student")
 public class StudentController {
 
+    @GetMapping(value = {"/", "/index"})
+    public String index(){
+        return "student/index";
+    }
 
 
 }
