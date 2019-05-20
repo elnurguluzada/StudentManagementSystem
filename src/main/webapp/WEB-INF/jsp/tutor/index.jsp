@@ -3,8 +3,6 @@
 <head>
     <title>Home Page</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"><%--For datatable--%>
-<%--    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">&lt;%&ndash;For datatable buttons&ndash;%&gt;--%>
-<%--    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">&lt;%&ndash;For jquery-ui (pop-up)&ndash;%&gt;--%>
 <%--    <style>--%>
 <%--        table, th, td{--%>
 <%--            border: 1px solid black;--%>
@@ -51,10 +49,6 @@
 <br/><br/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><%--jQuery--%>
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script><%--dataTables libraries--%>
-<%--<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>&lt;%&ndash;buttons for dataTables&ndash;%&gt;--%>
-<%--<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js "></script>&lt;%&ndash;buttons for dataTables&ndash;%&gt;--%>
-<%--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>&lt;%&ndash;popup&ndash;%&gt;--%>
-<%--<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>&lt;%&ndash;popup&ndash;%&gt;--%>
 <script>
 
     $(document).ready(function () {

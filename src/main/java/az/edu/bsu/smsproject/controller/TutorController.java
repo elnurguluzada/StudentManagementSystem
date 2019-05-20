@@ -584,11 +584,6 @@ public class TutorController {
 
 //------------------------------------------------------------------------------------------------------------------------------
 
-//    @GetMapping("/orders")
-//    public String orders() {
-//        return "/tutor/index";
-//    }
-
     @ResponseBody
     @GetMapping("/showOrders")
     public DataTable showOrders(
@@ -639,7 +634,6 @@ public class TutorController {
             e.printStackTrace();
         }
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
-
     }
 
     @GetMapping("/order/download/{fileName}")
