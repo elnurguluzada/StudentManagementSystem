@@ -223,6 +223,8 @@ public class TutorController {
         List<Group> filteredGroupList = groupService.getFilteredGroupList(start, start+length, searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
         int numberOfFilteredStudents = groupService.getNumberOfFilteredGroups(searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
 
+
+
         if ( start+length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
@@ -280,7 +282,7 @@ public class TutorController {
             length = numberOfFilteredStudents - start;
 
         String[][] data = new String[length][25];
-        for (int i=0; i<length; i++){
+        for (int i=0; i < length; i++){
             Student student = filteredStudentList.get(i);
             data[i][0] = String.valueOf(student.getId());
             data[i][1] = student.getName();
