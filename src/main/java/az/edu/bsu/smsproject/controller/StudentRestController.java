@@ -19,7 +19,6 @@ public class StudentRestController {
         this.studentService = studentService;
     }
 
-
     @GetMapping("/{id}")
     public Student getStudentById(@PathVariable("id") long id){
         System.out.println(id);
