@@ -2,6 +2,7 @@ package az.edu.bsu.smsproject.controller;
 
 import az.edu.bsu.smsproject.Service.StudentService;
 import az.edu.bsu.smsproject.domain.Student;
+import az.edu.bsu.smsproject.domain.StudentListWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,10 @@ public class StudentRestController {
     }
 
     @GetMapping("/")
-    public List<Student> getStudentList(){
-        return studentService.getStudentList();
+    public StudentListWrapper getStudentList(){
+        StudentListWrapper studentListWrapper = new StudentListWrapper();
+        studentListWrapper.setStudentList(studentService.getStudentList());
+        return studentListWrapper;
     }
 
     @DeleteMapping("/delete/{id}")
