@@ -54,6 +54,7 @@
 </table>
 
 
+
 <script>
 
 
@@ -67,7 +68,8 @@
         var table = $('#group-list').DataTable( {
             "processing": true,
             "serverSide": true,
-            "ajax": "/tutor/getGroups"
+            "ajax": "/tutor/getGroups",
+
         } );
     } ;
 
