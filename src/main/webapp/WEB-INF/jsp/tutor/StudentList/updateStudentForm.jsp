@@ -35,9 +35,9 @@
     <form:label path="email">Email</form:label>
     <form:input path="email"/> <br/>
     <small><form:errors path="email" cssClass="error"/></small>
-    <br/><br/>
+    <br/>
     <form:hidden path="password"/>
-    <br/><br/>
+    <br/>
     <form:label path="phoneNumber">Phone Number</form:label>
     <form:input path="phoneNumber"/> <br/>
     <small><form:errors path="phoneNumber" cssClass="error"/></small>
@@ -143,6 +143,7 @@
     <small><form:errors path="educationType" cssClass="error"/></small>
     <br/>
     <form:button>Update</form:button>
+    <button type="reset"></button>
 </form:form>
 
 <div id="update-success" title="Student update">Student was updated successfully</div>

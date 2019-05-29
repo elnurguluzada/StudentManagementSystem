@@ -10,14 +10,14 @@ import java.util.List;
 @Service
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
-
+    @Autowired
     public GroupServiceImpl(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
     }
 
     @Override
-    public Group add(Group group) {
-        return groupRepository.add(group);
+    public long createGroup(String profession, String section, String eduType, int year, int studentCount) {
+        return groupRepository.createGroup(profession, section, eduType, year, studentCount);
     }
 
     @Override
@@ -59,6 +59,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<Group> getFilteredGroupList(String searchParam, int startRow, int endRow) {
         return groupRepository.getFilteredGroupList(searchParam, startRow, endRow);
+    }
+
+    @Override
+    public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCount) {
+        return groupRepository.groupStudents(profession, section, eduType, year, groupCount);
     }
 
     @Override

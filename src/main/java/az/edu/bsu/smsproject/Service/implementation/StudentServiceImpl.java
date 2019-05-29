@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -20,7 +21,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean addStudent(Student student) {
+    public Optional<Student> addStudent(Student student) {
         return studentRepository.addStudent( student );
     }
 
@@ -40,7 +41,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public int updateStudent(Student student) {
+    public Optional<Student> updateStudent(Student student) {
         return studentRepository.updateStudent( student );
     }
 
@@ -89,6 +90,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public boolean delete(long id) {
+        return studentRepository.delete(id);
+    }
+
+    @Override
     public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
         return studentRepository.getNumberOfStudentsOfIdenticalGroup(groupId);
     }
@@ -112,11 +118,6 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> getFilteredStudentListNotGrouped(int beginRow, int endRow, String searchValueForName, String searchValueForSurname, String searchValueForFatherName, String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace, String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore, String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection){
         return studentRepository.getFilteredStudentListNotGrouped(beginRow, endRow,  searchValueForName,  searchValueForSurname,  searchValueForFatherName,  searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,  searchValueForEntryYear,  searchValueForGraduationRegion,  searchValueForEntryScore, searchValueForFaculty,  searchValueForProfession,  searchValueForGroup,  searchValueForSection);
-    }
-
-    @Override
-    public List<Group> groupStudents(List<Student> studentList, List<Long> groupIdList) {
-        return studentRepository.groupStudents(studentList, groupIdList);
     }
 
     @Override

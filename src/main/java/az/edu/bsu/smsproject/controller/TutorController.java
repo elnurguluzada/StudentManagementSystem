@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,65 +56,63 @@ public class TutorController {
     }
 
     @InitBinder
-    public void initBinder(WebDataBinder webDataBinder) {
+    public void initBinder(WebDataBinder webDataBinder){
         Object target = webDataBinder.getTarget();
 
         if (target == null)
             return;
-        if (target.getClass() == Student.class)
+        if ( target.getClass() == Student.class )
             webDataBinder.setValidator(studentValidation);
 
     }
 
     @GetMapping(value = {"/index", "/"})
-    public String index() {
+    public String index(){
         return "tutor/index";
     }
-
-    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentForm")
-    public ModelAndView showStudentForm() {
+    public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
         modelAndView.addObject("student", new Student());
         return modelAndView;
     }
 
     @PostMapping("/addStudent")
-    public ModelAndView addStudent(@Valid @ModelAttribute("student") Student student, Errors errors) {
+    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
 
-        ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
+        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
 
-        if (!errors.hasErrors()) {
-            if (studentService.addStudent(student)) {
+        if ( !errors.hasErrors() ){
+            if ( studentService.addStudent( student ).isPresent() )
                 modelAndView.addObject("success", true);
-            } else {
+            else
                 modelAndView.addObject("success", false);
-            }
-        } else {
-            modelAndView.addObject("success", false);
         }
+        else
+            modelAndView.addObject("success", false);
+
         return modelAndView;
     }
 
     @ResponseBody @GetMapping("/getFaculties")
-    public Set<String> getFaculties(@RequestParam(name = "year") int year) {
+    public Set<String> getFaculties( @RequestParam(name="year") int year ){
         return commonService.getFacultySet(year);
     }
 
     @ResponseBody @GetMapping("/getProfessions")
-    public Set<String> getProfessions(@RequestParam(name = "year") int year, @RequestParam(name = "faculty") String faculty) {
+    public Set<String> getProfessions(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty){
         return commonService.getProfessionSet(year, faculty);
     }
 
     @ResponseBody @GetMapping("/getSections")
-    public Set<String> getSections(@RequestParam(name = "year") int year, @RequestParam(name = "faculty") String faculty, @RequestParam(name = "profession") String profession
-    ) {
+    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession
+    ){
         return commonService.getSectionSet(year, faculty, profession);
     }
-
-    //--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     @GetMapping("/studentsList")
-    public String getStudentsForm() {
+    public String getStudentsForm(){
         return "tutor/StudentList/studentList";
     }
 
@@ -139,7 +138,7 @@ public class TutorController {
     ) {
         int numberOfAllStudents = studentService.getNumberOfAllStudents();
 
-        List<Student> filteredStudentList = studentService.getFilteredStudentList(start, start + length,
+        List<Student > filteredStudentList = studentService.getFilteredStudentList( start+1, start+length+1,
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection);
@@ -149,12 +148,12 @@ public class TutorController {
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
         );
-        System.out.println("numberOfFilteredStudents = " + numberOfFilteredStudents);
-        if (start + length > numberOfFilteredStudents)
+        System.out.println("numberOfFilteredStudents = "+numberOfFilteredStudents);
+        if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
         String[][] data = new String[length][25];
-        for (int i = 0; i < length; i++) {
+        for (int i=0; i<length; i++){
             Student student = filteredStudentList.get(i);
             data[i][0] = String.valueOf(student.getId());
             data[i][1] = student.getName();
@@ -169,7 +168,7 @@ public class TutorController {
             data[i][10] = student.getParentPhoneNumber();
             data[i][11] = String.valueOf(student.getEntryYear());
             data[i][12] = student.getGraduatedRegion();
-            data[i][13] = student.getGraduatedRegion();
+            data[i][13] = student.getGraduatedSchool();
             data[i][14] = String.valueOf(student.getEntryIdNumber());
             data[i][15] = String.valueOf(student.getEntryScore());
             data[i][16] = student.getSection();
@@ -192,24 +191,24 @@ public class TutorController {
     }
 
     @GetMapping("/getStudentInfoPopup/{userId}")
-    public String getPersonalStudentInfo(@PathVariable("userId") long userId, Model model) {
+    public String getPersonalStudentInfo( @PathVariable("userId") long userId, Model model) {
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "tutor/StudentList/studentPersonalInfo";
+        return "Tutor/StudentList/studentPersonalInfo";
     }
 
     @GetMapping("/updateStudent/{userId}")
-    public String showUpdateStudent(@PathVariable("userId") int userId, Model model) {
+    public String showUpdateStudent( @PathVariable("userId") int userId, Model model){
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "tutor/StudentList/updateStudentForm";
+        return "Tutor/StudentList/updateStudentForm";
     }
 
     @PostMapping("/updateStudent")
-    public ModelAndView updateStudent(@Valid @ModelAttribute(name = "student") Student student, BindingResult bindingResult) {
-        bindingResult.getAllErrors().forEach(System.out::println);
-
+    public ModelAndView updateStudent( @Valid @ModelAttribute(name = "student") Student student, BindingResult bindingResult ){
+//        bindingResult.getAllErrors().forEach(System.out::println);
+        System.out.println(student);
         ModelAndView modelAndView = new ModelAndView("tutor/StudentList/updateStudentForm");
-        if (!bindingResult.hasErrors()) {
-            boolean success = studentService.updateStudent(student) == 1;
+        if ( !bindingResult.hasErrors() ){
+            boolean success = studentService.updateStudent(student).isPresent();
             modelAndView.addObject("success", success);
         }
         return modelAndView;
@@ -218,7 +217,7 @@ public class TutorController {
 //----------------------------------------------------------------------------------------------------------------------------------
 
     @GetMapping("/groups")
-    public String groupList() {
+    public String groupList(){
         return "tutor/groupList";
     }
 
@@ -232,17 +231,19 @@ public class TutorController {
             @RequestParam(name = "columns[3][search][value]") String searchValueForFaculty,
             @RequestParam(name = "columns[4][search][value]") String searchValueForProfession,
             @RequestParam(name = "columns[5][search][value]") String searchValueForSection
-    ) {
+    ){
         int numberOfAllGroups = groupService.getNumberOfAllGroups();
 
-        List<Group> filteredGroupList = groupService.getFilteredGroupList(start, start + length, searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
+        List<Group> filteredGroupList = groupService.getFilteredGroupList(start, start+length, searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
         int numberOfFilteredStudents = groupService.getNumberOfFilteredGroups(searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
 
-        if (start + length > numberOfFilteredStudents)
+
+
+        if ( start+length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
         String[][] data = new String[length][7];
-        for (int i = 0; i < length; i++) {
+        for (int i=0; i<length; i++){
             Group group = filteredGroupList.get(i);
             data[i][0] = String.valueOf(group.getId());
             data[i][1] = group.getName();
@@ -278,7 +279,7 @@ public class TutorController {
 
         int numberOfAllStudents = studentService.getNumberOfAllStudents();
 
-        List<Student> filteredStudentList = studentService.getFilteredStudentListOfSelectedGroup(start, start + length,
+        List<Student > filteredStudentList = studentService.getFilteredStudentListOfSelectedGroup( start, start+length,
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, groupId, searchValueForSection);
@@ -291,11 +292,11 @@ public class TutorController {
         );
 
 
-        if (start + length > numberOfFilteredStudents)
+        if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
         String[][] data = new String[length][25];
-        for (int i = 0; i < length; i++) {
+        for (int i=0; i < length; i++){
             Student student = filteredStudentList.get(i);
             data[i][0] = String.valueOf(student.getId());
             data[i][1] = student.getName();
@@ -332,77 +333,22 @@ public class TutorController {
         return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
     }
 
-
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-//    @GetMapping("/getGroupsList")
-//    public ModelAndView getGroups() {
-//        return new ModelAndView("tutor/Group/groupList");
-//    }
+    @GetMapping("/getGroupMembers")
+    public ModelAndView getStudentsOfIdenticalGroup(@RequestParam("groupId") long groupId,
+                                                    HttpSession httpSession) {
+        //httpServletRequest.setAttribute("groupId" , groupId);
+        httpSession.setAttribute("groupId" , groupId);
+        //TODO take from httpsession
+        ModelAndView modelAndView = new ModelAndView();
 
-//    @ResponseBody @GetMapping("/getGroups")
-//    public DataTable showGroups(@RequestParam(name = "draw") int draw,
-//                                @RequestParam(name = "start") int start,
-//                                @RequestParam(name = "length") int length,
-//                                @RequestParam(name = "search[value]") String searchValue) {
-//
-//
-//        DataTable dataTable = new DataTable();
-//        dataTable.setDraw(draw);
-//
-//        int amountOfAllGroups = tutorService.getNumberOfAllGroups();
-//        dataTable.setRecordsTotal(amountOfAllGroups);
-//
-//        int amountOfFilteredGroups = tutorService.getNumberOfFilteredGroups(searchValue);
-//        dataTable.setRecordsFiltered(amountOfFilteredGroups);
-//
-//
-//        List<Group> filteredGroupList = tutorService.getFilteredGroupList(searchValue, start, start + length);
-//
-//        System.out.println(filteredGroupList);
-//
-//        if (start + length > amountOfFilteredGroups) {
-//            length = amountOfFilteredGroups % length;
-//        }
-//
-//        String[][] data = new String[length][8];
-//        for (int i = 0; i < length; i++) {
-//            Group groups = filteredGroupList.get(i);
-//            System.out.println(groups);
-//            data[i][0] = String.valueOf(groups.getId());
-//            data[i][1] = groups.getName();
-//            data[i][2] = String.valueOf(groups.getCreationYear());
-//            data[i][3] = groups.getFaculty();
-//            data[i][4] = groups.getProfession();
-//            data[i][5] = groups.getSection();
-//            data[i][6] = String.valueOf(groups.getStudentNumber());
-//            data[i][7] = "<a href=\"/tutor/getGroupMembers?groupId=" + groups.getId() + "\">View Group Members</a>";
-//
-//        }
-//
-//        dataTable.setData(data);
-//        return dataTable;
-//    }
+        modelAndView.addObject("groupId" , groupId);
+        modelAndView.setViewName( "tutor/Group/groupMembers");
+        return  modelAndView;
+    }
 
-//------------------------------------------------------------------------------------------------------------------------------
-
-
-//    @GetMapping("/getGroupMembers")
-//    public ModelAndView getStudentsOfIdenticalGroup(@RequestParam("groupId") long groupId,
-//                                                    HttpSession httpSession) {
-//
-//        //httpServletRequest.setAttribute("groupId" , groupId);
-//        httpSession.setAttribute("groupId" , groupId);
-//        //TODO take from httpsession
-//        ModelAndView modelAndView = new ModelAndView();
-//        System.out.println(groupId);
-//        modelAndView.addObject("groupId" , groupId);
-//        modelAndView.setViewName( "tutor/Group/groupMembers");
-//        return  modelAndView;
-//    }
-
-    @ResponseBody
-    @GetMapping("/getStudentsOfGroup")
+    @ResponseBody @GetMapping("/getStudentsOfGroup")
     public DataTable showStudentsOfGroup(
             @RequestParam(name = "draw") int draw,
             @RequestParam(name = "start") int start,
@@ -423,10 +369,10 @@ public class TutorController {
         dataTable.setRecordsTotal(numberOfStudentsOfGroup);
 
 
-        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfIdenticalGroup(searchValue, groupId);
+        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfIdenticalGroup( searchValue, groupId);
         dataTable.setRecordsFiltered(numberOfFilteredStudentsOfGroup);
 
-        List<Student> studentList = studentService.getStudentsOfIdenticalGroup(groupId, searchValue, start, start + length);
+        List<Student> studentList = studentService.getStudentsOfIdenticalGroup( groupId, searchValue , start , start + length);
 
         System.out.println(studentList);
 
@@ -479,32 +425,30 @@ public class TutorController {
 
 
     @GetMapping("/getNotGroupedStudent")
-    public ModelAndView getNotGroupedStudents() {
+    public ModelAndView getNotGroupedStudents(){
         return new ModelAndView("tutor/StudentList/notGroupedStudentList");
     }
 
-
-    @ResponseBody
-    @GetMapping("/getNotGroupedStudents")
-    public DataTable showNotGroupedStudents(@RequestParam(name = "draw") int draw,
-                                            @RequestParam(name = "start") int start,
-                                            @RequestParam(name = "length") int length,
-                                            @RequestParam(name = "search[value]") String searchValue,
-                                            @RequestParam(name = "columns[1][search][value]") String searchValueForName,
-                                            @RequestParam(name = "columns[2][search][value]") String searchValueForSurname,
-                                            @RequestParam(name = "columns[3][search][value]") String searchValueForFatherName,
-                                            @RequestParam(name = "columns[4][search][value]") String searchValueForBirthDate,
-                                            @RequestParam(name = "columns[5][search][value]") String searchValueForBirthPlace,
-                                            @RequestParam(name = "columns[6][search][value]") String searchValueForLivingPlace,
-                                            @RequestParam(name = "columns[11][search][value]") String searchValueForEntryYear,
-                                            @RequestParam(name = "columns[12][search][value]") String searchValueForGraduationRegion,
-                                            @RequestParam(name = "columns[15][search][value]") String searchValueForEntryScore,
-                                            @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
-                                            @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
-                                            @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
-                                            @RequestParam(name = "columns[16][search][value]") String searchValueForSection,
-                                            HttpSession httpSession
-    ) {
+    @ResponseBody @GetMapping("/getNotGroupedStudents")
+    public DataTable showNotGroupedStudents( @RequestParam(name = "draw") int draw,
+                                             @RequestParam(name = "start") int start,
+                                             @RequestParam(name = "length") int length,
+                                             @RequestParam(name = "search[value]") String searchValue,
+                                             @RequestParam(name = "columns[1][search][value]") String searchValueForName,
+                                             @RequestParam(name = "columns[2][search][value]") String searchValueForSurname,
+                                             @RequestParam(name = "columns[3][search][value]") String searchValueForFatherName,
+                                             @RequestParam(name = "columns[4][search][value]") String searchValueForBirthDate,
+                                             @RequestParam(name = "columns[5][search][value]") String searchValueForBirthPlace,
+                                             @RequestParam(name = "columns[6][search][value]") String searchValueForLivingPlace,
+                                             @RequestParam(name = "columns[11][search][value]") String searchValueForEntryYear,
+                                             @RequestParam(name = "columns[12][search][value]") String searchValueForGraduationRegion,
+                                             @RequestParam(name = "columns[15][search][value]") String searchValueForEntryScore,
+                                             @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
+                                             @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
+                                             @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
+                                             @RequestParam(name = "columns[16][search][value]") String searchValueForSection,
+                                             HttpSession httpSession
+    ){
 
         ModelAndView modelAndView = new ModelAndView();
 
@@ -522,11 +466,12 @@ public class TutorController {
 
         dataTable.setRecordsFiltered(numberOfFilteredStudentsNotGrouped);
 
-        List<Student> filteredNotGroupedStudentList = studentService.getFilteredStudentListNotGrouped(start, start + length,
+        List<Student> filteredNotGroupedStudentList = studentService.getFilteredStudentListNotGrouped( start,  start + length,
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
         );
+
 
 
         if (start + length > numberOfFilteredStudentsNotGrouped)
@@ -536,8 +481,9 @@ public class TutorController {
         String[][] data = new String[length][25];
 
 
+
         int a = 0;
-        for (int i = 0; i < length; i++) {
+        for (int i = 0 ; i < length; i++) {
             Student student = filteredNotGroupedStudentList.get(i);
 
             data[i][0] = String.valueOf(student.getId());
@@ -576,16 +522,100 @@ public class TutorController {
         dataTable.setData(data);
 
 
-        httpSession.setAttribute("studentList", filteredNotGroupedStudentList);
+        httpSession.setAttribute("studentList" , filteredNotGroupedStudentList);
 
         return dataTable;
 
-    }
+        }
+
 
 //------------------------------------------------------------------------------------------------------------------------------
 
-    @ResponseBody
-    @GetMapping("/showOrders")
+
+
+    @GetMapping("/getNewCreatedGroup")
+    public ModelAndView getNewGroups(@RequestParam (name = "profession") String profession,
+                                     @RequestParam (name = "section") String section,
+                                     @RequestParam (name = "year") int year,
+                                     @RequestParam (name = "groupCount") int groupCount,
+                                     @RequestParam (name = "educationType") String eduType,
+                                     HttpSession httpSession) {
+
+//        System.out.println("/getNewCreatedGroup");
+//        System.out.println(profession + " " + section  + " " + year + " " + eduType + " " + groupCount);
+//        httpSession.setAttribute("profession" , profession );
+//        httpSession.setAttribute("section" , section );
+//        httpSession.setAttribute("year" , year );
+//        httpSession.setAttribute("eduType" , eduType );
+//        httpSession.setAttribute("groupCount" , groupCount );
+//        ModelAndView modelAndView = new ModelAndView();
+//        modelAndView.setViewName("tutor/Group/createdGroupList");
+
+        List<Group> groupList = new ArrayList<>();
+        groupList = groupService.groupStudents(profession, section , eduType , year , groupCount);
+
+        httpSession.setAttribute("groupList", groupList);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("tutor/Group/createdGroupList");
+
+        return modelAndView;
+    }
+
+
+    @ResponseBody @GetMapping("/createNewGroup")
+    public DataTable createGroup(@RequestParam(name = "draw") int draw,
+                                 @RequestParam(name = "start") int start,
+                                 @RequestParam(name = "length") int length,
+                                 @RequestParam(name = "search[value]") String searchValue,
+                                 HttpSession httpSession) {
+
+        DataTable dataTable = new DataTable();
+        dataTable.setDraw(draw);
+
+        List<Group> groupList = (List<Group>) httpSession.getAttribute("groupList");
+        int amountOfAllGroups = groupList.size();
+        dataTable.setRecordsTotal(amountOfAllGroups);
+
+        int amountOfFilteredGroups = groupList.size();
+        dataTable.setRecordsFiltered(amountOfFilteredGroups);
+        return dataTable;
+    }
+
+/*
+    @GetMapping("/orders/{fileName}")
+    public void orders(@PathVariable("fileName") String fileName,
+                                      HttpServletResponse response){
+        String separator = File.separator;
+        String path = "C:"+separator+"Users"+separator+"isace"+separator+"Desktop"+separator+"Files"+separator+""+fileName;
+        try {
+            InputStream inputStream = new FileInputStream(path);
+            response.getOutputStream().write(inputStream.readAllBytes());
+            response.setContentType(Files.probeContentType(Paths.get(path)));
+        } catch (IOException e) { e.printStackTrace(); }
+
+        if (start + length > amountOfFilteredGroups)
+            length = amountOfFilteredGroups - start;
+
+        String[][] data = new String[length][8];
+        for (int i = 0; i < length; i++) {
+            Group groups = groupList.get(i);
+            System.out.println(groups);
+            data[i][0] = String.valueOf(groups.getId());
+            data[i][1] = groups.getName();
+            data[i][2] = String.valueOf(groups.getCreationYear());
+            data[i][3] = groups.getFaculty();
+            data[i][4] = groups.getProfession();
+            data[i][5] = groups.getSection();
+            data[i][6] = String.valueOf(groups.getStudentNumber());
+            data[i][7] = "<a href=\"/tutor/getGroupMembers?groupId=" + groups.getId() + "\">View Group Members</a>";
+        }
+
+        dataTable.setData(data);
+        return dataTable;
+    }
+*/
+
+    @ResponseBody @GetMapping("/showOrders")
     public DataTable showOrders(
             @RequestParam(name = "draw") int draw,
             @RequestParam(name = "start") int start,
@@ -650,47 +680,8 @@ public class TutorController {
                 .body(resource);
     }
 
-/*
-    @GetMapping("/orders/{fileName}")
-    public void orders(@PathVariable("fileName") String fileName,
-                                      HttpServletResponse response){
-        String separator = File.separator;
-        String path = "C:"+separator+"Users"+separator+"isace"+separator+"Desktop"+separator+"Files"+separator+""+fileName;
-        try {
-            InputStream inputStream = new FileInputStream(path);
-            response.getOutputStream().write(inputStream.readAllBytes());
-            response.setContentType(Files.probeContentType(Paths.get(path)));
-        } catch (IOException e) { e.printStackTrace(); }
-
-    }
-*/
-
-    @GetMapping("/test")
-    public void test() throws IOException {
-//        File order = commonService.getOrderById(1);
-//        System.out.println(order.getName());
-//        System.out.println(order.getPath());
-//        System.out.println(order.getTotalSpace());
-//        System.out.println(order.getAbsoluteFile());
-//        System.out.println(order.canWrite());
-//        System.out.println(order.canRead());
-//        System.out.println(order.exists());
-//        System.out.println("------------------------------");
-
-//        Path path = order.toPath();
-//        try {
-//            BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
-//            System.out.println(attributes.creationTime());
-//            System.out.println(attributes.isRegularFile());
-//            System.out.println(attributes.isDirectory());
-//            System.out.println(attributes.lastAccessTime());
-//            System.out.println(attributes.lastModifiedTime());
-//            System.out.println(attributes.size());
-//            System.out.println(Files.probeContentType(order.toPath()));
-//            Files.probeContentType(order.toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+    @GetMapping("/chat")
+    public String chat(){
+        return "tutor/chat";
     }
 }
