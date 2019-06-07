@@ -2,16 +2,9 @@ package az.edu.bsu.smsproject.domain;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Student extends User implements Serializable {
     private static final long serialVersionUID = 3743824363989869865L;
@@ -29,7 +22,7 @@ public class Student extends User implements Serializable {
     private String graduatedSchool;
     private int entryIdNumber;
     private int entryScore;
-    private Set<Integer> socialStatusSet;
+    private List<SocialStatus> socialStatusList;
     private String educationType;
     private boolean presidentialScholarship;            // true -> prezident teqaudcusu
     private boolean dovletSifarisli;                    // true -> dovlet sifarisli false -> odenisli
@@ -39,8 +32,7 @@ public class Student extends User implements Serializable {
     private long groupId;
     private int scholarshipStatus;
 
-
-    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, @Past @NotNull(message = "birth date is required") LocalDate birthDate, @NotBlank(message = "Birth place is required") String birthPlace, @NotBlank(message = "Living place is required") String livingPlace, @NotBlank(message = "Official home address is required") String officialHome, @Digits(integer = 8, fraction = 0, message = "Invalid Id card number") String idCardNumber, String idCardFinCode, @Digits(integer = 10, fraction = 0, message = "Invalid telephone number") String parentPhoneNumber, @NotBlank(message = "Graduated region id required") String graduatedRegion, @NotBlank(message = "Graduated school id required") String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, long groupId, int scholarshipStatus) {
+    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String fatherName, LocalDate birthDate, String birthPlace, String livingPlace, String officialHome, String idCardNumber, String idCardFinCode, String parentPhoneNumber, String graduatedRegion, String graduatedSchool, int entryIdNumber, int entryScore, List<SocialStatus> socialStatusList, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, long groupId, int scholarshipStatus) {
         super(id, name, status, roleId, surname, email, password, phoneNumber, faculty, gender);
         this.fatherName = fatherName;
         this.birthDate = birthDate;
@@ -54,7 +46,7 @@ public class Student extends User implements Serializable {
         this.graduatedSchool = graduatedSchool;
         this.entryIdNumber = entryIdNumber;
         this.entryScore = entryScore;
-        this.socialStatusSet = socialStatusSet;
+        this.socialStatusList = socialStatusList;
         this.educationType = educationType;
         this.presidentialScholarship = presidentialScholarship;
         this.dovletSifarisli = dovletSifarisli;
@@ -75,7 +67,7 @@ public class Student extends User implements Serializable {
         this.parentPhoneNumber = "";
         this.graduatedRegion = "";
         this.graduatedSchool = "";
-        this.socialStatusSet = new HashSet<>();
+        this.socialStatusList = new ArrayList<>();
         this.educationType = "";
         this.presidentialScholarship = false;
         this.dovletSifarisli = false;
@@ -83,43 +75,6 @@ public class Student extends User implements Serializable {
         this.section = "";
         this.gender = ' '; //otherwise spring initializes gender and when gender isn't selected in addStudent form,
         //it is validated as correct
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", status=" + status +
-                ", roleId=" + roleId +
-                ", surname='" + surname + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", faculty='" + faculty + '\'' +
-                ", gender=" + gender +
-                "fatherName='" + fatherName + '\'' +
-                ", birthDate=" + birthDate +
-                ", birthPlace='" + birthPlace + '\'' +
-                ", livingPlace='" + livingPlace + '\'' +
-                ", officialHome='" + officialHome + '\'' +
-                ", idCardNumber='" + idCardNumber + '\'' +
-                ", idCardFinCode='" + idCardFinCode + '\'' +
-                ", parentPhoneNumber='" + parentPhoneNumber + '\'' +
-                ", graduatedRegion='" + graduatedRegion + '\'' +
-                ", graduatedSchool='" + graduatedSchool + '\'' +
-                ", entryIdNumber=" + entryIdNumber +
-                ", entryScore=" + entryScore +
-                ", socialStatusSet=" + socialStatusSet +
-                ", educationType='" + educationType + '\'' +
-                ", presidentialScholarship=" + presidentialScholarship +
-                ", dovletSifarisli=" + dovletSifarisli +
-                ", entryYear=" + entryYear +
-                ", profession='" + profession + '\'' +
-                ", section='" + section + '\'' +
-                ", groupId='" + groupId + '\'' +
-                ", scholarshipStatus=" + scholarshipStatus +
-                '}';
     }
 
     public String getFatherName() {
@@ -282,21 +237,57 @@ public class Student extends User implements Serializable {
         this.scholarshipStatus = scholarshipStatus;
     }
 
-    public Set<Integer> getSocialStatusSet() {
-        return socialStatusSet;
+    public List<SocialStatus> getSocialStatusList() {
+        return socialStatusList;
     }
 
-    public void setSocialStatusSet(Set<Integer> socialStatusSet) {
-        this.socialStatusSet = socialStatusSet;
+    public void setSocialStatusList(List<SocialStatus> socialStatusList) {
+        this.socialStatusList = socialStatusList;
     }
 
-    public static class SortbyEntryScore extends Student implements Comparator<Student>
-    {
-
+    public static class SortByEntryScore extends Student implements Comparator<Student> {
         public int compare(Student a, Student b)
         {
             return a.entryScore - b.entryScore;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", roleId=" + roleId +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", faculty='" + faculty + '\'' +
+                ", gender=" + gender +
+                ", fatherName='" + fatherName + '\'' +
+                ", birthDate=" + birthDate +
+                ", birthPlace='" + birthPlace + '\'' +
+                ", livingPlace='" + livingPlace + '\'' +
+                ", officialHome='" + officialHome + '\'' +
+                ", idCardNumber='" + idCardNumber + '\'' +
+                ", idCardFinCode='" + idCardFinCode + '\'' +
+                ", parentPhoneNumber='" + parentPhoneNumber + '\'' +
+                ", graduatedRegion='" + graduatedRegion + '\'' +
+                ", graduatedSchool='" + graduatedSchool + '\'' +
+                ", entryIdNumber=" + entryIdNumber +
+                ", entryScore=" + entryScore +
+                ", socialStatusList=" + socialStatusList +
+                ", educationType='" + educationType + '\'' +
+                ", presidentialScholarship=" + presidentialScholarship +
+                ", dovletSifarisli=" + dovletSifarisli +
+                ", entryYear=" + entryYear +
+                ", profession='" + profession + '\'' +
+                ", section='" + section + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", scholarshipStatus=" + scholarshipStatus +
+                '}';
+    }
+
 
 }

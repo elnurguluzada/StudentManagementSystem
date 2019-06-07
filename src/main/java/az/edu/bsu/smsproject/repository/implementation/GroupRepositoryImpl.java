@@ -2,6 +2,7 @@ package az.edu.bsu.smsproject.repository.implementation;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import az.edu.bsu.smsproject.domain.Group;
+import az.edu.bsu.smsproject.domain.SocialStatus;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.GroupRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -27,7 +28,6 @@ public class GroupRepositoryImpl implements GroupRepository {
     public GroupRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
 
     @Override
     public long createGroup(String profession, String section, String eduType, int year, int studentCount) {
@@ -69,7 +69,7 @@ public class GroupRepositoryImpl implements GroupRepository {
 
     @Override
     public List<Group> getFilteredGroupList(int begin, int end, String name, String year, String faculty, String profession, String section) {
-        String sql = "select * from( "+
+        String sql = "SELECT * FROM( "+
                 "SELECT row_number() over(order by group_id) as rownum, * FROM groups " +
                     "WHERE lower(group_name) LIKE lower(?) AND " +
                     "lower(to_char(creation_year, '9999')) LIKE lower(?) AND " +
@@ -145,7 +145,6 @@ public class GroupRepositoryImpl implements GroupRepository {
         return null;
     }
 
-
     @Override
     public boolean deleteGroup(long groupId) {
         return false;
@@ -183,7 +182,7 @@ public class GroupRepositoryImpl implements GroupRepository {
         int index = 0;
 
 
-        Collections.sort(studentList, new Student.SortbyEntryScore());
+        Collections.sort(studentList, new Student.SortByEntryScore());
 
 
         for (Student student1 : studentList) {
@@ -454,7 +453,6 @@ public class GroupRepositoryImpl implements GroupRepository {
     };
 
     private class StudentMapper implements RowMapper<Student> {
-
         @Override
         public Student mapRow(ResultSet resultSet, int i) throws SQLException {
             Student student = new Student();
@@ -474,9 +472,9 @@ public class GroupRepositoryImpl implements GroupRepository {
             student.setBirthPlace(resultSet.getString("birth_place"));
             student.setLivingPlace(resultSet.getString("living_place"));
             student.setOfficialHome(resultSet.getString("official_home"));
-            student.setSocialStatusSet(getSocialStatusSetById(resultSet.getLong("user_id")));
+            student.setSocialStatusList(getSocialStatusSetById(resultSet.getLong("user_id")));
             student.setParentPhoneNumber(resultSet.getString("parent_num"));
-            student.setGraduatedRegion(resultSet.getString("graduation_school"));
+            student.setGraduatedRegion(resultSet.getString("graduation_region"));
             student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
             student.setEntryScore(resultSet.getInt("entry_score"));
             student.setEducationType(resultSet.getString("education_type"));
@@ -485,16 +483,15 @@ public class GroupRepositoryImpl implements GroupRepository {
             student.setGroupId(resultSet.getInt("group_id"));
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
+            student.setGraduatedSchool(resultSet.getString("graduation_school"));
             return student;
         }
     }
 
-    private Set<Integer> getSocialStatusSetById(long userId ){
-        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
-                ((resultSet, i) -> resultSet.getInt(1)),
+    private List<SocialStatus> getSocialStatusSetById(long userId ){
+        return jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+                ((resultSet, i) -> new SocialStatus(resultSet.getLong(1), resultSet.getString(2), Status.ACTIVE) ),
                 userId);
-        return new HashSet<>(socialStatusList);
     }
-
 
 }

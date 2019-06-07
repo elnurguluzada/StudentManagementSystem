@@ -55,10 +55,9 @@ public interface StudentRepository {
                                                           String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
     );
 
-    public int getNumberOfStudentsOfIdenticalGroup(long groupId);
-    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);
-    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow);
+    public int getNumberOfStudentsOfSameGroup(long groupId);
+    public int getNumberOfFilteredStudentsOfSameGroup(String searchValue , long groupId);
+    public List<Student> getStudentsOfSameGroup(long groupId , String searchParam, int startRow, int endRow);
     public boolean delete(long id);
-
 
 }

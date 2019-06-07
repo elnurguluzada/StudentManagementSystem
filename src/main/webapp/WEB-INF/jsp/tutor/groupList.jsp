@@ -124,9 +124,9 @@
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script><%--popup--%>
 
 <script>
-    var groupTable;
-    var studentsTable;
-    var selectedGroupId=0;
+    let groupTable;
+    let studentsTable;
+    let selectedGroupId = -1;
 
     $(document).ready(function () {
         drawGroupsTable();
@@ -136,7 +136,7 @@
     function drawGroupsTable() {
 
         $('#group-list-table tfoot th').each( function () { // Setup - add a text input to each footer cell
-            var title = $(this).text();
+            let title = $(this).text();
             if (title === 'Name' || title === 'Year' || title === 'Faculty' || title === 'Profession' || title === 'Section'){
                 $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
             }
@@ -218,7 +218,7 @@
         });
 
         groupTable.columns().every( function () { // Apply the search
-            var that = this;
+            let that = this;
 
             $( 'input', this.footer() ).on( 'keyup change', function () {
                 if ( that.search() !== this.value ) {
@@ -233,7 +233,7 @@
 
     function drawStudentsTable() {
         $('#student-list-table tfoot th').each( function () { // Setup - add a text input to each footer cell
-            var title = $(this).text();
+            let title = $(this).text();
             if (title === 'Name' || title === 'Surname' || title === 'Father name' || title === 'Birth date' || title === 'Birth place' ||
                 title === 'Living place' || title === 'Entry year' || title === 'Graduation region' || title === 'Entry score' ||
                 title === 'Faculty' || title === 'Profession' || title === 'Section'){

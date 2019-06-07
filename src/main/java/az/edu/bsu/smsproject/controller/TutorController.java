@@ -1,13 +1,10 @@
 package az.edu.bsu.smsproject.controller;
 
 import az.edu.bsu.smsproject.Service.*;
-import az.edu.bsu.smsproject.domain.DataTable;
-import az.edu.bsu.smsproject.domain.Group;
-import az.edu.bsu.smsproject.domain.Student;
-import az.edu.bsu.smsproject.domain.StudentValidation;
+import az.edu.bsu.smsproject.domain.*;
+import az.edu.bsu.smsproject.domain.Enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,23 +15,13 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/tutor")
@@ -44,14 +31,16 @@ public class TutorController {
     private final StudentService studentService;
     private final TutorService tutorService;
     private final GroupService groupService;
+    private final SocialStatusService socialStatusService;
     private final StudentValidation studentValidation;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, SocialStatusService socialStatusService, StudentValidation studentValidation) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
         this.groupService = groupService;
+        this.socialStatusService = socialStatusService;
         this.studentValidation = studentValidation;
     }
 
@@ -63,7 +52,6 @@ public class TutorController {
             return;
         if ( target.getClass() == Student.class )
             webDataBinder.setValidator(studentValidation);
-
     }
 
     @GetMapping(value = {"/index", "/"})
@@ -74,14 +62,21 @@ public class TutorController {
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
-        modelAndView.addObject("student", new Student());
+        List<SocialStatus> socialStatusList = socialStatusService.getSocialStatusList();
+
+        Student student = new Student();
+        student.setSocialStatusList(socialStatusList);
+        System.out.println( student.getSocialStatusList() );
+
+        modelAndView.addObject("student", student).addObject("sslist",socialStatusList);
         return modelAndView;
     }
 
     @PostMapping("/addStudent")
     public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
-
-        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
+        System.out.println(student);
+        System.out.println(errors);
+        ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
             if ( studentService.addStudent( student ).isPresent() )
@@ -106,8 +101,7 @@ public class TutorController {
     }
 
     @ResponseBody @GetMapping("/getSections")
-    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession
-    ){
+    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession){
         return commonService.getSectionSet(year, faculty, profession);
     }
  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,21 +128,21 @@ public class TutorController {
             @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
             @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
             @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
-            @RequestParam(name = "columns[16][search][value]") String searchValueForSection
-    ) {
+            @RequestParam(name = "columns[16][search][value]") String searchValueForSection) {
+
         int numberOfAllStudents = studentService.getNumberOfAllStudents();
 
         List<Student > filteredStudentList = studentService.getFilteredStudentList( start+1, start+length+1,
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection);
-        System.out.println(filteredStudentList);
+
         int numberOfFilteredStudents = studentService.getNumberOfFilteredStudents(
                 searchValueForName, searchValueForSurname, searchValueForFatherName, searchValueForBirthDate,
                 searchValueForBirthPlace, searchValueForLivingPlace, searchValueForEntryYear, searchValueForGraduationRegion,
                 searchValueForEntryScore, searchValueForFaculty, searchValueForProfession, searchValueForGroup, searchValueForSection
         );
-        System.out.println("numberOfFilteredStudents = "+numberOfFilteredStudents);
+
         if ( start + length > numberOfFilteredStudents )
             length = numberOfFilteredStudents - start;
 
@@ -179,12 +173,9 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = student.getSocialStatusSet().toString();
+            data[i][24] = stringfySocialStatusList( student.getSocialStatusList() );
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
-
-            /*
-            <%--todo scholarship status--%>
-             */
+//            todo scholarship status
         }
 
         return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
@@ -193,13 +184,13 @@ public class TutorController {
     @GetMapping("/getStudentInfoPopup/{userId}")
     public String getPersonalStudentInfo( @PathVariable("userId") long userId, Model model) {
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "Tutor/StudentList/studentPersonalInfo";
+        return "tutor/StudentList/studentPersonalInfo";
     }
 
     @GetMapping("/updateStudent/{userId}")
     public String showUpdateStudent( @PathVariable("userId") int userId, Model model){
         model.addAttribute("student", studentService.getStudentById(userId));
-        return "Tutor/StudentList/updateStudentForm";
+        return "tutor/StudentList/updateStudentForm";
     }
 
     @PostMapping("/updateStudent")
@@ -230,8 +221,8 @@ public class TutorController {
             @RequestParam(name = "columns[2][search][value]") String searchValueForYear,
             @RequestParam(name = "columns[3][search][value]") String searchValueForFaculty,
             @RequestParam(name = "columns[4][search][value]") String searchValueForProfession,
-            @RequestParam(name = "columns[5][search][value]") String searchValueForSection
-    ){
+            @RequestParam(name = "columns[5][search][value]") String searchValueForSection ){
+
         int numberOfAllGroups = groupService.getNumberOfAllGroups();
 
         List<Group> filteredGroupList = groupService.getFilteredGroupList(start, start+length, searchValueForName, searchValueForYear, searchValueForFaculty, searchValueForProfession, searchValueForSection);
@@ -274,8 +265,7 @@ public class TutorController {
             @RequestParam(name = "columns[17][search][value]") String searchValueForFaculty,
             @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
             @RequestParam(name = "groupId") int groupId,
-            @RequestParam(name = "columns[16][search][value]") String searchValueForSection
-    ) {
+            @RequestParam(name = "columns[16][search][value]") String searchValueForSection) {
 
         int numberOfAllStudents = studentService.getNumberOfAllStudents();
 
@@ -322,12 +312,9 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = student.getSocialStatusSet().toString();
+            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
-
-            /*
-            <%--todo scholarship status--%>
-             */
+//            todo scholarship status
         }
 
         return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
@@ -336,7 +323,7 @@ public class TutorController {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @GetMapping("/getGroupMembers")
-    public ModelAndView getStudentsOfIdenticalGroup(@RequestParam("groupId") long groupId,
+    public ModelAndView getStudentsOfSameGroup(@RequestParam("groupId") long groupId,
                                                     HttpSession httpSession) {
         //httpServletRequest.setAttribute("groupId" , groupId);
         httpSession.setAttribute("groupId" , groupId);
@@ -354,9 +341,7 @@ public class TutorController {
             @RequestParam(name = "start") int start,
             @RequestParam(name = "length") int length,
             @RequestParam(name = "search[value]") String searchValue,
-            HttpSession httpSession
-
-    ) {
+            HttpSession httpSession ) {
 
         long groupId = (long) httpSession.getAttribute("groupId");
 
@@ -365,14 +350,14 @@ public class TutorController {
         DataTable dataTable = new DataTable();
         dataTable.setDraw(draw);
 
-        int numberOfStudentsOfGroup = studentService.getNumberOfStudentsOfIdenticalGroup(groupId);
+        int numberOfStudentsOfGroup = studentService.getNumberOfStudentsOfSameGroup(groupId);
         dataTable.setRecordsTotal(numberOfStudentsOfGroup);
 
 
-        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfIdenticalGroup( searchValue, groupId);
+        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfSameGroup( searchValue, groupId);
         dataTable.setRecordsFiltered(numberOfFilteredStudentsOfGroup);
 
-        List<Student> studentList = studentService.getStudentsOfIdenticalGroup( groupId, searchValue , start , start + length);
+        List<Student> studentList = studentService.getStudentsOfSameGroup( groupId, searchValue , start , start + length);
 
         System.out.println(studentList);
 
@@ -406,12 +391,9 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = student.getSocialStatusSet().toString();
+            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
-
-            /*
-            <%--todo scholarship status--%>
-             */
+//            todo scholarship status
         }
         dataTable.setData(data);
 
@@ -419,7 +401,6 @@ public class TutorController {
         return dataTable;
 
     }
-
 
 //------------------------------------------------------------------------------------------------------------------------------
 
@@ -447,8 +428,7 @@ public class TutorController {
                                              @RequestParam(name = "columns[18][search][value]") String searchValueForProfession,
                                              @RequestParam(name = "columns[19][search][value]") String searchValueForGroup,
                                              @RequestParam(name = "columns[16][search][value]") String searchValueForSection,
-                                             HttpSession httpSession
-    ){
+                                             HttpSession httpSession){
 
         ModelAndView modelAndView = new ModelAndView();
 
@@ -511,7 +491,7 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = student.getSocialStatusSet().toString();
+            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
 
             /*
@@ -620,8 +600,8 @@ public class TutorController {
             @RequestParam(name = "draw") int draw,
             @RequestParam(name = "start") int start,
             @RequestParam(name = "length") int length,
-            @RequestParam(name = "search[value]") String searchValue
-    ) {
+            @RequestParam(name = "search[value]") String searchValue ) {
+
         int numberOfAllOrders = commonService.getNumberOfAllOrders();
         int numberOfFilteredOrders = commonService.getNumberOfFilteredOrders();
         List<Resource> filteredResourceList = commonService.getFilteredOrdersList(start, start+length);
@@ -684,4 +664,13 @@ public class TutorController {
     public String chat(){
         return "tutor/chat";
     }
+
+    private String stringfySocialStatusList(List<SocialStatus> socialStatusList){
+        String result = "";
+        for (SocialStatus s: socialStatusList)
+            result += s.getName()+", ";
+
+        return result.equals("")?"":result.substring(0, result.length()-2);
+    }
+
 }

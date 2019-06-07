@@ -102,11 +102,8 @@ public class StudentValidation implements Validator {
     }
     private boolean isNameValid(String word){
         for ( char c: word.toCharArray() ) {
-            if ( c>=65 && c<=90 )
-                continue;
-            else if ( c>=97 && c<=122 )
-                continue;
-            else return false;
+            if ( !((c>=65 && c<=90) || (c>=97 && c<=122)) )
+                return false;
         }
         return true;
     }

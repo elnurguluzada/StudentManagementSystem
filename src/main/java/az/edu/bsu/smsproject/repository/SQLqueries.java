@@ -25,8 +25,11 @@ public class SQLqueries {
 
     public static String GET_SECTION_LIST_BY_YEAR = "SELECT DISTINCT(section) FROM groups WHERE creation_year = ?";
 
-    public static String GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID = "SELECT sss.social_status_id FROM student s JOIN student_social_status sss ON s.user_id = sss.user_id where s.user_id = ?";
-
+    public static String GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID =
+                    "select ss.id, ss.name " +
+                    "from student s join student_social_status sss on s.user_id=sss.user_id " +
+                    "join social_status ss on sss.social_status_id=ss.id " +
+                    "where s.user_id = ?";
     public static String GET_THE_NUMBER_OF_ALL_STUDENTS = "SELECT count(*) FROM student";
 
     public static String UPDATE_STUDENT_IN_STUDENT_TABLE = "UPDATE student SET id_card_num  = ?, id_card_fin_code  = ?, father_name  = ?, birth_date  = ?, " +

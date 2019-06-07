@@ -20,6 +20,7 @@ public abstract class BaseDomain implements Serializable {
     }
 
     public BaseDomain() {
+        this.id = 0;
         this.name = "";
     }
 
@@ -28,6 +29,7 @@ public abstract class BaseDomain implements Serializable {
     }
 
     public void setId(long id) {
+        System.out.println("Here we go again! -- "+ id);
         this.id = id;
     }
 

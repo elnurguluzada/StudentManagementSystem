@@ -1,7 +1,6 @@
 package az.edu.bsu.smsproject.Service.implementation;
 
 import az.edu.bsu.smsproject.Service.StudentService;
-import az.edu.bsu.smsproject.domain.Group;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +84,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
-        return  studentRepository.getStudentsOfIdenticalGroup(groupId , searchParam , startRow , endRow);
+    public List<Student> getStudentsOfSameGroup(long groupId , String searchParam, int startRow, int endRow) {
+        return  studentRepository.getStudentsOfSameGroup(groupId , searchParam , startRow , endRow);
     }
 
     @Override
@@ -95,13 +94,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
-        return studentRepository.getNumberOfStudentsOfIdenticalGroup(groupId);
+    public int getNumberOfStudentsOfSameGroup(long groupId) {
+        return studentRepository.getNumberOfStudentsOfSameGroup(groupId);
     }
 
     @Override
-    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue, long groupId) {
-        return studentRepository.getNumberOfFilteredStudentsOfIdenticalGroup(searchValue , groupId);
+    public int getNumberOfFilteredStudentsOfSameGroup(String searchValue, long groupId) {
+        return studentRepository.getNumberOfFilteredStudentsOfSameGroup(searchValue , groupId);
     }
 
     @Override

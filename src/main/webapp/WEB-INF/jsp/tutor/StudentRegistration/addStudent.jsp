@@ -1,4 +1,6 @@
 <%@ page import="java.time.LocalDate" %>
+<%@ page import="az.edu.bsu.smsproject.domain.SocialStatus" %>
+<%@ page import="az.edu.bsu.smsproject.domain.Enums.Status" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -67,14 +69,52 @@
     <form:input path="idCardFinCode" /> <br/>
     <small><form:errors path="idCardFinCode" cssClass="error"/></small>
         <br/><br/>
+
+    <%--
     <label>Social status: </label> <br/><br/>
     <label >Sehid ailesi: </label>
-    <form:checkbox path="socialStatusSet" value="1" /> <br/>
+    <form:checkbox path="socialStatusList[0].name" value='wh' /> <br/>
     <label>Mecburi kockun: </label>
-    <form:checkbox path="socialStatusSet" value="2" /> <br/>
+    <form:checkbox path="socialStatusList" value='<%= new SocialStatus(1, "Go on", Status.ACTIVE)%>' /> <br/>
     <label>Asagi teminatli: </label>
-    <form:checkbox path="socialStatusSet" value="3" />
-        <br/><br/>
+    <form:checkbox path="socialStatusList" value='<%= new SocialStatus(2, "F10", Status.ACTIVE)%>' />
+    --%>
+<%--    <br/><br/>--%>
+
+
+    <%--    <form:label path="socialStatusList" >Social Statsus 2</form:label> <br/><br/>--%>
+    <%--    <form:select path="socialStatusList" multiple="true" items="${sslist}" itemValue="id" itemLabel="name" >--%>
+    <%--        <form:options items="${sslist}" itemValue="id" itemLabel="name" />--%>
+    <%--    </form:select>--%>
+
+<%--    <form:label path="socialStatusList" >Social Status 2</form:label> <br/><br/>--%>
+<%--    <form:checkboxes path="socialStatusList.id" items="${sslist}" itemValue="id" itemLabel="name" delimiter="</br>" />--%>
+
+<%--    <form:checkbox path="socialStatusList[0].selected" value="true" label="${sslist[0].name}" /> <br/>--%>
+<%--    <form:checkbox path="socialStatusList[1].selected" value="true" label="${sslist[1].name}" /> <br/>--%>
+<%--    <form:checkbox path="socialStatusList[2].selected" value="true" label="${sslist[2].name}" /> <br/>--%>
+<hr/>
+
+<%--    <c:forEach items="${student.socialStatusList}" var="socialStatus" varStatus="s">--%>
+<%--        <form:checkbox path="socialStatusList[${s.index}].name" value="${sslist[s.index].name}" label="${sslist[s.index].name}" /> <br/>--%>
+<%--        <sf:input path="socialStatusList[${s.index}].id" />--%>
+<%--    </c:forEach>--%>
+
+<%--    <c:forEach items="${student.socialStatusList}" var="socialStatus" varStatus="s">--%>
+<%--        <form:checkbox path="socialStatusList[${s.index}].selected" value="true" label="${sslist[s.index].name}" /> <br/>--%>
+<%--                <sf:input path="socialStatusList[${s.index}].id" />--%>
+<%--    </c:forEach>--%>
+
+<%--    <c:forEach var="i" begin="0" end="${sslist.size()}" step="1" >--%>
+<%--        <form:checkbox path="socialStatusList[${i}].selected" value="true" label="${sslist[i].name}" /> <br/>--%>
+<%--    </c:forEach>--%>
+<hr/>
+
+<%--    <form:checkboxes path="socialStatusList[0].id" items="${sslist}" delimiter="<br/>" itemLabel="name" itemValue="id" />--%>
+
+    <form:checkbox path="socialStatusList[0].selected" value="true" />
+
+    <br/><br/>
     <form:label path="parentPhoneNumber">Parent Phone Number</form:label>
     <form:input path="parentPhoneNumber" /> <br/>
     <small><form:errors path="parentPhoneNumber" cssClass="error"/></small>
