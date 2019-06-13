@@ -1,16 +1,14 @@
 package az.edu.bsu.smsproject.controller;
 
 import az.edu.bsu.smsproject.Service.*;
-import az.edu.bsu.smsproject.domain.DataTable;
-import az.edu.bsu.smsproject.domain.Group;
-import az.edu.bsu.smsproject.domain.Student;
-import az.edu.bsu.smsproject.domain.StudentValidation;
+import az.edu.bsu.smsproject.domain.*;
+import az.edu.bsu.smsproject.domain.DataTransferObject.StudentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,20 +16,13 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,14 +36,16 @@ public class TutorController {
     private final TutorService tutorService;
     private final GroupService groupService;
     private final StudentValidation studentValidation;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation, PasswordEncoder passwordEncoder) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
         this.groupService = groupService;
         this.studentValidation = studentValidation;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @InitBinder
@@ -61,7 +54,7 @@ public class TutorController {
 
         if (target == null)
             return;
-        if ( target.getClass() == Student.class )
+        if ( target.getClass() == StudentDTO.class )
             webDataBinder.setValidator(studentValidation);
 
     }
@@ -74,23 +67,24 @@ public class TutorController {
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
-        modelAndView.addObject("student", new Student());
+        modelAndView.addObject("student", new StudentDTO());
         return modelAndView;
     }
 
     @PostMapping("/addStudent")
-    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
-
-        ModelAndView modelAndView = new ModelAndView("Tutor/StudentRegistration/addStudent");
+    public ModelAndView addStudent( @Valid @ModelAttribute("student") StudentDTO studentDTO, Errors errors ){
+        System.out.println(studentDTO);
+        System.out.println(errors);
+        ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
+            Student student = studentDTO.toStudent(passwordEncoder);
+            System.out.println(student);
             if ( studentService.addStudent( student ).isPresent() )
                 modelAndView.addObject("success", true);
             else
                 modelAndView.addObject("success", false);
         }
-        else
-            modelAndView.addObject("success", false);
 
         return modelAndView;
     }
@@ -420,7 +414,6 @@ public class TutorController {
 
     }
 
-
 //------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -635,11 +628,11 @@ public class TutorController {
                 Resource resource = filteredResourceList.get(i);
                 File file = resource.getFile();
                 BasicFileAttributes attributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                System.out.println(file.getPath());
-                System.out.println(file.getAbsolutePath());
-                System.out.println(file.getName());
-                System.out.println(resource.getURL());
-                System.out.println(resource.getURI());
+//                System.out.println(file.getPath());
+//                System.out.println(file.getAbsolutePath());
+//                System.out.println(file.getName());
+//                System.out.println(resource.getURL());
+//                System.out.println(resource.getURI());
                 data[i][0] = "<img src='"+resource.getURI()+"'/>";
                 data[i][1] = file.getName();
                 data[i][2] = dateFormat.format(new Date(attributes.creationTime().toMillis()));

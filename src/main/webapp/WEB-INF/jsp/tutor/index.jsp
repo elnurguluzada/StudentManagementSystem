@@ -3,15 +3,6 @@
 <head>
     <title>Home Page</title>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"><%--For datatable--%>
-<%--    <style>--%>
-<%--        table, th, td{--%>
-<%--            border: 1px solid black;--%>
-<%--        }--%>
-<%--        table{--%>
-<%--            width: 60%;--%>
-<%--            border-collapse: collapse;--%>
-<%--        }--%>
-<%--    </style>--%>
 </head>
 <body>
 <a href="/tutor/studentForm">Add Student</a>
@@ -21,7 +12,12 @@
 <a href="/tutor/groups">Groups</a>
 <br/> <br/>
 <a href="/tutor/getNotGroupedStudent">Ungrouped Students</a>
-
+<br/>
+<form action="/sign-out" method="post">
+    <input type="submit" value="Log out" />
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+</form>
+<br/>
 <%------------------------------------------------------------------------------------------------------%>
 <table id="order-list-table" class="display" style="width: 80%"> <!--display is a class in the imported dataTables.min.css-->
     <thead>

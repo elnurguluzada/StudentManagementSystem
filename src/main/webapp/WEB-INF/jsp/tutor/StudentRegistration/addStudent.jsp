@@ -140,6 +140,7 @@
         <form:radiobutton path="educationType" value="Qiyabi"/>
     <small><form:errors path="educationType" cssClass="error"/> </small> <br/>
         <br/><br/>
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
     <form:button>Submit</form:button>
     <button type="reset" >Reset</button>
 </form:form>

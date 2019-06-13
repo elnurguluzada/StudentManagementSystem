@@ -17,6 +17,8 @@
 </head>
 <body>
 
+<a href="/logout/"> <button >LOG OUT</button> </a> <br/><br/>
+
 <%--<button onclick="connect()">Connect</button>    <br/> <br/>--%>
 
 <input type="text" id="input-id"/>              <br/> <br/>
