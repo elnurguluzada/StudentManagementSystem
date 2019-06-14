@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.security.auth.message.callback.PrivateKeyCallback;
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping({"/login", "/"})
 //@SessionAttributes("user")
 public class LoginController {
 
@@ -55,15 +56,11 @@ public class LoginController {
 //    }
 
     @GetMapping("/")
-    public String loginPage(Model model){
-        return "login";
-    }
+    public String loginPage(@RequestParam(value = "isFailed", required = false) boolean isFailed, Model model) {
+        System.out.println("message = "+isFailed);
 
-    @GetMapping("/m")
-    public String logout(){
-        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        attr.getRequest().getSession().invalidate();
-        return "redirect:/login/";
+        model.addAttribute("isFailed", isFailed);
+        return "login";
     }
 
 }

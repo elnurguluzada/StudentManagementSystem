@@ -37,15 +37,17 @@ public class TutorController {
     private final GroupService groupService;
     private final StudentValidation studentValidation;
     private final PasswordEncoder passwordEncoder;
+    private final OrderService orderService;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation, PasswordEncoder passwordEncoder) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation, PasswordEncoder passwordEncoder, OrderService orderService) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
         this.groupService = groupService;
         this.studentValidation = studentValidation;
         this.passwordEncoder = passwordEncoder;
+        this.orderService = orderService;
     }
 
     @InitBinder
@@ -615,9 +617,9 @@ public class TutorController {
             @RequestParam(name = "length") int length,
             @RequestParam(name = "search[value]") String searchValue
     ) {
-        int numberOfAllOrders = commonService.getNumberOfAllOrders();
-        int numberOfFilteredOrders = commonService.getNumberOfFilteredOrders();
-        List<Resource> filteredResourceList = commonService.getFilteredOrdersList(start, start+length);
+        int numberOfAllOrders = orderService.getNumberOfAllOrders();
+        int numberOfFilteredOrders = orderService.getNumberOfFilteredOrders();
+        List<Resource> filteredResourceList = orderService.getFilteredOrdersList(start, start+length);
         if (start + length > numberOfFilteredOrders)
             length = numberOfFilteredOrders - start;
 
@@ -651,7 +653,7 @@ public class TutorController {
         Resource resource = null;
         String contentType = "";
         try {
-            resource = commonService.getOrderByName(fileName);
+            resource = orderService.getOrderByName(fileName);
             contentType = Files.probeContentType(resource.getFile().toPath());
         } catch (IOException e) {
             e.printStackTrace();
@@ -661,7 +663,7 @@ public class TutorController {
 
     @GetMapping("/order/download/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName){
-        Resource resource = commonService.getOrderByName(fileName);
+        Resource resource = orderService.getOrderByName(fileName);
         String contentType = "";
         try {
             contentType = Files.probeContentType(resource.getFile().toPath());

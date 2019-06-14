@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.sql.DataSource;
 
@@ -35,26 +37,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        String sql1 = "select email, password, enabled from bdu_user where email = ?";
-        String sql2 = "select bu.email, r.name " +
-                        "from bdu_user bu join role r on bu.role_id = r.id " +
-                        "where bu.email = ?";
-
-        auth
+//        String sql1 = "select email, password, enabled from bdu_user where email = ?";
+//        String sql2 = "select bu.email, r.name " +
+//                        "from bdu_user bu join role r on bu.role_id = r.id " +
+//                        "where bu.email = ?";
+//
+//        auth
 //                .jdbcAuthentication().dataSource(dataSource)
 //                .usersByUsernameQuery(sql1)
-//                .authoritiesByUsernameQuery(sql2)
-//                .and()
+//                .authoritiesByUsernameQuery(sql2);
+        auth
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
 
+
+    @Bean
+    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+        return new MyAuthenticationSuccessHandler();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//        The  order  of  these  rules  matters
-        http
-                .authorizeRequests()        //todo hasRole("") and hasAuthority("") are different
-                    .antMatchers("/student/**").hasAuthority("student")  //role should not start with 'ROLE_' since it is automatically inserted. Got 'ROLE_USER'
+
+        http    // The  order  of  the  rules  matters
+                .authorizeRequests()                                                    //todo hasRole("") and hasAuthority("") are different
+                    .antMatchers("/student/**").hasAuthority("student")      //role should not start with 'ROLE_' since it is automatically inserted. Got 'ROLE_USER'
                     .antMatchers("/tutor/**").access("hasAuthority('tutor')")
                     .antMatchers("/login*", "/", "/**").permitAll()
                 .and()
@@ -62,8 +70,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .loginPage("/login/")
                     .loginProcessingUrl("/login/submit")
                     .usernameParameter("username").passwordParameter("password")
-                    .defaultSuccessUrl("/success/") //todo take success page from DB
-                    .failureUrl("/failure/")        //todo take failure page from DB
+                    .successHandler( myAuthenticationSuccessHandler() )
+//                    .defaultSuccessUrl("/success") // isn't good option when target page depends on user
+                    .failureUrl("/login/?isFailed="+true)        //todo take failure page from DB
                 .and()
                     .logout()
                     .logoutUrl("/sign-out")

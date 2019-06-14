@@ -25,7 +25,7 @@ class MyErrorController implements ErrorController {
             System.out.println( "statusCode = "+statusCode);
 
             if (statusCode == HttpStatus.NOT_FOUND.value()){
-//                return "error/page-404"; todo uncomment it
+//                return "error/page-404";              todo uncomment it
             }
             else if ( statusCode == HttpStatus.FORBIDDEN.value() ){
                 return "error/page-403";
@@ -36,6 +36,5 @@ class MyErrorController implements ErrorController {
         }
         return "sthelse";
     }
-
 
 }
