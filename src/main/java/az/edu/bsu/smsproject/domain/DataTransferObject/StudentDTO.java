@@ -1,16 +1,14 @@
-package az.edu.bsu.smsproject.domain;
+package az.edu.bsu.smsproject.domain.DataTransferObject;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
+import az.edu.bsu.smsproject.domain.Student;
+import az.edu.bsu.smsproject.domain.User;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.io.Serializable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Set;
 
-public class Student extends User implements Serializable {
-    private static final long serialVersionUID = 3743824363989869865L;
-
+public class StudentDTO extends User {
     private String fatherName;
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private LocalDate birthDate;
@@ -34,56 +32,50 @@ public class Student extends User implements Serializable {
     private long groupId;
     private int scholarshipStatus;
 
-
-    public Student(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String authority, boolean enabled, String fatherName, LocalDate birthDate, String birthPlace, String livingPlace, String officialHome, String idCardNumber, String idCardFinCode, String parentPhoneNumber, String graduatedRegion, String graduatedSchool, int entryIdNumber, int entryScore, Set<Integer> socialStatusSet, String educationType, boolean presidentialScholarship, boolean dovletSifarisli, int entryYear, String profession, String section, long groupId, int scholarshipStatus) {
-        super(id, name, status, roleId, surname, email, password, phoneNumber, faculty, gender, authority, enabled);
-        this.fatherName = fatherName;
-        this.birthDate = birthDate;
-        this.birthPlace = birthPlace;
-        this.livingPlace = livingPlace;
-        this.officialHome = officialHome;
-        this.idCardNumber = idCardNumber;
-        this.idCardFinCode = idCardFinCode;
-        this.parentPhoneNumber = parentPhoneNumber;
-        this.graduatedRegion = graduatedRegion;
-        this.graduatedSchool = graduatedSchool;
-        this.entryIdNumber = entryIdNumber;
-        this.entryScore = entryScore;
-        this.socialStatusSet = socialStatusSet;
-        this.educationType = educationType;
-        this.presidentialScholarship = presidentialScholarship;
-        this.dovletSifarisli = dovletSifarisli;
-        this.entryYear = entryYear;
-        this.profession = profession;
-        this.section = section;
-        this.groupId = groupId;
-        this.scholarshipStatus = scholarshipStatus;
-    }
-
-    public Student() {
-        this.fatherName = "";
-        this.birthPlace = "";
-        this.livingPlace = "";
-        this.officialHome = "";
-        this.idCardNumber = "";
-        this.idCardFinCode = "";
-        this.parentPhoneNumber = "";
-        this.graduatedRegion = "";
-        this.graduatedSchool = "";
-        this.socialStatusSet = new HashSet<>();
-        this.educationType = "";
-        this.presidentialScholarship = false;
-        this.dovletSifarisli = false;
-        this.profession = "";
-        this.section = "";
-        this.gender = ' '; //otherwise spring initializes gender and when gender isn't selected in addStudent form,
-        //it is validated as correct
+    public Student toStudent(PasswordEncoder passwordEncoder){
+        Student student = new Student();
+        student.setId( id );
+        student.setName(name);
+        student.setSurname(surname);
+        student.setEmail( email );
+        student.setRoleId(roleId);
+        student.setPassword(passwordEncoder.encode(password));
+        student.setPhoneNumber(phoneNumber);
+        student.setFaculty(faculty);
+        student.setGender(gender);
+        student.setIdCardNumber(idCardNumber);
+        student.setIdCardFinCode(idCardFinCode);
+        student.setFatherName(fatherName);
+        student.setBirthDate(birthDate);
+        student.setBirthPlace(birthPlace);
+        student.setLivingPlace(livingPlace);
+        student.setOfficialHome(officialHome);
+        student.setSocialStatusSet(socialStatusSet);
+        student.setParentPhoneNumber(parentPhoneNumber);
+        student.setGraduatedRegion(graduatedRegion);
+        student.setEntryIdNumber(entryIdNumber);
+        student.setEntryScore(entryScore);
+        student.setEducationType(educationType);
+        student.setProfession(profession);
+        student.setSection(section);
+        student.setGroupId(groupId);
+        student.setScholarshipStatus(scholarshipStatus);
+        student.setDovletSifarisli(dovletSifarisli);
+        student.setPresidentialScholarship(presidentialScholarship);
+        student.setEntryYear(entryYear);
+        student.setGraduatedSchool(graduatedSchool);
+        student.setStatus( Status.ACTIVE );
+        student.setEnabled(true);
+        return student;
     }
 
     @Override
     public String toString() {
-        return "Student{" +
-                "fatherName='" + fatherName + '\'' +
+        return "StudentDTO{" +
+                "  id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", fatherName='" + fatherName + '\'' +
                 ", birthDate=" + birthDate +
                 ", birthPlace='" + birthPlace + '\'' +
                 ", livingPlace='" + livingPlace + '\'' +
@@ -104,6 +96,13 @@ public class Student extends User implements Serializable {
                 ", section='" + section + '\'' +
                 ", groupId=" + groupId +
                 ", scholarshipStatus=" + scholarshipStatus +
+                ", roleId=" + roleId +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", faculty='" + faculty + '\'' +
+                ", gender=" + gender +
+                ", status=" + status +
                 '}';
     }
 
@@ -203,6 +202,14 @@ public class Student extends User implements Serializable {
         this.entryScore = entryScore;
     }
 
+    public Set<Integer> getSocialStatusSet() {
+        return socialStatusSet;
+    }
+
+    public void setSocialStatusSet(Set<Integer> socialStatusSet) {
+        this.socialStatusSet = socialStatusSet;
+    }
+
     public String getEducationType() {
         return educationType;
     }
@@ -266,19 +273,4 @@ public class Student extends User implements Serializable {
     public void setScholarshipStatus(int scholarshipStatus) {
         this.scholarshipStatus = scholarshipStatus;
     }
-
-    public Set<Integer> getSocialStatusSet() {
-        return socialStatusSet;
-    }
-
-    public void setSocialStatusSet(Set<Integer> socialStatusSet) {
-        this.socialStatusSet = socialStatusSet;
-    }
-
-    public static class SortByEntryScore extends Student implements Comparator<Student> {
-        public int compare(Student a, Student b) {
-            return a.entryScore - b.entryScore;
-        }
-    }
-
 }

@@ -20,4 +20,6 @@ public class UserServiceImpl implements UserService {
     public User authenticate(String email, String password) {
         return userRepository.authenticate( email, password );
     }
+
+
 }

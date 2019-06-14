@@ -1,6 +1,7 @@
 package az.edu.bsu.smsproject.controller;
 
 import az.edu.bsu.smsproject.Service.CommonService;
+import az.edu.bsu.smsproject.Service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,12 @@ import java.nio.file.FileAlreadyExistsException;
 public class RectorController {
 
     private final CommonService commonService;
+    private final OrderService orderService;
 
     @Autowired
-    public RectorController(CommonService commonService) {
+    public RectorController(CommonService commonService, OrderService orderService) {
         this.commonService = commonService;
+        this.orderService = orderService;
     }
 
     @GetMapping(value = {"/", "/index"})
@@ -36,7 +39,7 @@ public class RectorController {
     @PostMapping("/file")
     public String uploadOrder(@RequestParam("file") MultipartFile multipartFile, Model model) {
         try {
-            commonService.addOrder(multipartFile);
+            orderService.addOrder(multipartFile);
         } catch (FileAlreadyExistsException e) {
             model.addAttribute("fileExist", true);
             return "/rector/orders";

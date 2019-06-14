@@ -1,7 +1,6 @@
 package az.edu.bsu.smsproject.repository.implementation;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
-import az.edu.bsu.smsproject.domain.SocialStatus;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.RoleRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -17,7 +16,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class StudentRepositoryImpl implements StudentRepository {
@@ -32,13 +34,14 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
     //------------------------------------------------------------------------------------------------------
+
     @Override
     public Optional<Student> addStudent(Student student) {
         long userId = insertIntoUserTable( student );
         student.setId( userId );
 
         if (insertIntoStudentTable(student, userId) == 1 &&
-                insertIntoStudentSocialStatusTable(student) == student.getSocialStatusList().size() )
+                insertIntoStudentSocialStatusTable(student) == student.getSocialStatusSet().size() )
             return Optional.of(getStudentById(userId));
 
         else
@@ -48,7 +51,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
 
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE , Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE , Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.BOOLEAN);
         factory.setReturnGeneratedKeys(true);
         PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
                 roleIdOfStudent,
@@ -58,7 +61,9 @@ public class StudentRepositoryImpl implements StudentRepository {
                 student.getPassword(),
                 student.getPhoneNumber(),
                 student.getFaculty(),
-                student.getGender()
+                student.getGender(),
+                student.getStatus().name(),
+                student.isEnabled()
         });
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -96,12 +101,14 @@ public class StudentRepositoryImpl implements StudentRepository {
     private int insertIntoStudentSocialStatusTable(Student student) {
 
         int numOfInserts = 0;
-        for (SocialStatus socialStatus : student.getSocialStatusList()) {
-            numOfInserts += jdbcTemplate.update(SQLqueries.INSERT_INTO_STUDENT_SOCIAL_STATUS_TABLE, student.getId(), socialStatus.getId());
+        for (int socialStatusId : student.getSocialStatusSet()) {
+            numOfInserts += jdbcTemplate.update(SQLqueries.INSERT_INTO_STUDENT_SOCIAL_STATUS_TABLE, student.getId(), socialStatusId);
         }
         return numOfInserts;
     }
+
     //------------------------------------------------------------------------------------------------------
+
     @Override
     public Student getStudentById(long studentId) {
 
@@ -250,15 +257,14 @@ public class StudentRepositoryImpl implements StudentRepository {
 //                "%" + searchValueForGroup + "%",
                 "%" + searchValueForSection + "%").get(0);
     }
-
+//-----------------------------------------------------------------------------------------------------------------
     @Override
     public List<Student> getFilteredStudentListOfSelectedGroup(
         int beginRow, int endRow,
         String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
         String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
         String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-        String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
-    ) {
+        String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection ) {
     String sql =
             "SELECT * FROM ( " +
                     "SELECT row_number() OVER (ORDER BY s.user_id) AS rownum, * " +
@@ -304,8 +310,7 @@ public class StudentRepositoryImpl implements StudentRepository {
             String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
             String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
             String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
-    ) {
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection ) {
         String sql =
                 "select count(*) " +
                         "from bdu_user bu join student s on bu.user_id = s.user_id " +
@@ -392,27 +397,25 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
     private int updateStudentInStudentSocialStatus(Student student) {
-        List<SocialStatus> updatedStatus = student.getSocialStatusList();
-        List<SocialStatus> currentStatusInDB = getSocialStatusListById(student.getId());
-        List<SocialStatus> statusToAdd = new ArrayList<>();
-        List<SocialStatus> statusToRemove = new ArrayList<>();
+        Set<Integer> updatedStatus = student.getSocialStatusSet();
+        Set<Integer> currentStatusInDB = getSocialStatusSetById(student.getId());
+        Set<Integer> statusToAdd = new HashSet<>();
+        Set<Integer> statusToRemove = new HashSet<>();
 
 //which statuses will be added
-        for (SocialStatus i : updatedStatus) {
+        for (Integer i : updatedStatus) {
             boolean flag = false;
-            for (SocialStatus j : currentStatusInDB) {
-                if (i.getId()==j.getId())
-                    flag = true;
+            for (Integer j : currentStatusInDB) {
+                if (i.equals(j)) flag = true;
             }
             if (!flag)
                 statusToAdd.add(i);
         }
 //which statuses will be removed
-        for (SocialStatus i : currentStatusInDB) {
+        for (Integer i : currentStatusInDB) {
             boolean flag = false;
-            for (SocialStatus j : updatedStatus) {
-                if (i.getId() == j.getId())
-                    flag = true;
+            for (Integer j : updatedStatus) {
+                if (i.equals(j)) flag = true;
             }
             if (!flag)
                 statusToRemove.add(i);
@@ -420,19 +423,19 @@ public class StudentRepositoryImpl implements StudentRepository {
 
 //add new statuses
         String sql = "INSERT INTO student_social_status VALUES (nextval('student_social_status_sequence'), ?, ?)";
-        for (SocialStatus status : statusToAdd) {
+        for (Integer status : statusToAdd) {
             jdbcTemplate.update(sql,
                     student.getId(),
-                    status.getId()
+                    status
             );
         }
 
 //remove old statuses
         sql = "DELETE FROM student_social_status WHERE user_id=? AND social_status_id=? ";
-        for (SocialStatus status : statusToRemove) {
+        for (Integer status : statusToRemove) {
             jdbcTemplate.update(sql,
                     student.getId(),
-                    status.getId()
+                    status
             );
         }
 
@@ -453,8 +456,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     public int getNumberOfFilteredStudentsNotGrouped(String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
                                                      String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
                                                      String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-                                                     String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
-    ) {
+                                                     String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection) {
 
         String sql =
                 "select count(*) " +
@@ -498,8 +500,7 @@ public class StudentRepositoryImpl implements StudentRepository {
                                                           String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
                                                           String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
                                                           String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-                                                          String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection
-    ) {
+                                                          String searchValueForFaculty, String searchValueForProfession, String searchValueForGroup, String searchValueForSection) {
 
 
         String sql =
@@ -546,14 +547,17 @@ public class StudentRepositoryImpl implements StudentRepository {
 //------------------------------------------------------------------------------------------------------
 
     @Override
-    public int getNumberOfStudentsOfSameGroup(long groupId) {
+    public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
+
         return jdbcTemplate.query(SQLqueries.GET_THE_NUMBER_OF_STUDENTS_OF_IDENTICAL_GROUP,
                 (resultSet, i) -> resultSet.getInt(1),
                 groupId).get(0);
+
     }
 
+
     @Override
-    public int getNumberOfFilteredStudentsOfSameGroup(String searchValue , long groupId) {
+    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId) {
         String sql = "select count(*) " +
                 "from bdu_user bu join student s on bu.user_id = s.user_id " +
                 "where lower(bu.name) LIKE lower(?) AND group_id = ? ";
@@ -566,7 +570,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
     @Override
-    public List<Student> getStudentsOfSameGroup(long groupId , String searchParam, int startRow, int endRow) {
+    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
 
         String sql = " select * from( " +
                 "select row_number() over(order by s.user_id) as rownum, * " +
@@ -580,39 +584,24 @@ public class StudentRepositoryImpl implements StudentRepository {
                 startRow,
                 endRow);
 
-        System.out.println("in getStudentsOfSameGroup metod " + studentList);
+        System.out.println("in getStudentsOfIdenticalGroup metod " + studentList);
 
         return  studentList;
     }
 
-//------------------------------------------------------------------------------------------------------
-
     @Override
-    public boolean delete(long id) {
-        return deleteFromBduUser(id)==1 && deleteFromStudent(id)==1 && deleteFromStudentSocialStatus(id)>=1;
+    public int delete(long userId) {
+        String sql =    "UPDATE bdu_user " +
+                        "SET status = ? " +
+                        "WHERE user_id = ?";
+        return jdbcTemplate.update(sql, Status.DELETED.name(), userId);
     }
-
-    private int deleteFromBduUser(long id){
-        String sql = "DELETE FROM bdu_user WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-    private int deleteFromStudent(long id){
-        String sql = "DELETE FROM student WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-    private int deleteFromStudentSocialStatus(long id){
-        String sql = "DELETE FROM student_social_status WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-//------------------------------------------------------------------------------------------------------
 
     private class StudentMapper implements RowMapper<Student> {
         @Override
         public Student mapRow(ResultSet resultSet, int i) throws SQLException {
             Student student = new Student();
+
             student.setId(resultSet.getLong("user_id"));
             student.setSurname(resultSet.getString("surname"));
             student.setName(resultSet.getString("name"));
@@ -629,7 +618,7 @@ public class StudentRepositoryImpl implements StudentRepository {
             student.setBirthPlace(resultSet.getString("birth_place"));
             student.setLivingPlace(resultSet.getString("living_place"));
             student.setOfficialHome(resultSet.getString("official_home"));
-            student.setSocialStatusList(getSocialStatusListById(resultSet.getLong("user_id")));
+            student.setSocialStatusSet(getSocialStatusSetById(resultSet.getLong("user_id")));
             student.setParentPhoneNumber(resultSet.getString("parent_num"));
             student.setGraduatedRegion(resultSet.getString("graduation_region"));
             student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
@@ -641,14 +630,18 @@ public class StudentRepositoryImpl implements StudentRepository {
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
             student.setGraduatedSchool(resultSet.getString("graduation_school"));
+            student.setEnabled( resultSet.getBoolean("enabled") );
+            student.setStatus( Status.valueOf(resultSet.getString("status")) );
+
             return student;
         }
     }
 
-    private List<SocialStatus> getSocialStatusListById(long userId ){
-        return jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
-                ((resultSet, i) -> new SocialStatus(resultSet.getLong(1), resultSet.getString(2), Status.ACTIVE) ),
+    private Set<Integer> getSocialStatusSetById( long userId ){
+        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+                ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
+        return new HashSet<>(socialStatusList);
     }
 
 }

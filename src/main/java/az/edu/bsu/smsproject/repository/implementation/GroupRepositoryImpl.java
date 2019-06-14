@@ -2,7 +2,6 @@ package az.edu.bsu.smsproject.repository.implementation;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import az.edu.bsu.smsproject.domain.Group;
-import az.edu.bsu.smsproject.domain.SocialStatus;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.GroupRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -14,7 +13,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -28,6 +26,7 @@ public class GroupRepositoryImpl implements GroupRepository {
     public GroupRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
 
     @Override
     public long createGroup(String profession, String section, String eduType, int year, int studentCount) {
@@ -115,7 +114,6 @@ public class GroupRepositoryImpl implements GroupRepository {
                 "%"+section+"%").get(0);
     }
 
-    //    ***********************************
     @Override
     public int getNumberOfFilteredGroups(String searchParam) {
         String myQuery = " SELECT count(*) FROM groups  WHERE LOWER(group_name) like LOWER (?)";
@@ -138,8 +136,6 @@ public class GroupRepositoryImpl implements GroupRepository {
         return groupsList;
     }
 
-//    ***********************************
-
     @Override
     public Group updateGroup(Group group) {
         return null;
@@ -149,15 +145,15 @@ public class GroupRepositoryImpl implements GroupRepository {
     public boolean deleteGroup(long groupId) {
         return false;
     }
-//**********************************************************************************************************************
+
     @Override
     public List<Group> groupStudents(String profession, String section, String eduType, int year, int groupCnt) {
 
         String sql = " select * " +
-                "from student s full outer join bdu_user bu on s.user_id = bu.user_id\n" +
+                "from student s join bdu_user bu on s.user_id = bu.user_id " +
                 "where s.profession = ? and s.section = ? and s.education_type = ?  and group_id is null ";
-        List<Student> studentList = new ArrayList<>();
-               studentList = jdbcTemplate.query(sql,
+
+        List<Student> studentList = jdbcTemplate.query(sql,
                 new StudentMapper(),
                 profession,
                 section,
@@ -190,9 +186,6 @@ public class GroupRepositoryImpl implements GroupRepository {
         }
 
         System.out.println("totalStudentCount = " + totalStudentCount);
-
-
-
 
         int listsize;
         int listsize2;
@@ -265,7 +258,6 @@ public class GroupRepositoryImpl implements GroupRepository {
 
         }
 
-
         if (totalStudentCount % groupCount == 0) {
 
             groupCapacity = totalStudentCount / groupCount;
@@ -284,12 +276,10 @@ public class GroupRepositoryImpl implements GroupRepository {
 
                 currentMemberCount = 0;
 
-
                 while (currentMemberCount < groupCapacity) {
 
                     if (currentMemberCount == groupCapacity)
                         break;
-
 
                     if (!higherScoredStudentList.isEmpty()) {
                         ++currentMemberCount;
@@ -377,14 +367,12 @@ public class GroupRepositoryImpl implements GroupRepository {
                         updateStudentGroupID(higherScoredStudentList.get(index).getId(), groupId);
                         System.out.println( i + ")" + higherScoredStudentList.get(index).getId() + " " + groupId);
                         higherScoredStudentList.remove(index);
-
                     }
 
 
                     if (currentMemberCount > groupCapacity) {
                         System.out.println("if scope before  !middleScoredStudentList.isEmpty() ");
                         break;
-
                     }
 
                     if (!middleScoredStudentList.isEmpty()) {
@@ -401,7 +389,6 @@ public class GroupRepositoryImpl implements GroupRepository {
                     if (currentMemberCount > groupCapacity) {
                         System.out.println("if scope before  !lowerScoredStudentList.isEmpty() ");
                         break;
-
                     }
 
                     if (!lowerScoredStudentList.isEmpty()) {
@@ -426,11 +413,10 @@ public class GroupRepositoryImpl implements GroupRepository {
         }
 
     }
-//**********************************************************************************************************************
 
     private int updateStudentGroupID(long studentId, long groupId) {
         String sql = "UPDATE student " +
-                "SET   group_id = ? " +
+                "SET group_id = ? " +
                 "WHERE user_id = ? ";
 
         return jdbcTemplate.update(sql,
@@ -456,6 +442,7 @@ public class GroupRepositoryImpl implements GroupRepository {
         @Override
         public Student mapRow(ResultSet resultSet, int i) throws SQLException {
             Student student = new Student();
+
             student.setId(resultSet.getLong("user_id"));
             student.setSurname(resultSet.getString("surname"));
             student.setName(resultSet.getString("name"));
@@ -472,7 +459,7 @@ public class GroupRepositoryImpl implements GroupRepository {
             student.setBirthPlace(resultSet.getString("birth_place"));
             student.setLivingPlace(resultSet.getString("living_place"));
             student.setOfficialHome(resultSet.getString("official_home"));
-            student.setSocialStatusList(getSocialStatusSetById(resultSet.getLong("user_id")));
+            student.setSocialStatusSet(getSocialStatusSetById(resultSet.getLong("user_id")));
             student.setParentPhoneNumber(resultSet.getString("parent_num"));
             student.setGraduatedRegion(resultSet.getString("graduation_region"));
             student.setEntryIdNumber(resultSet.getInt("entry_id_num"));
@@ -484,14 +471,19 @@ public class GroupRepositoryImpl implements GroupRepository {
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
             student.setGraduatedSchool(resultSet.getString("graduation_school"));
+            student.setEnabled( resultSet.getBoolean("enabled") );
+            student.setStatus( Status.valueOf(resultSet.getString("status")) );
+
             return student;
         }
     }
 
-    private List<SocialStatus> getSocialStatusSetById(long userId ){
-        return jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
-                ((resultSet, i) -> new SocialStatus(resultSet.getLong(1), resultSet.getString(2), Status.ACTIVE) ),
+    private Set<Integer> getSocialStatusSetById(long userId ){
+        List<Integer> socialStatusList = jdbcTemplate.query( SQLqueries.GET_SOCIAL_STATUS_SET_OF_STUDENT_BY_USER_ID,
+                ((resultSet, i) -> resultSet.getInt(1)),
                 userId);
+        return new HashSet<>(socialStatusList);
     }
+
 
 }

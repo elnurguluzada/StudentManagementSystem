@@ -3,11 +3,15 @@ package az.edu.bsu.smsproject.controller;
 import az.edu.bsu.smsproject.Service.*;
 import az.edu.bsu.smsproject.domain.*;
 import az.edu.bsu.smsproject.domain.Enums.Status;
+import az.edu.bsu.smsproject.domain.*;
+import az.edu.bsu.smsproject.domain.DataTransferObject.StudentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,13 +19,21 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/tutor")
@@ -31,17 +43,21 @@ public class TutorController {
     private final StudentService studentService;
     private final TutorService tutorService;
     private final GroupService groupService;
-    private final SocialStatusService socialStatusService;
     private final StudentValidation studentValidation;
+    private final PasswordEncoder passwordEncoder;
+    private final OrderService orderService;
+    private final SocialStatusService socialStatusService;
 
     @Autowired
-    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, SocialStatusService socialStatusService, StudentValidation studentValidation) {
+    public TutorController(StudentService studentService, CommonService commonService, TutorService tutorService, GroupService groupService, StudentValidation studentValidation, PasswordEncoder passwordEncoder, OrderService orderService, SocialStatusService socialStatusService) {
         this.studentService = studentService;
         this.commonService = commonService;
         this.tutorService = tutorService;
         this.groupService = groupService;
-        this.socialStatusService = socialStatusService;
         this.studentValidation = studentValidation;
+        this.passwordEncoder = passwordEncoder;
+        this.orderService = orderService;
+        this.socialStatusService = socialStatusService;
     }
 
     @InitBinder
@@ -50,42 +66,104 @@ public class TutorController {
 
         if (target == null)
             return;
-        if ( target.getClass() == Student.class )
+        if ( target.getClass() == StudentDTO.class )
             webDataBinder.setValidator(studentValidation);
+
     }
 
     @GetMapping(value = {"/index", "/"})
     public String index(){
         return "tutor/index";
     }
+
+    @ResponseBody @GetMapping("/showOrders")
+    public DataTable showOrders( @RequestParam(name = "draw") int draw,
+                                 @RequestParam(name = "start") int start,
+                                 @RequestParam(name = "length") int length,
+                                 @RequestParam(name = "search[value]") String searchValue ) {
+        int numberOfAllOrders = orderService.getNumberOfAllOrders();
+        int numberOfFilteredOrders = orderService.getNumberOfFilteredOrders();
+        List<Resource> filteredResourceList = orderService.getFilteredOrdersList(start, start+length);
+        if (start + length > numberOfFilteredOrders)
+            length = numberOfFilteredOrders - start;
+
+        String[][] data = new String[length][7];
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        for (int i = 0; i < length; i++) {
+            try {
+                Resource resource = filteredResourceList.get(i);
+                File file = resource.getFile();
+                BasicFileAttributes attributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+//                System.out.println(file.getPath());
+//                System.out.println(file.getAbsolutePath());
+//                System.out.println(file.getName());
+//                System.out.println(resource.getURL());
+//                System.out.println(resource.getURI());
+                data[i][0] = "<img src='"+resource.getURI()+"'/>";
+                data[i][1] = file.getName();
+                data[i][2] = dateFormat.format(new Date(attributes.creationTime().toMillis()));
+                data[i][3] = dateFormat.format(new Date(attributes.lastModifiedTime().toMillis()));
+                data[i][4] = String.valueOf(attributes.size());
+                data[i][5] = "<a href='/tutor/order/open/" + file.getName() + "'><button>Click</button></a>";
+                data[i][6] = "<a href='/tutor/order/download/" + file.getName() + "'><button>Click</button></a>";
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+        return new DataTable(draw, numberOfAllOrders, numberOfFilteredOrders, data);
+    }
+
+
+    @GetMapping("/order/open/{fileName}")
+    public ResponseEntity<Resource> openFile(@PathVariable("fileName") String fileName) {
+        Resource resource = null;
+        String contentType = "";
+        try {
+            resource = orderService.getOrderByName(fileName);
+            contentType = Files.probeContentType(resource.getFile().toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+    }
+
+    @GetMapping("/order/download/{fileName}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName){
+        Resource resource = orderService.getOrderByName(fileName);
+        String contentType = "";
+        try {
+            contentType = Files.probeContentType(resource.getFile().toPath());
+
+        } catch (IOException e) { e.printStackTrace(); }
+
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+resource.getFilename())
+                .body(resource);
+    }
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
+
     @GetMapping("/studentForm")
     public ModelAndView showStudentForm(){
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
-        List<SocialStatus> socialStatusList = socialStatusService.getSocialStatusList();
-
-        Student student = new Student();
-        student.setSocialStatusList(socialStatusList);
-        System.out.println( student.getSocialStatusList() );
-
-        modelAndView.addObject("student", student).addObject("sslist",socialStatusList);
+        modelAndView.addObject("student", new StudentDTO()).addObject("list", socialStatusService.getSocialStatusList());
         return modelAndView;
     }
 
     @PostMapping("/addStudent")
-    public ModelAndView addStudent( @Valid @ModelAttribute("student") Student student, Errors errors ){
-        System.out.println(student);
+    public ModelAndView addStudent( @Valid @ModelAttribute("student") StudentDTO studentDTO, Errors errors ){
+        System.out.println(studentDTO);
         System.out.println(errors);
         ModelAndView modelAndView = new ModelAndView("tutor/StudentRegistration/addStudent");
 
         if ( !errors.hasErrors() ){
+            Student student = studentDTO.toStudent(passwordEncoder);
+            System.out.println(student);
             if ( studentService.addStudent( student ).isPresent() )
                 modelAndView.addObject("success", true);
             else
                 modelAndView.addObject("success", false);
         }
         else
-            modelAndView.addObject("success", false);
+            modelAndView.addObject("list", socialStatusService.getSocialStatusList());
 
         return modelAndView;
     }
@@ -101,7 +179,8 @@ public class TutorController {
     }
 
     @ResponseBody @GetMapping("/getSections")
-    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession){
+    public Set<String> getSections(@RequestParam(name="year") int year, @RequestParam(name="faculty") String faculty, @RequestParam(name="profession") String profession
+    ){
         return commonService.getSectionSet(year, faculty, profession);
     }
  //--------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,9 +252,10 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = stringfySocialStatusList( student.getSocialStatusList() );
+            data[i][24] = student.getSocialStatusSet().toString();
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
 //            todo scholarship status
+
         }
 
         return new DataTable(draw, numberOfAllStudents, numberOfFilteredStudents, data);
@@ -196,7 +276,7 @@ public class TutorController {
     @PostMapping("/updateStudent")
     public ModelAndView updateStudent( @Valid @ModelAttribute(name = "student") Student student, BindingResult bindingResult ){
 //        bindingResult.getAllErrors().forEach(System.out::println);
-        System.out.println(student);
+//        System.out.println(student);
         ModelAndView modelAndView = new ModelAndView("tutor/StudentList/updateStudentForm");
         if ( !bindingResult.hasErrors() ){
             boolean success = studentService.updateStudent(student).isPresent();
@@ -312,7 +392,7 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
+            data[i][24] = stringfySocialStatusSet(student.getSocialStatusSet());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
 //            todo scholarship status
         }
@@ -323,7 +403,7 @@ public class TutorController {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     @GetMapping("/getGroupMembers")
-    public ModelAndView getStudentsOfSameGroup(@RequestParam("groupId") long groupId,
+    public ModelAndView getStudentsOfIdenticalGroup(@RequestParam("groupId") long groupId,
                                                     HttpSession httpSession) {
         //httpServletRequest.setAttribute("groupId" , groupId);
         httpSession.setAttribute("groupId" , groupId);
@@ -350,14 +430,14 @@ public class TutorController {
         DataTable dataTable = new DataTable();
         dataTable.setDraw(draw);
 
-        int numberOfStudentsOfGroup = studentService.getNumberOfStudentsOfSameGroup(groupId);
+        int numberOfStudentsOfGroup = studentService.getNumberOfStudentsOfIdenticalGroup(groupId);
         dataTable.setRecordsTotal(numberOfStudentsOfGroup);
 
 
-        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfSameGroup( searchValue, groupId);
+        int numberOfFilteredStudentsOfGroup = studentService.getNumberOfFilteredStudentsOfIdenticalGroup( searchValue, groupId);
         dataTable.setRecordsFiltered(numberOfFilteredStudentsOfGroup);
 
-        List<Student> studentList = studentService.getStudentsOfSameGroup( groupId, searchValue , start , start + length);
+        List<Student> studentList = studentService.getStudentsOfIdenticalGroup( groupId, searchValue , start , start + length);
 
         System.out.println(studentList);
 
@@ -391,7 +471,7 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
+            data[i][24] = stringfySocialStatusSet(student.getSocialStatusSet());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
 //            todo scholarship status
         }
@@ -491,7 +571,7 @@ public class TutorController {
             data[i][21] = student.getIdCardNumber();
             data[i][22] = student.getIdCardFinCode();
             data[i][23] = String.valueOf(student.getGender());
-            data[i][24] = stringfySocialStatusList(student.getSocialStatusList());
+            data[i][24] = stringfySocialStatusSet(student.getSocialStatusSet());
 //            data[i][25] = "<a href='#' class='sth' customerId='"+ student.getId() +"'></a>";
 
             /*
@@ -595,82 +675,19 @@ public class TutorController {
     }
 */
 
-    @ResponseBody @GetMapping("/showOrders")
-    public DataTable showOrders(
-            @RequestParam(name = "draw") int draw,
-            @RequestParam(name = "start") int start,
-            @RequestParam(name = "length") int length,
-            @RequestParam(name = "search[value]") String searchValue ) {
-
-        int numberOfAllOrders = commonService.getNumberOfAllOrders();
-        int numberOfFilteredOrders = commonService.getNumberOfFilteredOrders();
-        List<Resource> filteredResourceList = commonService.getFilteredOrdersList(start, start+length);
-        if (start + length > numberOfFilteredOrders)
-            length = numberOfFilteredOrders - start;
-
-        String[][] data = new String[length][7];
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        for (int i = 0; i < length; i++) {
-            try {
-                Resource resource = filteredResourceList.get(i);
-                File file = resource.getFile();
-                BasicFileAttributes attributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                System.out.println(file.getPath());
-                System.out.println(file.getAbsolutePath());
-                System.out.println(file.getName());
-                System.out.println(resource.getURL());
-                System.out.println(resource.getURI());
-                data[i][0] = "<img src='"+resource.getURI()+"'/>";
-                data[i][1] = file.getName();
-                data[i][2] = dateFormat.format(new Date(attributes.creationTime().toMillis()));
-                data[i][3] = dateFormat.format(new Date(attributes.lastModifiedTime().toMillis()));
-                data[i][4] = String.valueOf(attributes.size());
-                data[i][5] = "<a href='/tutor/order/open/" + file.getName() + "'><button>Click</button></a>";
-                data[i][6] = "<a href='/tutor/order/download/" + file.getName() + "'><button>Click</button></a>";
-            } catch (IOException e) { e.printStackTrace(); }
-        }
-        return new DataTable(draw, numberOfAllOrders, numberOfFilteredOrders, data);
-    }
-
-
-    @GetMapping("/order/open/{fileName}")
-    public ResponseEntity<Resource> openFile(@PathVariable("fileName") String fileName) {
-        Resource resource = null;
-        String contentType = "";
-        try {
-            resource = commonService.getOrderByName(fileName);
-            contentType = Files.probeContentType(resource.getFile().toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
-    }
-
-    @GetMapping("/order/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName){
-        Resource resource = commonService.getOrderByName(fileName);
-        String contentType = "";
-        try {
-            contentType = Files.probeContentType(resource.getFile().toPath());
-
-        } catch (IOException e) { e.printStackTrace(); }
-
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+resource.getFilename())
-                .body(resource);
-    }
 
     @GetMapping("/chat")
     public String chat(){
         return "tutor/chat";
     }
 
-    private String stringfySocialStatusList(List<SocialStatus> socialStatusList){
-        String result = "";
-        for (SocialStatus s: socialStatusList)
-            result += s.getName()+", ";
+    private String stringfySocialStatusSet(Set<Integer> socialStatusList){
+//        String result = "";
+//        for (SocialStatus s: socialStatusList)
+//            result += s.getName()+", ";
 
-        return result.equals("")?"":result.substring(0, result.length()-2);
+//        return result.equals("")?"":result.substring(0, result.length()-2);
+        return ""; //todo complete it
     }
 
 }

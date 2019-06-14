@@ -14,5 +14,6 @@ public class StudentRestClient {
         StudentListWrapper studentListWrapper = restTemplate.getForObject("http://localhost:8080/studentRest/", StudentListWrapper.class);
         System.out.println( studentListWrapper.getStudentList() );
 
+        restTemplate.delete("http://localhost:8080/studentRest/delete/8");
     }
 }

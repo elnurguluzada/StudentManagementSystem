@@ -59,8 +59,8 @@ public class StudentServiceImpl implements StudentService {
             String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
             String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
             String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
-    ){
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection ){
+
         return studentRepository.getFilteredStudentListOfSelectedGroup(
                 beginRow, endRow,
                 searchValueForName,  searchValueForSurname,  searchValueForFatherName,
@@ -69,12 +69,13 @@ public class StudentServiceImpl implements StudentService {
                 searchValueForFaculty,  searchValueForProfession,  groupId,  searchValueForSection
         );
     }
+
     public int getNumberOfFilteredStudentsOfSelectedGroup(
             String searchValueForName, String searchValueForSurname, String searchValueForFatherName,
             String searchValueForBirthDate, String searchValueForBirthPlace, String searchValueForLivingPlace,
             String searchValueForEntryYear, String searchValueForGraduationRegion, String searchValueForEntryScore,
-            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection
-    ){
+            String searchValueForFaculty, String searchValueForProfession, int groupId, String searchValueForSection ){
+
         return studentRepository.getNumberOfFilteredStudentsOfSelectedGroup(
                 searchValueForName,  searchValueForSurname,  searchValueForFatherName,
                 searchValueForBirthDate,  searchValueForBirthPlace,  searchValueForLivingPlace,
@@ -84,23 +85,23 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> getStudentsOfSameGroup(long groupId , String searchParam, int startRow, int endRow) {
-        return  studentRepository.getStudentsOfSameGroup(groupId , searchParam , startRow , endRow);
+    public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow) {
+        return  studentRepository.getStudentsOfIdenticalGroup(groupId , searchParam , startRow , endRow);
     }
 
     @Override
-    public boolean delete(long id) {
-        return studentRepository.delete(id);
+    public int delete(long userId) {
+        return studentRepository.delete(userId);
     }
 
     @Override
-    public int getNumberOfStudentsOfSameGroup(long groupId) {
-        return studentRepository.getNumberOfStudentsOfSameGroup(groupId);
+    public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
+        return studentRepository.getNumberOfStudentsOfIdenticalGroup(groupId);
     }
 
     @Override
-    public int getNumberOfFilteredStudentsOfSameGroup(String searchValue, long groupId) {
-        return studentRepository.getNumberOfFilteredStudentsOfSameGroup(searchValue , groupId);
+    public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue, long groupId) {
+        return studentRepository.getNumberOfFilteredStudentsOfIdenticalGroup(searchValue , groupId);
     }
 
     @Override
