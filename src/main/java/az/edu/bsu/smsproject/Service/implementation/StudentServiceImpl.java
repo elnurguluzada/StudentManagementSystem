@@ -90,8 +90,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean delete(long id) {
-        return studentRepository.delete(id);
+    public int delete(long userId) {
+        return studentRepository.delete(userId);
     }
 
     @Override

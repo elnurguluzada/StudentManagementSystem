@@ -485,6 +485,7 @@ public class GroupRepositoryImpl implements GroupRepository {
             student.setGroupId(resultSet.getInt("group_id"));
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
+            student.setStatus( Status.valueOf(resultSet.getString("status")) );
             return student;
         }
     }

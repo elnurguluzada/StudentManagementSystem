@@ -60,5 +60,5 @@ public interface StudentService {
     public int getNumberOfStudentsOfIdenticalGroup(long groupId);
     public int getNumberOfFilteredStudentsOfIdenticalGroup(String searchValue , long groupId);
     public List<Student> getStudentsOfIdenticalGroup(long groupId , String searchParam, int startRow, int endRow);
-    public boolean delete(long id);
+    public int delete(long userId);
 }

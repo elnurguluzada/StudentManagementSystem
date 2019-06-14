@@ -1,5 +1,6 @@
 package az.edu.bsu.smsproject.repository.implementation;
 
+import az.edu.bsu.smsproject.domain.Enums.Status;
 import az.edu.bsu.smsproject.domain.Student;
 import az.edu.bsu.smsproject.repository.RoleRepository;
 import az.edu.bsu.smsproject.repository.SQLqueries;
@@ -49,7 +50,7 @@ public class StudentRepositoryImpl implements StudentRepository {
     private long insertIntoUserTable(Student student ){
         int roleIdOfStudent = roleRepository.getRoleIdByName("student");
 
-        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE , Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR);
+        PreparedStatementCreatorFactory factory = new PreparedStatementCreatorFactory(SQLqueries.INSERT_STUDENT_INTO_BDU_USER_TABLE , Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.BOOLEAN);
         factory.setReturnGeneratedKeys(true);
         PreparedStatementCreator creator = factory.newPreparedStatementCreator( new Object[]{
                 roleIdOfStudent,
@@ -59,7 +60,9 @@ public class StudentRepositoryImpl implements StudentRepository {
                 student.getPassword(),
                 student.getPhoneNumber(),
                 student.getFaculty(),
-                student.getGender()
+                student.getGender(),
+                student.getStatus().name(),
+                student.isEnabled()
         });
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -544,9 +547,6 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 //------------------------------------------------------------------------------------------------------
 
-
-
-
     @Override
     public int getNumberOfStudentsOfIdenticalGroup(long groupId) {
 
@@ -591,26 +591,12 @@ public class StudentRepositoryImpl implements StudentRepository {
     }
 
     @Override
-    public boolean delete(long id) {
-        return deleteFromBduUser(id)==1 && deleteFromStudent(id)==1 && deleteFromStudentSocialStatus(id)>=1;
+    public int delete(long userId) {
+        String sql =    "UPDATE bdu_user " +
+                        "SET status = ? " +
+                        "WHERE user_id = ?";
+        return jdbcTemplate.update(sql, Status.DELETED.name(), userId);
     }
-
-    private int deleteFromBduUser(long id){
-        String sql = "DELETE FROM bdu_user WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-    private int deleteFromStudent(long id){
-        String sql = "DELETE FROM student WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-    private int deleteFromStudentSocialStatus(long id){
-        String sql = "DELETE FROM student_social_status WHERE user_id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-//    *******************************************************
 
     private class StudentMapper implements RowMapper<Student> {
         @Override
@@ -644,6 +630,7 @@ public class StudentRepositoryImpl implements StudentRepository {
             student.setScholarshipStatus(resultSet.getInt("scholarship_status"));
             student.setEntryYear(resultSet.getInt("entry_year"));
             student.setGraduatedSchool(resultSet.getString("graduation_school"));
+            student.setStatus( Status.valueOf(resultSet.getString("status")) );
             return student;
         }
     }

@@ -1,6 +1,7 @@
 package az.edu.bsu.smsproject.domain;
 
 
+import az.edu.bsu.smsproject.domain.DataTransferObject.StudentDTO;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 public class StudentValidation implements Validator {
     @Override
     public boolean supports(Class<?> aClass) {
-        return aClass.equals(Student.class);
+        return aClass.equals(StudentDTO.class);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class StudentValidation implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "profession", "addStudent.profession.required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "section", "addStudent.section.required");
 
-        Student student = (Student) o;
+        StudentDTO student = (StudentDTO) o;
         EmailValidator emailValidator = EmailValidator.getInstance();
 
         if (!errors.hasErrors()){

@@ -2,12 +2,18 @@ package az.edu.bsu.smsproject.domain;
 
 import az.edu.bsu.smsproject.domain.Enums.Status;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-
-public abstract class User extends BaseDomain implements Serializable, Comparable<User> {
+//todo think about abstract
+public class User extends BaseDomain implements Serializable, Comparable<User>, UserDetails {
     private static final long serialVersionUID = -1691632973585761641L;
 
     protected long roleId;
@@ -17,8 +23,10 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
     protected String phoneNumber;
     protected String faculty;
     protected char gender;
+    private String authority;
+    private boolean enabled;
 
-    public User(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender) {
+    public User(long id, String name, Status status, long roleId, String surname, String email, String password, String phoneNumber, String faculty, char gender, String authority, boolean enabled) {
         super(id, name, status);
         this.roleId = roleId;
         this.surname = surname;
@@ -27,16 +35,53 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
         this.phoneNumber = phoneNumber;
         this.faculty = faculty;
         this.gender = gender;
+        this.authority = authority;
+        this.enabled = enabled;
     }
 
     public User() {
-        surname = "";
-        email = "";
-        password = "";
-        phoneNumber = "";
-        faculty = "";
+        this(0, "", Status.ACTIVE, 0, "", "", "", "", "", ' ', "", true);
     }
 
+// Spring Security --
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println("authority: "+authority);
+        return Arrays.asList(new SimpleGrantedAuthority(authority));
+    }
+
+    @Override
+    public String getUsername() {
+        System.out.println("getUsername: "+ email);
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        System.out.println("isAccountNonExpired: "+true);
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        System.out.println("isAccountNonLocked: "+true);
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        System.out.println("isCredentialsNonExpired: "+true);
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        System.out.println("isEnabled: " + enabled);
+        return enabled;
+    }
+
+// Spring Security --
 
     //TODO make sure
     @Override
@@ -64,16 +109,21 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
         return Objects.hash(id, name, email);
     }
 
+
     @Override
     public String toString() {
         return "User{" +
-                "roleId=" + roleId +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", roleId=" + roleId +
                 ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", faculty='" + faculty + '\'' +
                 ", gender=" + gender +
+                ", authority='" + authority + '\'' +
+                ", status=" + status +
                 '}';
     }
 
@@ -87,6 +137,18 @@ public abstract class User extends BaseDomain implements Serializable, Comparabl
             else
                 return this.surname.compareTo(o.getSurname());
         }
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
     public long getRoleId() {
